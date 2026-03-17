@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find . -maxdepth 3 -type f \\\\\\(-name .cursorrules -o -name *.md -o -name .cursor \\\\\\))",
+      "Bash(npx shadcn@latest add card input --yes)",
+      "Bash(npm run:*)",
+      "mcp__claude_ai_Figma__get_design_context",
+      "mcp__claude_ai_Figma__get_screenshot",
+      "mcp__claude_ai_Figma__whoami",
+      "mcp__figma-dev-mode-mcp-server__get_design_context",
+      "mcp__figma-dev-mode-mcp-server__get_screenshot",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}
