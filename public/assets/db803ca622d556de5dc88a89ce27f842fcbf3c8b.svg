@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#6366F1"/>
+  <path d="M8 24V8h6l4 10 4-10h6v16h-4v-10l-3.5 10h-5L12 14v10H8z" fill="white"/>
+  <text x="40" y="22" font-family="Inter, sans-serif" font-weight="700" font-size="16" fill="#1E1B4B">CoreRecruiter</text>
+</svg>

@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const logoSvg = "http://localhost:3845/assets/db803ca622d556de5dc88a89ce27f842fcbf3c8b.svg"
+const logoSvg = "/assets/db803ca622d556de5dc88a89ce27f842fcbf3c8b.svg"
 
 const navItems = [
   { icon: LayoutDashboard, href: "/dashboard/hr",            label: "Overview"  },
