@@ -21,12 +21,9 @@ const logoSvg = "/assets/db803ca622d556de5dc88a89ce27f842fcbf3c8b.svg"
 const navItems = [
   { icon: LayoutDashboard, href: "/dashboard/hr",            label: "Overview"  },
   { icon: Briefcase,       href: "/dashboard/hr/jobs",       label: "Jobs"      },
-  { icon: CalendarDays,    href: "/dashboard/hr/calendar",   label: "Calendar"  },
-  { icon: MessageSquare,   href: "/dashboard/hr/messages",   label: "Messages", badge: true },
   { icon: Users,           href: "/dashboard/hr/employees",  label: "Employees",
     matchGroup: ["/dashboard/hr/employees", "/dashboard/hr/departments", "/dashboard/hr/payroll", "/dashboard/hr/leave", "/dashboard/hr/history"] },
   { icon: Monitor,         href: "/dashboard/hr/reports",    label: "Reports"   },
-  { icon: Package,         href: "/dashboard/hr/packages",   label: "Packages"  },
   { icon: ClipboardList,   href: "/dashboard/hr/tasks",      label: "Tasks"     },
 ]
 

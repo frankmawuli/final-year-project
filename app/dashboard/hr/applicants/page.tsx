@@ -215,7 +215,8 @@ const allCandidates: Candidate[] = [
   },
 ]
 
-const ROWS_PER_PAGE = 9
+const ROWS_PER_PAGE = 8
+const TABLE_COLUMNS = "grid-cols-[minmax(0,2fr)_minmax(0,2fr)_96px_minmax(0,1.2fr)_minmax(0,1.5fr)]"
 
 // ── Social icon buttons ────────────────────────────────────────
 function FacebookIcon() {
@@ -324,9 +325,6 @@ export default function ApplicantsPage() {
         </nav>
 
         <div className="flex flex-col gap-3">
-          <button className="w-full rounded px-3 py-2.5 text-left text-base font-medium text-[#324054] hover:bg-muted">
-            Settings
-          </button>
           <div className="flex items-center gap-2 rounded-lg px-3 py-2">
             <img src={profilePhoto} alt="Michael Smith" className="size-10 shrink-0 rounded-full object-cover" />
             <div className="flex min-w-0 flex-col">
@@ -357,21 +355,24 @@ export default function ApplicantsPage() {
         {/* Table card */}
         <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
           {/* Table header */}
-          <div className="grid grid-cols-[2fr_2fr_auto_1.2fr_1.5fr] items-center border-b border-border px-6 py-3">
+          <div className={cn("grid items-center gap-x-4 border-b border-border px-6 py-3  ", TABLE_COLUMNS)}>
             {["Candidate Name", "Email", "Social", "City", "Job Title"].map((col) => (
-              <span key={col} className="text-sm font-medium text-[#1f2937]">
+              <span key={col} className="text-sm font-medium text-[#1f2937] ">
                 {col}
               </span>
             ))}
           </div>
-
+ 
           {/* Rows */}
           <div className="flex-1 overflow-y-auto divide-y divide-border">
             {paginated.length > 0 ? (
               paginated.map((candidate) => (
                 <div
                   key={candidate.id}
-                  className="grid grid-cols-[2fr_2fr_auto_1.2fr_1.5fr] items-center gap-x-4 px-6 py-3.5 transition-colors hover:bg-[#f8fafc]"
+                  className={cn(
+                    "grid items-center gap-x-4 px-6 py-3.5 transition-colors hover:bg-[#f8fafc]",
+                    TABLE_COLUMNS
+                  )}
                 >
                   {/* Candidate Name */}
                   <div className="flex items-center gap-3 min-w-0">
@@ -389,7 +390,7 @@ export default function ApplicantsPage() {
                   <span className="truncate text-sm text-[#667388]">{candidate.email}</span>
 
                   {/* Social */}
-                  <div className="flex justify-start pr-6">
+                  <div className="flex justify-start">
                     <SocialLinks social={candidate.social} />
                   </div>
 

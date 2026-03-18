@@ -10,7 +10,12 @@
       "mcp__figma-dev-mode-mcp-server__get_design_context",
       "mcp__figma-dev-mode-mcp-server__get_screenshot",
       "Bash(npm install:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(mkdir -p D:/core-recruiter/public/assets)",
+      "Bash(curl -s -O http://localhost:3845/assets/db803ca622d556de5dc88a89ce27f842fcbf3c8b.svg -O http://localhost:3845/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png -O http://localhost:3845/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png -O http://localhost:3845/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png -O http://localhost:3845/assets/cf9965b714128bf9b66e7daf6ad58bf5300b9eea.png -O http://localhost:3845/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png -O http://localhost:3845/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png -O http://localhost:3845/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png -O http://localhost:3845/assets/635a3bf857069957b4442100197a1e910ea3121d.png -O http://localhost:3845/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png -O http://localhost:3845/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png -O http://localhost:3845/assets/2aa4ccfe7aa8b40d03bc579f255782e2d4894460.png -O http://localhost:3845/assets/ebd4a3a11f0187a98b13e4c169aed2f3d43383cf.png -O http://localhost:3845/assets/436771083b9e6fbf3b904cb9059f230ff9ac3c54.png -O http://localhost:3845/assets/9162b46046ea191cf2521da217a47666fbc1dd85.png -O http://localhost:3845/assets/06f94aa9dc854a370f71bf1ebb26ed778dcf8302.png -O http://localhost:3845/assets/9e3b4e81174edab916396a375259694534e63067.png -O http://localhost:3845/assets/aaaa09271295e3a0e2de430793dd620b97f19e60.png -O http://localhost:3845/assets/bc29c53acc3a7842572d5ad4194df98ca02711de.png -O http://localhost:3845/assets/2dba1db7966039308370470fce52b3b220f9a3fb.png -O http://localhost:3845/assets/5f121b335ad17b18af3c3c797e7a5f1afc3ec39f.png -O http://localhost:3845/assets/b576687fbeec177fd13f21dd8dbc7c15d0e204cb.png -O http://localhost:3845/assets/8f6f543c46450ef718dbf42187ca471c92a99cbf.svg -O http://localhost:3845/assets/ead6b51bacf1ba5639ebedd3818eabae4109fb3d.svg -O http://localhost:3845/assets/e4478e9b5a6f2c79870bedf6446dd7b9c9c09ee0.png -O http://localhost:3845/assets/277048e308d3c618330fc9b64ac87f9bdc187ddd.png)",
+      "Bash(cd:*)",
+      "Bash(sed -i 's/formatter={\\(v: number\\) => \\\\[`\\\\${v}%`, \"\"Attendance\"\"\\\\]}/formatter={\\(v\\) => [`${v}%`, \"\"Attendance\"\"]}/' app/dashboard/hr/page.tsx)",
+      "Bash(sed -i 's/formatter={\\(v: number\\) => \\\\[v, \"\"Employees\"\"\\\\]}/formatter={\\(v\\) => [v, \"\"Employees\"\"]}/' app/dashboard/hr/page.tsx)"
     ]
   }
 }

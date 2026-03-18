@@ -305,8 +305,7 @@ export default function JobsPage() {
         {/* Header row */}
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-semibold text-[#1f2937]">Job Listings</h1>
-            <p className="text-sm text-[#667388]">{filtered.length} listing{filtered.length !== 1 ? "s" : ""} found</p>
+           
           </div>
           <button
             onClick={() => setShowModal(true)}

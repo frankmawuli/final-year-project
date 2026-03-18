@@ -207,7 +207,7 @@ const initial: Candidate[] = [
   },
 ]
 
-const ROWS_PER_PAGE = 9
+const ROWS_PER_PAGE = 8
 
 // ── Sub-components ─────────────────────────────────────────────
 
@@ -513,9 +513,6 @@ export default function EvaluationPage() {
           ))}
         </nav>
         <div className="flex flex-col gap-3">
-          <button className="w-full rounded px-3 py-2.5 text-left text-base font-medium text-[#324054] hover:bg-muted">
-            Settings
-          </button>
           <div className="flex items-center gap-2 rounded-lg px-3 py-2">
             <img src={profilePhoto} alt="Michael Smith" className="size-10 shrink-0 rounded-full object-cover" />
             <div className="flex min-w-0 flex-col">
