@@ -24,20 +24,20 @@ import {
 } from "recharts"
 
 // ── Asset URLs ──────────────────────────────────────────────
-const profilePhoto = "http://localhost:3845/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
+const profilePhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
 
 const activityPhotos = [
-  "http://localhost:3845/assets/2aa4ccfe7aa8b40d03bc579f255782e2d4894460.png",
-  "http://localhost:3845/assets/ebd4a3a11f0187a98b13e4c169aed2f3d43383cf.png",
-  "http://localhost:3845/assets/436771083b9e6fbf3b904cb9059f230ff9ac3c54.png",
-  "http://localhost:3845/assets/9162b46046ea191cf2521da217a47666fbc1dd85.png",
-  "http://localhost:3845/assets/06f94aa9dc854a370f71bf1ebb26ed778dcf8302.png",
+  "/assets/2aa4ccfe7aa8b40d03bc579f255782e2d4894460.png",
+  "/assets/ebd4a3a11f0187a98b13e4c169aed2f3d43383cf.png",
+  "/assets/436771083b9e6fbf3b904cb9059f230ff9ac3c54.png",
+  "/assets/9162b46046ea191cf2521da217a47666fbc1dd85.png",
+  "/assets/06f94aa9dc854a370f71bf1ebb26ed778dcf8302.png",
 ]
 
 const customerPhotos = [
-  "http://localhost:3845/assets/9e3b4e81174edab916396a375259694534e63067.png",
-  "http://localhost:3845/assets/aaaa09271295e3a0e2de430793dd620b97f19e60.png",
-  "http://localhost:3845/assets/bc29c53acc3a7842572d5ad4194df98ca02711de.png",
+  "/assets/9e3b4e81174edab916396a375259694534e63067.png",
+  "/assets/aaaa09271295e3a0e2de430793dd620b97f19e60.png",
+  "/assets/bc29c53acc3a7842572d5ad4194df98ca02711de.png",
 ]
 
 // ── Chart Data ───────────────────────────────────────────────

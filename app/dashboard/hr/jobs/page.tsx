@@ -9,7 +9,7 @@ import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
 
 // ── Asset URLs ───────────────────────────────────────────────
-const profilePhoto = "http://localhost:3845/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
+const profilePhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
 
 // ── Types ─────────────────────────────────────────────────────
 type JobStatus = "Open" | "Closed" | "Draft"

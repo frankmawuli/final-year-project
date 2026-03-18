@@ -7,22 +7,22 @@ import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
 
 // ── Asset URLs ───────────────────────────────────────────────
-const profilePhoto = "http://localhost:3845/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
+const profilePhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
 
 // ── Candidate photos ─────────────────────────────────────────
 const photos = {
-  tigerNixon:         "http://localhost:3845/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
-  garrettWinters:     "http://localhost:3845/assets/2dba1db7966039308370470fce52b3b220f9a3fb.png",
-  ashtonCox:          "http://localhost:3845/assets/5f121b335ad17b18af3c3c797e7a5f1afc3ec39f.png",
-  tigerNixon2:        "http://localhost:3845/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
-  cedricKelly:        "http://localhost:3845/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
-  airiSatou:          "http://localhost:3845/assets/e4478e9b5a6f2c79870bedf6446dd7b9c9c09ee0.png",
-  brielleWilliamson:  "http://localhost:3845/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
-  herrodChandler:     "http://localhost:3845/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
-  rhonaDavidson:      "http://localhost:3845/assets/277048e308d3c618330fc9b64ac87f9bdc187ddd.png",
-  colleenHurst:       "http://localhost:3845/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
-  soonyaeKim:         "http://localhost:3845/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png",
-  jennaElliott:       "http://localhost:3845/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png",
+  tigerNixon:         "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
+  garrettWinters:     "/assets/2dba1db7966039308370470fce52b3b220f9a3fb.png",
+  ashtonCox:          "/assets/5f121b335ad17b18af3c3c797e7a5f1afc3ec39f.png",
+  tigerNixon2:        "/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
+  cedricKelly:        "/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
+  airiSatou:          "/assets/e4478e9b5a6f2c79870bedf6446dd7b9c9c09ee0.png",
+  brielleWilliamson:  "/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
+  herrodChandler:     "/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
+  rhonaDavidson:      "/assets/277048e308d3c618330fc9b64ac87f9bdc187ddd.png",
+  colleenHurst:       "/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
+  soonyaeKim:         "/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png",
+  jennaElliott:       "/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png",
 }
 
 // ── Types ─────────────────────────────────────────────────────
@@ -394,14 +394,14 @@ export default function ApplicantsPage() {
                   </div>
 
                   {/* City */}
-                  <span className="truncate text-sm text-[#667388]">{candidate.city}</span>
+                  <span className="truncate text-sm text-[#667388] ">{candidate.city}</span>
 
                   {/* Job Title */}
                   <span className="truncate text-sm text-[#667388]">{candidate.position}</span>
                 </div>
               ))
             ) : (
-              <div className="flex h-32 items-center justify-center text-sm text-[#8181a5]">
+              <div className="flex h-32 items-center justify-center text-sm text-[#8181a52f]">
                 No applicants match your search.
               </div>
             )}

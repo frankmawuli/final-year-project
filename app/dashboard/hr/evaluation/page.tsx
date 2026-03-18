@@ -11,18 +11,18 @@ import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
 
 // ── Asset URLs ────────────────────────────────────────────────
-const profilePhoto = "http://localhost:3845/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
+const profilePhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
 
 const photos = {
-  a: "http://localhost:3845/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
-  b: "http://localhost:3845/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
-  c: "http://localhost:3845/assets/cf9965b714128bf9b66e7daf6ad58bf5300b9eea.png",
-  d: "http://localhost:3845/assets/2dba1db7966039308370470fce52b3b220f9a3fb.png",
-  e: "http://localhost:3845/assets/5f121b335ad17b18af3c3c797e7a5f1afc3ec39f.png",
-  f: "http://localhost:3845/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
-  g: "http://localhost:3845/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
-  h: "http://localhost:3845/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
-  i: "http://localhost:3845/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
+  a: "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
+  b: "/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
+  c: "/assets/cf9965b714128bf9b66e7daf6ad58bf5300b9eea.png",
+  d: "/assets/2dba1db7966039308370470fce52b3b220f9a3fb.png",
+  e: "/assets/5f121b335ad17b18af3c3c797e7a5f1afc3ec39f.png",
+  f: "/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
+  g: "/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
+  h: "/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
+  i: "/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
 }
 
 // ── Types ─────────────────────────────────────────────────────

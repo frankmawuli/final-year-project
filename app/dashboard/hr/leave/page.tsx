@@ -7,18 +7,18 @@ import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
 
 // ── Assets ────────────────────────────────────────────────────
-const adminPhoto = "http://localhost:3845/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
+const adminPhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
 
 const photos: Record<string, string> = {
-  "Michael Chen":     "http://localhost:3845/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
-  "Sarah Williams":   "http://localhost:3845/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png",
-  "David Rodriguez":  "http://localhost:3845/assets/cf9965b714128bf9b66e7daf6ad58bf5300b9eea.png",
-  "James Anderson":   "http://localhost:3845/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
-  "Jessica Martinez": "http://localhost:3845/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png",
-  "Robert Taylor":    "http://localhost:3845/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
-  "Priya Patel":      "http://localhost:3845/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
-  "Lena Schmidt":     "http://localhost:3845/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
-  "Omar Hassan":      "http://localhost:3845/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
+  "Michael Chen":     "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
+  "Sarah Williams":   "/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png",
+  "David Rodriguez":  "/assets/cf9965b714128bf9b66e7daf6ad58bf5300b9eea.png",
+  "James Anderson":   "/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
+  "Jessica Martinez": "/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png",
+  "Robert Taylor":    "/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
+  "Priya Patel":      "/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
+  "Lena Schmidt":     "/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
+  "Omar Hassan":      "/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
 }
 
 // ── Types ─────────────────────────────────────────────────────
