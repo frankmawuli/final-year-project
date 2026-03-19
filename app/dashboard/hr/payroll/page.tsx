@@ -5,6 +5,7 @@ import Link from "next/link"
 import { DollarSign, BarChart2, Minus, CalendarDays, Clock, ChevronRight, Search } from "lucide-react"
 import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
+import HrNavigationPannel from "@/components/hr-navigation-pannel"
 
 // ── Assets ────────────────────────────────────────────────────
 const adminPhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
@@ -235,39 +236,7 @@ export default function PayrollPage() {
       <HRIconSidebar />
 
       {/* ── Text sidebar ── */}
-      <aside className="flex w-[280px] shrink-0 flex-col justify-between bg-white py-5 pl-5 pr-3 shadow-sm">
-        <nav className="flex flex-col gap-1">
-          {sidebarNav.map(({ label, href }) => {
-            const isActive = href === "/dashboard/hr/payroll"
-            return (
-              <Link
-                key={label}
-                href={href}
-                className={cn(
-                  "block w-full rounded px-3 py-2.5 text-left text-base font-medium transition-colors hover:bg-muted",
-                  isActive ? "font-semibold text-primary" : "text-[#324054]"
-                )}
-              >
-                {label}
-              </Link>
-            )
-          })}
-        </nav>
-
-        <div className="flex flex-col gap-3">
-          <button className="w-full rounded px-3 py-2.5 text-left text-base font-medium text-[#324054] hover:bg-muted">
-            Settings
-          </button>
-          <div className="flex items-center gap-2 rounded-lg px-3 py-2">
-            <img src={adminPhoto} alt="Michael Smith" className="size-10 shrink-0 rounded-full object-cover" />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-[#324054]">Michael Smith</p>
-              <p className="truncate text-xs text-[#71839b]">michaelsmith12@gmail.com</p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
+      <HrNavigationPannel navItems={sidebarNav}/>
       {/* ── Main content ── */}
       <main className="flex flex-1 flex-col overflow-auto p-8">
 

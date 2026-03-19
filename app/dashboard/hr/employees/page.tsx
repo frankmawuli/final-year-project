@@ -518,8 +518,7 @@ export default function EmployeesPage() {
         {/* Header row */}
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-semibold text-[#1f2937]">Employees</h1>
-            <p className="text-sm text-[#667388]">{filtered.length} employee{filtered.length !== 1 ? "s" : ""}</p>
+
           </div>
           <button
             onClick={() => setEditing(null)}

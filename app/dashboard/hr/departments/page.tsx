@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
+import HrNavigationPannel from "@/components/hr-navigation-pannel"
 
 // ── Assets ────────────────────────────────────────────────────
 const adminPhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
@@ -549,35 +550,7 @@ export default function DepartmentsPage() {
       <HRIconSidebar />
 
       {/* ── Text sidebar ── */}
-      <aside className="flex w-[280px] shrink-0 flex-col justify-between bg-white py-5 pl-5 pr-3 shadow-sm">
-        <nav className="flex flex-col gap-1">
-          {sidebarNav.map(({ label, href, active }) => (
-            <Link
-              key={label}
-              href={href}
-              className={cn(
-                "block w-full rounded px-3 py-2.5 text-left text-base font-medium transition-colors hover:bg-muted",
-                active ? "font-semibold text-primary" : "text-[#324054]"
-              )}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex flex-col gap-3">
-          <button className="w-full rounded px-3 py-2.5 text-left text-base font-medium text-[#324054] hover:bg-muted">
-            Settings
-          </button>
-          <div className="flex items-center gap-2 rounded-lg px-3 py-2">
-            <img src={adminPhoto} alt="Michael Smith" className="size-10 shrink-0 rounded-full object-cover" />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-[#324054]">Michael Smith</p>
-              <p className="truncate text-xs text-[#71839b]">michaelsmith12@gmail.com</p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
+    <HrNavigationPannel navItems={sidebarNav}/>
       {/* ── Main content ── */}
       <main className="flex flex-1 flex-col overflow-hidden p-6">
         {/* Search */}
@@ -598,23 +571,9 @@ export default function DepartmentsPage() {
         {/* Header + stats */}
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <div>
-              <h1 className="text-lg font-semibold text-[#1f2937]">Departments</h1>
-              <p className="text-sm text-[#667388]">
-                {departments.length} departments · {totalMembers} total employees
-              </p>
-            </div>
+           
             {/* Quick stat pills */}
-            <div className="hidden items-center gap-2 lg:flex">
-              {departments.slice(0, 3).map((d) => {
-                const { bg, light } = colorMap[d.colorKey]
-                return (
-                  <span key={d.id} className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium" style={{ background: light, color: bg }}>
-                    <Users className="size-3" /> {d.name} ({d.members.length})
-                  </span>
-                )
-              })}
-            </div>
+          
           </div>
           <button
             onClick={() => setEditing(null)}

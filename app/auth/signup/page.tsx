@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 
 type Role = "hr" | "employee"
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const [role, setRole] = useState<Role>("hr")
 
   return (
@@ -93,31 +93,27 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h2>
-            <p className="text-sm text-muted-foreground">Sign in to your account to continue</p>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Create an account</h2>
+            <p className="text-sm text-muted-foreground">Fill in details to get started</p>
           </div>
 
           {/* Role switcher */}
-          <div className="flex rounded-xl border border-border bg-muted p-1">
-            {(["hr", "employee"] as const).map((r) => (
-              <button
-                key={r}
-                onClick={() => setRole(r)}
-                className={cn(
-                  "flex-1 rounded-lg py-2 text-sm font-medium transition-all",
-                  role === r
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {r === "hr" ? "HR Admin" : "Employee"}
-              </button>
-            ))}
-          </div>
+         
 
           {/* Form */}
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
             <div className="space-y-1.5">
+              <label htmlFor="email" className="text-sm font-medium text-foreground">
+                Full Name
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder={role === "hr" ? "admin@company.com" : "you@company.com"}
+                className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+              />
+            </div>
+             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-foreground">
                 Email address
               </label>
@@ -134,12 +130,21 @@ export default function LoginPage() {
                 <label htmlFor="password" className="text-sm font-medium text-foreground">
                   Password
                 </label>
-                <a
-                  href="#"
-                  className="text-xs font-medium text-primary hover:underline"
-                >
-                  Forgot password?
-                </a>
+               
+              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+              />
+            </div>
+             <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="text-sm font-medium text-foreground">
+                  Confirm Password 
+                </label>
+                
               </div>
               <Input
                 id="password"
@@ -154,7 +159,7 @@ export default function LoginPage() {
               size="lg"
               className="gradient-primary h-11 w-full rounded-xl border-0 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50"
             >
-              Sign in
+              Sign up
             </Button>
           </form>
 
@@ -181,9 +186,9 @@ export default function LoginPage() {
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <a href="/signup" className="font-medium text-primary hover:underline">
-              Create account
+            Already have an account?{" "}
+            <a href="/auth/login" className="font-medium text-primary hover:underline">
+              Sign in
             </a>
           </p>
         </div>

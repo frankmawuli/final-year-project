@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import Link from "next/link"
 import {
   Search, SlidersHorizontal, ChevronLeft, ChevronRight,
   ChevronDown, X, Download, MapPin, Mail, Phone,
@@ -9,10 +8,9 @@ import {
 } from "lucide-react"
 import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
+import HrNavigationPannel from "@/components/hr-navigation-pannel"
 
 // ── Asset URLs ────────────────────────────────────────────────
-const profilePhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
-
 const photos = {
   a: "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
   b: "/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
@@ -497,31 +495,7 @@ export default function EvaluationPage() {
       <HRIconSidebar />
 
       {/* ── Text sidebar ── */}
-      <aside className="flex w-[280px] shrink-0 flex-col justify-between bg-white py-5 pl-5 pr-3 shadow-sm">
-        <nav className="flex flex-col gap-1">
-          {sidebarNav.map(({ label, href, active }) => (
-            <Link
-              key={label}
-              href={href}
-              className={cn(
-                "block w-full rounded px-3 py-2.5 text-left text-base font-medium transition-colors hover:bg-muted",
-                active ? "font-semibold text-primary" : "text-[#324054]"
-              )}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 rounded-lg px-3 py-2">
-            <img src={profilePhoto} alt="Michael Smith" className="size-10 shrink-0 rounded-full object-cover" />
-            <div className="flex min-w-0 flex-col">
-              <p className="truncate text-sm font-medium text-[#324054]">Michael Smith</p>
-              <p className="truncate text-xs text-[#71839b]">michaelsmith12@gmail.com</p>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <HrNavigationPannel navItems={sidebarNav} />
 
       {/* ── Main content ── */}
       <main className="flex flex-1 flex-col overflow-hidden p-6">
