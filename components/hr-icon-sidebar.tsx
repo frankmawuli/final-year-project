@@ -39,7 +39,8 @@ export function HRIconSidebar() {
 
       {/* Nav icons */}
       <nav className="flex flex-1 flex-col items-center gap-1">
-        {navItems.map(({ icon: Icon, href, label, badge, matchGroup }) => {
+        {navItems.map(({ icon: Icon, href, label, matchGroup }) => {
+          const badge = undefined
           const isActive = matchGroup
             ? matchGroup.some((p) => pathname === p || pathname.startsWith(p + "/"))
             : pathname === href || (href !== "/dashboard/hr" && pathname.startsWith(href))

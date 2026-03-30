@@ -16,7 +16,22 @@
       "Bash(cd:*)",
       "Bash(sed -i 's/formatter={\\(v: number\\) => \\\\[`\\\\${v}%`, \"\"Attendance\"\"\\\\]}/formatter={\\(v\\) => [`${v}%`, \"\"Attendance\"\"]}/' app/dashboard/hr/page.tsx)",
       "Bash(sed -i 's/formatter={\\(v: number\\) => \\\\[v, \"\"Employees\"\"\\\\]}/formatter={\\(v\\) => [v, \"\"Employees\"\"]}/' app/dashboard/hr/page.tsx)",
-      "Bash(ipconfig)"
+      "Bash(ipconfig)",
+      "mcp__figma-dev-mode-mcp-server__get_metadata",
+      "mcp__figma-dev-mode-mcp-server__get_variable_defs",
+      "mcp__plugin_figma_figma__get_metadata",
+      "mcp__plugin_figma_figma__use_figma",
+      "mcp__plugin_figma_figma__get_screenshot",
+      "mcp__figma__generate_figma_design",
+      "mcp__figma__use_figma",
+      "mcp__figma__get_screenshot",
+      "Bash(netstat -ano)",
+      "Bash(findstr :3000)",
+      "Bash(grep -E \"\\(app|components|lib|services|hooks\\)/.*\\\\.\\(ts|tsx|js|jsx\\)$\")",
+      "Bash(xargs grep:*)",
+      "Bash(xargs wc:*)",
+      "Bash(find /d/core-recruiter -not -path */node_modules/* -not -path */.next/* -not -path */.git/* -type d)",
+      "Bash(find /d/core-recruiter -not -path */node_modules/* -not -path */.next/* -not -path */.git/*)"
     ]
   }
 }
