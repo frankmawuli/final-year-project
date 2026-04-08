@@ -530,13 +530,12 @@ export default function JobDetailPage() {
               {/* Action buttons */}
               <div className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-4 shadow-sm">
                 <Link
-                  href="/dashboard/hr/applicants"
+                  href="/apply/apply"
                   className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
                 >
-                  <ClipboardList className="size-4"/>
-                  Apply
-                 
+                  <ClipboardList className="size-4" />
+                  Apply Now
                 </Link>
                 <Link
                   href="/dashboard/hr/jobs"
