@@ -31,7 +31,8 @@
       "Bash(xargs grep:*)",
       "Bash(xargs wc:*)",
       "Bash(find /d/core-recruiter -not -path */node_modules/* -not -path */.next/* -not -path */.git/* -type d)",
-      "Bash(find /d/core-recruiter -not -path */node_modules/* -not -path */.next/* -not -path */.git/*)"
+      "Bash(find /d/core-recruiter -not -path */node_modules/* -not -path */.next/* -not -path */.git/*)",
+      "mcp__figma__get_design_context"
     ]
   }
 }

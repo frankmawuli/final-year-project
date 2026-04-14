@@ -64,17 +64,7 @@ export default function AttendancePage() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* ── Header (desktop only — mobile bar is in EssShell) ── */}
-      <header className="hidden items-center justify-between border-b border-border bg-white px-6 py-4 lg:flex">
-        <h1 className="text-lg font-semibold text-foreground">Clock In / Clock Out</h1>
-        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <span>Time</span>
-          <ChevronRight className="size-3.5" />
-          <span>Attendance</span>
-          <ChevronRight className="size-3.5" />
-          <span className="text-foreground">Clock In / Clock Out</span>
-        </nav>
-      </header>
+     
 
       {/* ── Mobile page title ── */}
       <div className="border-b border-border bg-white px-4 py-3 lg:hidden">

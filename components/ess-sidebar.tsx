@@ -11,8 +11,15 @@ import {
   Banknote,
   MessageSquare,
   FileBarChart2,
+  LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface LeafItem {
   label: string
@@ -34,43 +41,38 @@ interface Section {
 
 const sections: Section[] = [
   {
-    label: "Time",
+    label: "Attendance",
     icon: Clock,
     children: [
-      {
-        label: "Attendance",
-        children: [
-          { label: "Clock In / Clock Out", href: "/dashboard/ess/attendance" },
-          { label: "Timesheet", href: "/dashboard/ess/timesheet" },
-        ],
-      },
-      { label: "Overtime", href: "/dashboard/ess/overtime", hasChevron: true },
-      { label: "Overtime Done", href: "/dashboard/ess/overtime-done", hasChevron: true },
-      { label: "Visit", href: "/dashboard/ess/visit", hasChevron: true },
+      { label: "Clock In / Clock Out", href: "/dashboard/ess/attendance" },
+      { label: "Overtime", href: "/dashboard/ess/overtime",  },
       { label: "Worksheet", href: "/dashboard/ess/worksheet" },
     ],
   },
   {
-    label: "Reimbursement",
+    label: "Leave & Time Off",
     icon: CreditCard,
     children: [
-      { label: "My Requests", href: "/dashboard/ess/reimbursement" },
-      { label: "History", href: "/dashboard/ess/reimbursement/history" },
+      { label: "My Requests", href: "/dashboard/ess/leave" },
+      { label: "History", href: "/dashboard/ess/leave/history" },
     ],
   },
   {
-    label: "Payroll",
+    label: "Compensation",
     icon: Banknote,
     children: [
-      { label: "Payslip", href: "/dashboard/ess/payroll" },
-      { label: "Tax Documents", href: "/dashboard/ess/payroll/tax" },
+      { label: "Allowance", href: "/dashboard/ess/payroll" },
+      { label: "Payslips", href: "/dashboard/ess/payroll/tax" },
     ],
   },
+  
   {
-    label: "Chat",
+    label: "Documents",
     icon: MessageSquare,
     children: [
-      { label: "Messages", href: "/dashboard/ess/chat" },
+      { label: "Certification", href: "/dashboard/ess/chat" },
+      { label: "Upload files", href: "/dashboard/ess/chat" },
+
     ],
   },
   {
@@ -240,6 +242,33 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
           )
         })}
       </nav>
+
+      {/* User profile at bottom */}
+      <div className="mt-auto pt-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-muted">
+              <div className="size-8 shrink-0 overflow-hidden rounded-full bg-muted">
+                <img
+                  src="https://i.pravatar.cc/32?img=11"
+                  alt="Michael Smith"
+                  className="size-full object-cover"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-foreground">Michael Smith</p>
+                <p className="truncate text-[11px] text-muted-foreground">HR Administrator</p>
+              </div>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="w-48">
+            <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+              <LogOut className="mr-2 size-4" />
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </aside>
   )
 }
