@@ -70,16 +70,16 @@ const sections: Section[] = [
     label: "Documents",
     icon: MessageSquare,
     children: [
-      { label: "Certification", href: "/dashboard/ess/chat" },
-      { label: "Upload files", href: "/dashboard/ess/chat" },
-
+      { label: "My Documents",  href: "/dashboard/ess/documents" },
+      { label: "Upload Files",  href: "/dashboard/ess/documents/upload" },
     ],
   },
   {
     label: "Report",
     icon: FileBarChart2,
     children: [
-      { label: "My Reports", href: "/dashboard/ess/report" },
+      { label: "My Reports",   href: "/dashboard/ess/report"      },
+      { label: "Complaints",   href: "/dashboard/ess/report/complaints" },
     ],
   },
 ]

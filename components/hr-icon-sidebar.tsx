@@ -73,9 +73,21 @@ export function HRIconSidebar() {
         <button className="flex size-12 items-center justify-center rounded-lg text-[#8181a5] hover:bg-muted hover:text-foreground" title="Toggle theme">
           <Moon className="size-[22px]" />
         </button>
-        <button className="flex size-12 items-center justify-center rounded-lg text-[#8181a5] hover:bg-muted hover:text-foreground" title="Settings">
+        <Link
+          href="/dashboard/hr/settings"
+          title="Settings"
+          className={cn(
+            "relative flex size-12 items-center justify-center rounded-lg transition-colors",
+            pathname === "/dashboard/hr/settings" || pathname.startsWith("/dashboard/hr/settings/")
+              ? "bg-[#5e81f4]/10 text-[#5e81f4]"
+              : "text-[#8181a5] hover:bg-muted hover:text-foreground"
+          )}
+        >
           <Settings className="size-[22px]" />
-        </button>
+          {(pathname === "/dashboard/hr/settings" || pathname.startsWith("/dashboard/hr/settings/")) && (
+            <span className="absolute right-0 top-[12%] h-[76%] w-0.5 rounded-sm bg-[#5e81f4]" />
+          )}
+        </Link>
       </div>
     </aside>
   )

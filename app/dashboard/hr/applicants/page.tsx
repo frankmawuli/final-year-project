@@ -281,7 +281,7 @@ const sidebarNav = [
   { label: "Job Listings",         active: false, href: "/dashboard/hr/jobs"       },
   { label: "Applicants",           active: true,  href: "/dashboard/hr/applicants" },
   { label: "Candidate Evaluation", active: false, href: "/dashboard/hr/evaluation" },
-  { label: "Interview Scheduling", active: false, href: "#"                        },
+  { label: "Interview Scheduling", active: false, href: "/dashboard/hr/interviews"  },
   { label: "History",              active: false, href: "#"                        },
 ]
 
