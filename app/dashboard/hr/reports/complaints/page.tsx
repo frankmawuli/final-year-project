@@ -7,7 +7,6 @@ import {
   EyeOff, Eye, MessageSquare, CalendarDays, Building2,
   SlidersHorizontal,
 } from "lucide-react"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { cn } from "@/lib/utils"
 
@@ -531,8 +530,7 @@ export default function HRComplaintsPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-[#1c1c1c]">
-      <HRIconSidebar />
+    <>
       <HrNavigationPannel navItems={sidebarNav} />
 
       <main className="flex flex-1 flex-col overflow-hidden">
@@ -739,6 +737,6 @@ export default function HRComplaintsPage() {
           onStatusChange={s => updateStatus(detail.id, s)}
         />
       )}
-    </div>
+    </>
   )
 }

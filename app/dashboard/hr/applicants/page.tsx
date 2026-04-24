@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 
@@ -302,8 +301,7 @@ export default function ApplicantsPage() {
   const paginated  = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-[#1c1c1c]">
-      <HRIconSidebar />
+    <>
 
       {/* ── Text sidebar ── */}
       <HrNavigationPannel navItems={sidebarNav} />
@@ -414,6 +412,6 @@ export default function ApplicantsPage() {
           </button>
         </div>
       </main>
-    </div>
+    </>
   )
 }

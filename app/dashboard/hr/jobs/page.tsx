@@ -3,7 +3,6 @@
 import { useState, useRef, KeyboardEvent } from "react"
 import Link from "next/link"
 import { Search, SlidersHorizontal, Building2, Plus, X, ChevronLeft, ChevronRight, Check, Trash2 } from "lucide-react"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { jobsStore } from "@/lib/jobs-store"
@@ -591,8 +590,7 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-[#1c1c1c]">
-      <HRIconSidebar />
+    <>
 
       {/* ── Text sidebar ── */}
      <HrNavigationPannel navItems={sidebarNav}/>
@@ -678,6 +676,6 @@ export default function JobsPage() {
       {showModal && (
         <AddListingModal onClose={() => setShowModal(false)} onAdd={addJob} />
       )}
-    </div>
+    </>
   )
 }

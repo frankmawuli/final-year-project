@@ -13,7 +13,6 @@ import {
   FileCheck,
 } from "lucide-react"
 import Link from "next/link"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import {
   BarChart,
   Bar,

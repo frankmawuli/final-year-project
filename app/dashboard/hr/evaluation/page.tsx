@@ -6,7 +6,6 @@ import {
   ChevronDown, X, Download, MapPin, Mail, Phone,
   Briefcase, GraduationCap, FileText, Star,
 } from "lucide-react"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 
@@ -491,8 +490,7 @@ export default function EvaluationPage() {
     setCandidates((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)))
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-[#1c1c1c]">
-      <HRIconSidebar />
+    <>
 
       {/* ── Text sidebar ── */}
       <HrNavigationPannel navItems={sidebarNav} />
@@ -620,6 +618,6 @@ export default function EvaluationPage() {
       {viewing && (
         <ProfilePanel candidate={viewing} onClose={() => setViewing(null)} />
       )}
-    </div>
+    </>
   )
 }

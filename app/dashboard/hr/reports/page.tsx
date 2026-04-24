@@ -7,7 +7,6 @@ import {
   Clock, CheckCircle2, XCircle, FileText, CalendarDays, Building2,
   Eye,
 } from "lucide-react"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { cn } from "@/lib/utils"
 
@@ -392,8 +391,7 @@ export default function HRReportsPage() {
   const hasFilters = search !== "" || typeFilter !== "All" || statFilter !== "All"
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-[#1c1c1c]">
-      <HRIconSidebar />
+    <>
       <HrNavigationPannel navItems={sidebarNav} />
 
       {/* ── Main content ── */}
@@ -651,6 +649,6 @@ export default function HRReportsPage() {
           onStatusChange={s => updateStatus(detail.id, s)}
         />
       )}
-    </div>
+    </>
   )
 }

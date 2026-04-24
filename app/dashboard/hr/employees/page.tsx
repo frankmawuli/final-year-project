@@ -7,7 +7,6 @@ import {
   Phone, MessageSquare, User, Mail, MapPin, Building2,
   Calendar, IdCard, Download, FileText, ChevronLeft, ChevronRight,
 } from "lucide-react"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 
@@ -492,8 +491,7 @@ export default function EmployeesPage() {
     setEmployees((prev) => prev.filter((e) => e.id !== id))
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-[#1c1c1c]">
-      <HRIconSidebar />
+    <>
 
       {/* ── Text sidebar ── */}
      <HrNavigationPannel navItems={sidebarNav}/>
@@ -597,6 +595,6 @@ export default function EmployeesPage() {
           onSave={saveEmployee}
         />
       )}
-    </div>
+    </>
   )
 }

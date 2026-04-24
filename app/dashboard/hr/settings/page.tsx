@@ -1,6 +1,5 @@
+import { redirect } from "next/navigation"
 
-export default function page() {
-  return (
-    <div>page</div>
-  )
+export default function SettingsPage() {
+  redirect("/dashboard/hr/settings/company")
 }

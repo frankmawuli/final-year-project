@@ -21,7 +21,6 @@ import {
   XCircle,
   Eye,
 } from "lucide-react"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { cn } from "@/lib/utils"
 
@@ -434,8 +433,7 @@ export default function JobDetailPage() {
   const applicantPct = Math.min(100, Math.round((job.applicants / (job.openings * 15)) * 100))
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      <HRIconSidebar />
+    <>
       <HrNavigationPannel navItems={sidebarNav} />
 
       <main className="flex-1 overflow-y-auto">
@@ -641,6 +639,6 @@ export default function JobDetailPage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   )
 }

@@ -14,7 +14,6 @@ import {
   Link2,
   AlignJustify,
 } from "lucide-react"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { cn } from "@/lib/utils"
 
@@ -438,8 +437,7 @@ export default function InterviewsPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-[#1c1c1c]">
-      <HRIconSidebar />
+    <>
       <HrNavigationPannel navItems={sidebarNav} />
 
       <main className="flex flex-1 flex-col overflow-hidden bg-white">
@@ -640,6 +638,6 @@ export default function InterviewsPage() {
           defaultEnd={modalEnd}
         />
       )}
-    </div>
+    </>
   )
 }
