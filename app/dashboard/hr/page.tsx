@@ -13,7 +13,6 @@ import {
   FileCheck,
 } from "lucide-react"
 import Link from "next/link"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import {
   BarChart,
   Bar,
@@ -148,9 +147,8 @@ const navItems = [
 // ── Main Page ─────────────────────────────────────────────────
 export default function HRDashboard() {
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      <HRIconSidebar />
-
+    // <div className="flex h-screen overflow-hidden bg-background text-foreground">
+<>
       {/* ── Text sidebar ── */}
       <HrNavigationPannel navItems={navItems}/>
     
@@ -360,6 +358,7 @@ export default function HRDashboard() {
           </div>
         </section>
       </aside>
-    </div>
+     {/* </div> */}
+     </>
   )
 }

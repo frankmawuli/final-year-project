@@ -9,7 +9,6 @@ import {
   ChevronLeft, ChevronRight, UserPlus, Trash2,
   Building2,
 } from "lucide-react"
-import { HRIconSidebar } from "@/components/hr-icon-sidebar"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 
@@ -546,8 +545,7 @@ export default function DepartmentsPage() {
   const totalMembers = departments.reduce((acc, d) => acc + d.members.length, 0)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-[#1c1c1c]">
-      <HRIconSidebar />
+    <>
 
       {/* ── Text sidebar ── */}
     <HrNavigationPannel navItems={sidebarNav}/>
@@ -659,6 +657,6 @@ export default function DepartmentsPage() {
           onSave={saveDept}
         />
       )}
-    </div>
+    </>
   )
 }

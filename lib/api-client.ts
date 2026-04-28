@@ -52,10 +52,11 @@ export const api = {
     return request<T>(path, { method: "DELETE", headers })
   },
   /** Multipart upload — do NOT set Content-Type (browser sets boundary). */
-  async upload<T>(path: string, formData: FormData): Promise<T> {
+  async upload<T>(path: string, formData: FormData, headers?: Record<string, string>): Promise<T> {
     const res = await fetch(`${BASE_URL}${path}`, {
       method: "POST",
       body: formData,
+      headers,
     })
     if (!res.ok) {
       const err = await res.json().catch(() => ({ message: "Upload failed" }))

@@ -1,72 +1,75 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { ApiError } from "@/lib/api-client"
 
 type Role = "hr" | "employee"
 
 export default function LoginPage() {
+  const { login } = useAuth()
   const [role, setRole] = useState<Role>("hr")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
+    try {
+      await login(email, password)
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 403) {
+        setError("Email not verified. Please check your inbox.")
+      } else if (err instanceof ApiError) {
+        setError(err.message)
+      } else {
+        setError("Something went wrong. Please try again.")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="auth-layout">
       {/* ── Left: Branding panel ── */}
       <div className="gradient-primary relative hidden flex-col items-start justify-between overflow-hidden p-12 text-white lg:flex">
-        {/* Decorative circles */}
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-white/10" />
-        <div className="absolute -bottom-32 -left-32 h-[28rem] w-[28rem] rounded-full bg-white/10" />
+        <div className="absolute -bottom-32 -left-32 h-112 w-md rounded-full bg-white/10" />
 
-        {/* Logo */}
         <div className="relative flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-            <svg
-              className="h-5 w-5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-              />
+            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
           <span className="text-lg font-semibold tracking-tight">CoreRecruiter</span>
         </div>
 
-        {/* Headline */}
         <div className="relative space-y-4">
           <h1 className="text-4xl leading-tight font-bold tracking-tight">
-            Streamline your
-            <br />
-            hiring process
+            Streamline your<br />hiring process
           </h1>
           <p className="max-w-xs text-base text-white/75">
-            Manage candidates, schedule interviews, and collaborate with your team — all in one
-            place.
+            Manage candidates, schedule interviews, and collaborate with your team — all in one place.
           </p>
-
-          {/* Feature pills */}
           <div className="flex flex-wrap gap-2 pt-2">
             {["AI Screening", "Smart Pipelines", "Team Collaboration"].map((f) => (
-              <span
-                key={f}
-                className="rounded-full bg-white/15 px-3 py-1 text-sm font-medium backdrop-blur-sm"
-              >
+              <span key={f} className="rounded-full bg-white/15 px-3 py-1 text-sm font-medium backdrop-blur-sm">
                 {f}
               </span>
             ))}
           </div>
         </div>
 
-        {/* Bottom tagline */}
-        <p className="relative text-sm text-white/50">
-          Trusted by 500+ companies worldwide
-        </p>
+        <p className="relative text-sm text-white/50">Trusted by 500+ companies worldwide</p>
       </div>
 
       {/* ── Right: Form panel ── */}
@@ -75,18 +78,8 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="flex items-center gap-2 lg:hidden">
             <div className="gradient-primary flex h-9 w-9 items-center justify-center rounded-xl">
-              <svg
-                className="h-5 w-5 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-                />
+              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
             <span className="text-lg font-semibold">CoreRecruiter</span>
@@ -102,6 +95,7 @@ export default function LoginPage() {
             {(["hr", "employee"] as const).map((r) => (
               <button
                 key={r}
+                type="button"
                 onClick={() => setRole(r)}
                 className={cn(
                   "flex-1 rounded-lg py-2 text-sm font-medium transition-all",
@@ -116,7 +110,13 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {error && (
+              <p className="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+                {error}
+              </p>
+            )}
+
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-foreground">
                 Email address
@@ -124,6 +124,9 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder={role === "hr" ? "admin@company.com" : "you@company.com"}
                 className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
               />
@@ -134,16 +137,16 @@ export default function LoginPage() {
                 <label htmlFor="password" className="text-sm font-medium text-foreground">
                   Password
                 </label>
-                <a
-                  href="#"
-                  className="text-xs font-medium text-primary hover:underline"
-                >
+                <Link href="/auth/reset-password" className="text-xs font-medium text-primary hover:underline">
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <Input
                 id="password"
                 type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
               />
@@ -152,23 +155,23 @@ export default function LoginPage() {
             <Button
               type="submit"
               size="lg"
-              className="gradient-primary h-11 w-full rounded-xl border-0 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50"
+              disabled={loading}
+              className="gradient-primary h-11 w-full rounded-xl border-0 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
             >
-              Sign in
+              {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
 
-          {/* Divider */}
           <div className="relative flex items-center gap-3">
             <div className="h-px flex-1 bg-border" />
             <span className="text-xs text-muted-foreground">or</span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          {/* SSO */}
           <Button
             variant="outline"
             size="lg"
+            type="button"
             className="h-11 w-full rounded-xl border-border text-sm font-medium"
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -182,9 +185,9 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <a href="/auth/signup" className="font-medium text-primary hover:underline">
+            <Link href="/auth/signup" className="font-medium text-primary hover:underline">
               Create account
-            </a>
+            </Link>
           </p>
         </div>
       </div>
