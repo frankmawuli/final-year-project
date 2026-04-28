@@ -1,12 +1,13 @@
-import {HRIconSidebar} from "@/components/hr-icon-sidebar";
+import { HRIconSidebar } from "@/components/hr-icon-sidebar"
+import RequireAuth from "@/components/require-auth"
 
 export default function HrLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
+    <RequireAuth>
+      <div className="flex h-screen overflow-hidden bg-background text-foreground">
         <HRIconSidebar />
         {children}
-
-    </div>
-
+      </div>
+    </RequireAuth>
   )
 }

@@ -18,6 +18,9 @@ import {
   Users,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { onboardingService } from "@/services/onboarding.service"
+import { ApiError } from "@/lib/api-client"
 
 // ── Step definitions ───────────────────────────────────────────
 const STEPS = [
@@ -443,10 +446,12 @@ function Step3({ data, onChange }: { data: Step3Data; onChange: (next: Step3Data
   )
 }
 
-function Step4({ data, onChange, departments }: {
+function Step4({ data, onChange, departments, csvFile, onCsvFileChange }: {
   data: Step4Data; onChange: (next: Step4Data) => void; departments: string[]
+  csvFile: File | null; onCsvFileChange: (file: File | null) => void
 }) {
-  const [inviteMethod, setInviteMethod] = useState<"manual" | "csv" | "link">("manual")
+  const [inviteMethod, setInviteMethod] = useState<"csv" | "link">("csv")
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   return (
     <div className="space-y-5 w-full">
@@ -455,8 +460,8 @@ function Step4({ data, onChange, departments }: {
         <FieldLabel>Invitation Method</FieldLabel>
         <div className="mt-2 flex gap-2">
           {([
-            { id: "csv",    label: "Bulk Upload (CSV)", icon: Users },
-            { id: "link",   label: "Generate Link",    icon: LinkIcon },
+            { id: "csv",  label: "Bulk Upload (CSV)", icon: Users },
+            { id: "link", label: "Generate Link",     icon: LinkIcon },
           ] as const).map(({ id, label, icon: Icon }) => (
             <button key={id} type="button" onClick={() => setInviteMethod(id)}
               className={cn(
@@ -472,17 +477,54 @@ function Step4({ data, onChange, departments }: {
       </div>
 
       {inviteMethod === "csv" && (
-        <div className="flex h-[140px] cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted hover:border-primary hover:bg-primary/5">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-card shadow-sm">
-            <Upload className="size-5 text-primary" />
-          </div>
-          <p className="text-[13px] text-muted-foreground">
-            <span className="font-medium text-primary">Upload CSV file</span> with employee details
-          </p>
-          <p className="text-[11px] text-muted-foreground">Columns: Name, Email, Department, Role, Start Date</p>
-          <button type="button" className="mt-1 rounded-lg bg-primary px-4 py-1.5 text-[12px] font-medium text-primary-foreground hover:bg-primary/90">
-            Choose File
-          </button>
+        <div
+          className={cn(
+            "flex h-35 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors",
+            csvFile
+              ? "border-primary bg-primary/5"
+              : "border-border bg-muted hover:border-primary hover:bg-primary/5"
+          )}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              onCsvFileChange(f ?? null)
+              e.target.value = ""
+            }}
+          />
+          {csvFile ? (
+            <>
+              <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+                <Users className="size-5 text-primary" />
+              </div>
+              <p className="text-[13px] font-medium text-foreground">{csvFile.name}</p>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onCsvFileChange(null) }}
+                className="text-[11px] text-muted-foreground hover:text-rose-500"
+              >
+                Remove
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="flex size-10 items-center justify-center rounded-lg bg-card shadow-sm">
+                <Upload className="size-5 text-primary" />
+              </div>
+              <p className="text-[13px] text-muted-foreground">
+                <span className="font-medium text-primary">Upload CSV file</span> with employee details
+              </p>
+              <p className="text-[11px] text-muted-foreground">Required columns: name, email, role</p>
+              <button type="button" className="mt-1 rounded-lg bg-primary px-4 py-1.5 text-[12px] font-medium text-primary-foreground hover:bg-primary/90">
+                Choose File
+              </button>
+            </>
+          )}
         </div>
       )}
 
@@ -590,6 +632,7 @@ function SidebarStepList({ current }: { current: number }) {
 // ── Main page ──────────────────────────────────────────────────
 export default function CompanyOnboardingPage() {
   const router = useRouter()
+  const { accessToken } = useAuth()
   const [step, setStep] = useState(1)
 
   const [step1, setStep1] = useState<Step1Data>({
@@ -606,7 +649,10 @@ export default function CompanyOnboardingPage() {
   const [step4, setStep4] = useState<Step4Data>({
     inviteRows: [{ name: "", email: "", department: "", role: "", startDate: "" }],
   })
+  const [csvFile, setCsvFile] = useState<File | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   function setS1(field: keyof Step1Data, val: string) {
     setStep1((f) => ({ ...f, [field]: val }))
@@ -635,10 +681,47 @@ export default function CompanyOnboardingPage() {
     return Object.keys(errs).length === 0
   }
 
-  function handleNext() {
+  async function handleNext() {
     if (!validate()) return
-    if (step < STEPS.length) setStep((s) => s + 1)
-    else router.push("/dashboard/hr")
+    if (step < STEPS.length) { setStep((s) => s + 1); return }
+
+    if (!accessToken) return
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      const companyRes = await onboardingService.createCompany(accessToken, {
+        name: step1.companyName,
+        industry: step1.industry || undefined,
+        size: step1.companySize || undefined,
+        website: step1.website || undefined,
+        registrationNo: step1.registrationNumber || undefined,
+        foundingYear: step1.yearFounded ? parseInt(step1.yearFounded) : undefined,
+        country: step2.country || undefined,
+        city: step2.city || undefined,
+        timezone: step2.timezone || undefined,
+        address: step2.address || undefined,
+      })
+      const companyId = companyRes.data.id
+
+      await Promise.allSettled([
+        ...step3.departments.map((name) =>
+          onboardingService.createDepartment(accessToken, companyId, name)
+        ),
+        ...step3.officeLocations.map((name) =>
+          onboardingService.createOfficeLocation(accessToken, companyId, name)
+        ),
+      ])
+
+      if (csvFile) {
+        await onboardingService.bulkInvite(accessToken, csvFile)
+      }
+
+      router.push("/dasboard/hr")
+    } catch (err) {
+      setSubmitError(err instanceof ApiError ? err.message : "Setup failed. Please try again.")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const stepLabels: Record<number, string> = {
@@ -693,16 +776,30 @@ export default function CompanyOnboardingPage() {
               </>
             )}
             {step === 4 && (
-              <Step4 data={step4} onChange={setStep4} departments={step3.departments} />
+              <Step4
+                data={step4}
+                onChange={setStep4}
+                departments={step3.departments}
+                csvFile={csvFile}
+                onCsvFileChange={setCsvFile}
+              />
             )}
           </div>
+
+          {/* Submit error */}
+          {submitError && (
+            <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-2.5 text-[13px] text-destructive">
+              {submitError}
+            </p>
+          )}
 
           {/* Navigation */}
           <div className="mt-6 flex items-center justify-between border-t border-border pt-5">
             <button
               type="button"
               onClick={() => step > 1 ? setStep((s) => s - 1) : router.back()}
-              className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground"
+              disabled={submitting}
+              className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
               ← Back
             </button>
@@ -710,9 +807,14 @@ export default function CompanyOnboardingPage() {
             <button
               type="button"
               onClick={handleNext}
-              className="rounded-xl bg-primary px-7 py-2.5 text-[13px] font-semibold text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+              disabled={submitting}
+              className="rounded-xl bg-primary px-7 py-2.5 text-[13px] font-semibold text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors disabled:opacity-60"
             >
-              {step === STEPS.length ? "Process and set up →" : "Save and continue →"}
+              {submitting
+                ? "Setting up…"
+                : step === STEPS.length
+                  ? "Process and set up →"
+                  : "Save and continue →"}
             </button>
           </div>
         </div>
