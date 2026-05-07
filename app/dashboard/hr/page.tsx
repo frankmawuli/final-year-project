@@ -117,7 +117,7 @@ function StatCard({
   icon: React.ElementType
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-white p-5 shadow-sm">
+    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{label}</p>
         <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
@@ -182,7 +182,7 @@ export default function HRDashboard() {
         </div>
 
         {/* HR Workforce Analytics */}
-        <div className="mb-6 rounded-xl border border-border bg-white p-6 shadow-sm">
+        <div className="mb-6 rounded-xl border border-border bg-card p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <p className="text-base font-semibold text-foreground">HR Workforce Analytics</p>
@@ -191,23 +191,23 @@ export default function HRDashboard() {
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={attendanceData} margin={{ left: -20, right: 10 }}>
-              <CartesianGrid vertical={false} stroke="#f0f0f0" />
+              <CartesianGrid vertical={false} stroke="var(--color-border)" />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 11, fill: "#9ca3af" }}
+                tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
                 domain={[80, 100]}
-                tick={{ fontSize: 11, fill: "#9ca3af" }}
+                tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v) => `${v}%`}
               />
               <Tooltip
-                cursor={{ stroke: "#e5e7eb" }}
-                contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12 }}
+                cursor={{ stroke: "var(--color-border)" }}
+                contentStyle={{ borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 12, background: "var(--color-card)", color: "var(--color-foreground)" }}
                 formatter={(v) => [`${v}%`, "Attendance"]}
               />
               <Line
@@ -225,26 +225,26 @@ export default function HRDashboard() {
         {/* Bottom charts row */}
         <div className="grid grid-cols-2 gap-4">
           {/* Employees by Department */}
-          <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
             <p className="mb-4 text-base font-semibold text-foreground">Employees by Department</p>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={departmentData} barSize={28} margin={{ left: -20 }}>
-                <CartesianGrid vertical={false} stroke="#f0f0f0" />
+                <CartesianGrid vertical={false} stroke="var(--color-border)" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 10, fill: "#9ca3af" }}
+                  tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: "#9ca3af" }}
+                  tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
                   axisLine={false}
                   tickLine={false}
                   ticks={[0, 10, 20, 30, 40]}
                 />
                 <Tooltip
-                  cursor={{ fill: "#f3f4f6" }}
-                  contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12 }}
+                  cursor={{ fill: "var(--color-muted)" }}
+                  contentStyle={{ borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 12, background: "var(--color-card)", color: "var(--color-foreground)" }}
                   formatter={(v) => [v, "Employees"]}
                 />
                 <Bar dataKey="value" fill="#3d70fa" radius={[3, 3, 0, 0]} />
@@ -253,7 +253,7 @@ export default function HRDashboard() {
           </div>
 
           {/* Employees by Role */}
-          <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
             <p className="mb-4 text-base font-semibold text-foreground">Employees by Role</p>
             <div className="flex items-center gap-4">
               <ResponsiveContainer width={140} height={140}>
@@ -272,7 +272,7 @@ export default function HRDashboard() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12 }}
+                    contentStyle={{ borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 12, background: "var(--color-card)", color: "var(--color-foreground)" }}
                     formatter={(v) => [v, "Employees"]}
                   />
                 </PieChart>
@@ -298,7 +298,7 @@ export default function HRDashboard() {
       </main>
 
       {/* ── Right sidebar ── */}
-      <aside className="flex w-[260px] shrink-0 flex-col gap-6 overflow-y-auto border-l border-border bg-white p-4">
+      <aside className="flex w-[260px] shrink-0 flex-col gap-6 overflow-y-auto border-l border-border bg-card p-4">
         {/* HR Activities */}
         <section>
           <p className="mb-2 px-1 py-2 text-sm font-semibold text-foreground">HR Activities</p>
@@ -327,7 +327,7 @@ export default function HRDashboard() {
                 <img
                   src={photo}
                   alt=""
-                  className="relative z-10 size-6 shrink-0 rounded-full object-cover ring-2 ring-white"
+                  className="relative z-10 size-6 shrink-0 rounded-full object-cover ring-2 ring-background"
                 />
                 <div className="min-w-0">
                   <p className="text-[13px] leading-snug text-foreground">{text}</p>

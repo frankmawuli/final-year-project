@@ -26,7 +26,7 @@ type ComplaintStatus   = "Submitted" | "Under Investigation" | "Resolved" | "Clo
 interface Complaint {
   id:          number
   ref:         string
-  name:        string        // "Anonymous" if anonymous
+  name:        string
   photo:       string
   email:       string
   department:  string
@@ -42,26 +42,26 @@ interface Complaint {
 
 // ── Style maps ────────────────────────────────────────────────
 const categoryStyle: Record<ComplaintCategory, { bg: string; text: string }> = {
-  "Workplace Harassment": { bg: "bg-[#fef2f2]", text: "text-[#dc2626]" },
-  "Discrimination":       { bg: "bg-[#fff7ed]", text: "text-[#ea580c]" },
-  "Safety Concern":       { bg: "bg-[#fffbeb]", text: "text-[#d97706]" },
-  "Manager Conduct":      { bg: "bg-[#f5f3ff]", text: "text-[#7c3aed]" },
-  "Policy Violation":     { bg: "bg-[#f0f9ff]", text: "text-[#0369a1]" },
-  "Other":                { bg: "bg-[#f4f5f9]", text: "text-[#6b7280]" },
+  "Workplace Harassment": { bg: "bg-red-50 dark:bg-red-900/30",     text: "text-red-600 dark:text-red-400"     },
+  "Discrimination":       { bg: "bg-orange-50 dark:bg-orange-900/30", text: "text-orange-600 dark:text-orange-400" },
+  "Safety Concern":       { bg: "bg-amber-50 dark:bg-amber-900/30", text: "text-amber-600 dark:text-amber-400" },
+  "Manager Conduct":      { bg: "bg-purple-50 dark:bg-purple-900/30", text: "text-purple-600 dark:text-purple-400" },
+  "Policy Violation":     { bg: "bg-sky-50 dark:bg-sky-900/30",     text: "text-sky-700 dark:text-sky-400"     },
+  "Other":                { bg: "bg-muted",                          text: "text-muted-foreground"               },
 }
 
 const priorityStyle: Record<ComplaintPriority, { badge: string; dot: string }> = {
-  Low:      { badge: "bg-[#f4f5f9] text-[#6b7280]",   dot: "bg-[#9ca3af]"  },
-  Medium:   { badge: "bg-[#fffbeb] text-[#d97706]",   dot: "bg-[#d97706]"  },
-  High:     { badge: "bg-[#fff7ed] text-[#ea580c]",   dot: "bg-[#ea580c]"  },
-  Critical: { badge: "bg-[#fef2f2] text-[#dc2626]",   dot: "bg-[#dc2626]"  },
+  Low:      { badge: "bg-muted text-muted-foreground",                                             dot: "bg-muted-foreground"  },
+  Medium:   { badge: "bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",       dot: "bg-amber-500"         },
+  High:     { badge: "bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",   dot: "bg-orange-500"        },
+  Critical: { badge: "bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400",               dot: "bg-red-500"           },
 }
 
 const statusStyle: Record<ComplaintStatus, { badge: string; dot: string; icon: React.ElementType }> = {
-  "Submitted":           { badge: "border-[#d97706] text-[#d97706]", dot: "bg-[#d97706]", icon: Clock        },
-  "Under Investigation": { badge: "border-[#5e81f4] text-[#5e81f4]", dot: "bg-[#5e81f4]", icon: AlertCircle  },
-  "Resolved":            { badge: "border-[#16a34a] text-[#16a34a]", dot: "bg-[#16a34a]", icon: CheckCircle2 },
-  "Closed":              { badge: "border-[#8181a5] text-[#8181a5]", dot: "bg-[#8181a5]", icon: XCircle      },
+  "Submitted":           { badge: "border-amber-500 text-amber-500",   dot: "bg-amber-500",   icon: Clock        },
+  "Under Investigation": { badge: "border-primary text-primary",       dot: "bg-primary",     icon: AlertCircle  },
+  "Resolved":            { badge: "border-emerald-600 text-emerald-600", dot: "bg-emerald-600", icon: CheckCircle2 },
+  "Closed":              { badge: "border-muted-foreground text-muted-foreground", dot: "bg-muted-foreground", icon: XCircle },
 }
 
 const CATEGORIES: ComplaintCategory[] = [
@@ -273,7 +273,7 @@ function StatusDropdown({ value, onChange }: { value: ComplaintStatus; onChange:
         <ChevronDown className="size-3" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+        <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
           {STATUSES.map(s => (
             <button
               key={s}
@@ -313,8 +313,8 @@ function FilterDropdown<T extends string>({
         className={cn(
           "flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
           active
-            ? "border-[#5e81f4] bg-[#eef2ff] text-[#5e81f4]"
-            : "border-border text-[#8181a5] hover:bg-muted"
+            ? "border-primary bg-primary/10 text-primary"
+            : "border-border text-muted-foreground hover:bg-muted"
         )}
       >
         <SlidersHorizontal className="size-3.5" />
@@ -322,7 +322,7 @@ function FilterDropdown<T extends string>({
         <ChevronDown className="size-3.5" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-30 mt-1 min-w-[180px] overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+        <div className="absolute right-0 top-full z-30 mt-1 min-w-[180px] overflow-hidden rounded-xl border border-border bg-card shadow-lg">
           <button
             onClick={() => { onChange("All"); setOpen(false) }}
             className={cn("flex w-full px-4 py-2.5 text-left text-sm hover:bg-muted", value === "All" && "bg-muted/60 font-medium")}
@@ -357,44 +357,44 @@ function DetailPanel({ c, onClose, onStatusChange }: {
   return (
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
-      <aside className="fixed right-0 top-0 z-40 flex h-full w-[440px] flex-col bg-white shadow-2xl">
+      <aside className="fixed right-0 top-0 z-40 flex h-full w-[440px] flex-col bg-card shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#8181a5]">{c.ref}</p>
-            <h2 className="mt-0.5 text-sm font-bold text-[#1f2937]">{c.title}</h2>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{c.ref}</p>
+            <h2 className="mt-0.5 text-sm font-bold text-foreground">{c.title}</h2>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
+          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+        <div className="flex-1 overflow-y-auto space-y-5 px-6 py-5">
           {/* Employee row */}
-          <div className="flex items-center gap-3 rounded-xl border border-border bg-[#f8fafc] px-4 py-3">
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3">
             <div className="relative">
               <img
                 src={c.photo}
                 alt={c.anonymous ? "Anonymous" : c.name}
-                className="size-11 shrink-0 rounded-full object-cover ring-2 ring-white shadow"
+                className="size-11 shrink-0 rounded-full object-cover ring-2 ring-background shadow"
               />
               {c.anonymous && (
-                <span className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full bg-[#6b7280] ring-2 ring-white">
-                  <EyeOff className="size-2.5 text-white" />
+                <span className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full bg-muted-foreground ring-2 ring-background">
+                  <EyeOff className="size-2.5 text-background" />
                 </span>
               )}
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-[#1f2937]">
+              <p className="font-semibold text-foreground">
                 {c.anonymous ? "Anonymous Employee" : c.name}
               </p>
               {c.anonymous ? (
-                <p className="text-xs text-[#8181a5]">Identity protected</p>
+                <p className="text-xs text-muted-foreground">Identity protected</p>
               ) : (
-                <p className="text-xs text-[#8181a5]">{c.email}</p>
+                <p className="text-xs text-muted-foreground">{c.email}</p>
               )}
               {c.department && (
-                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#f0f0ff] px-2 py-0.5 text-[11px] text-[#8a8cd9]">
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
                   <Building2 className="size-3" />{c.department}
                 </span>
               )}
@@ -415,7 +415,7 @@ function DetailPanel({ c, onClose, onStatusChange }: {
           </div>
 
           {/* Meta */}
-          <div className="flex items-center gap-4 text-xs text-[#8181a5]">
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <CalendarDays className="size-3.5" /> Submitted {c.submittedOn}
             </span>
@@ -426,30 +426,30 @@ function DetailPanel({ c, onClose, onStatusChange }: {
 
           {/* Description */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#8181a5]">Description</p>
-            <p className="text-sm leading-relaxed text-[#374151]">{c.description}</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</p>
+            <p className="text-sm leading-relaxed text-foreground">{c.description}</p>
           </div>
 
           {/* Timeline */}
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#8181a5]">Activity Timeline</p>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Activity Timeline</p>
             <div className="flex flex-col">
               {c.updates.map((u, i) => (
                 <div key={i} className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className="mt-1 size-2.5 shrink-0 rounded-full bg-[#5e81f4] ring-2 ring-[#5e81f4]/20" />
+                    <div className="mt-1 size-2.5 shrink-0 rounded-full bg-primary ring-2 ring-primary/20" />
                     {i < c.updates.length - 1 && <div className="my-0.5 w-px flex-1 bg-border" />}
                   </div>
                   <div className="pb-4">
-                    <p className="text-[11px] text-[#8181a5]">{u.date}</p>
-                    <p className="mt-0.5 text-sm text-[#374151]">{u.text}</p>
+                    <p className="text-[11px] text-muted-foreground">{u.date}</p>
+                    <p className="mt-0.5 text-sm text-foreground">{u.text}</p>
                   </div>
                 </div>
               ))}
               {c.status !== "Resolved" && c.status !== "Closed" && (
                 <div className="flex gap-3">
-                  <div className="mt-1 size-2.5 shrink-0 rounded-full border-2 border-border bg-white" />
-                  <p className="text-sm text-[#8181a5]/60">Awaiting next update…</p>
+                  <div className="mt-1 size-2.5 shrink-0 rounded-full border-2 border-border bg-card" />
+                  <p className="text-sm text-muted-foreground/60">Awaiting next update…</p>
                 </div>
               )}
             </div>
@@ -457,7 +457,7 @@ function DetailPanel({ c, onClose, onStatusChange }: {
 
           {/* Status update */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#8181a5]">Update Status</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Update Status</p>
             <div className="flex flex-wrap gap-2">
               {STATUSES.map(s => {
                 const active = s === c.status
@@ -469,7 +469,7 @@ function DetailPanel({ c, onClose, onStatusChange }: {
                       "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all",
                       active
                         ? statusStyle[s].badge
-                        : "border-border text-[#8181a5] hover:border-[#5e81f4] hover:text-[#5e81f4]"
+                        : "border-border text-muted-foreground hover:border-primary hover:text-primary"
                     )}
                   >
                     <span className={cn("size-2 rounded-full", statusStyle[s].dot)} />
@@ -494,12 +494,6 @@ export default function HRComplaintsPage() {
   const [statFilter,   setStatFilter]   = useState<ComplaintStatus   | "All">("All")
   const [page,         setPage]         = useState(1)
   const [detail,       setDetail]       = useState<Complaint | null>(null)
-
-  // Stats
-  const total       = complaints.length
-  const underInv    = complaints.filter(c => c.status === "Under Investigation").length
-  const resolved    = complaints.filter(c => c.status === "Resolved").length
-  const critical    = complaints.filter(c => c.priority === "Critical").length
 
   // Filtering
   const filtered = complaints.filter(c => {
@@ -534,24 +528,20 @@ export default function HRComplaintsPage() {
       <HrNavigationPannel navItems={sidebarNav} />
 
       <main className="flex flex-1 flex-col overflow-hidden">
-
-        {/* ── Stat cards ── */}
-     
-
         {/* ── Toolbar ── */}
-        <div className="flex shrink-0 items-center gap-3 border-b border-border bg-white px-6 py-3">
+        <div className="flex shrink-0 items-center gap-3 border-b border-border bg-card px-6 py-3">
           {/* Search */}
-          <div className="flex flex-1 items-center gap-2 rounded-lg bg-[#f4f5f9] px-4 py-2.5">
-            <Search className="size-4 shrink-0 text-[#8181a5]" />
+          <div className="flex flex-1 items-center gap-2 rounded-lg bg-muted px-4 py-2.5">
+            <Search className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="text"
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1) }}
               placeholder="Search by name, title, category, ref…"
-              className="flex-1 bg-transparent text-sm text-[#1c1c1c] outline-none placeholder:text-[#8181a5]"
+              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
             {search && (
-              <button onClick={() => setSearch("")} className="text-[#8181a5] hover:text-[#1c1c1c]">
+              <button onClick={() => setSearch("")} className="text-muted-foreground hover:text-foreground">
                 <X className="size-3.5" />
               </button>
             )}
@@ -564,7 +554,7 @@ export default function HRComplaintsPage() {
           {hasFilters && (
             <button
               onClick={clearFilters}
-              className="rounded-lg border border-border px-3 py-2.5 text-sm text-[#8181a5] hover:bg-muted"
+              className="rounded-lg border border-border px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted"
             >
               Clear
             </button>
@@ -573,14 +563,14 @@ export default function HRComplaintsPage() {
 
         {/* ── Table ── */}
         <div className="flex-1 overflow-auto p-6">
-          <div className="rounded-xl border border-border bg-white shadow-sm">
+          <div className="rounded-xl border border-border bg-card shadow-sm">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
                   {["Ref", "Employee", "Category", "Title", "Priority", "Submitted", "Status", ""].map(col => (
                     <th
                       key={col}
-                      className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#8181a5]"
+                      className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                     >
                       {col}
                     </th>
@@ -592,17 +582,16 @@ export default function HRComplaintsPage() {
                 {paginated.map(c => {
                   const catSty  = categoryStyle[c.category]
                   const prioSty = priorityStyle[c.priority]
-                  const statSty = statusStyle[c.status]
 
                   return (
                     <tr
                       key={c.id}
                       onClick={() => setDetail(c)}
-                      className="cursor-pointer hover:bg-[#f8fafc]"
+                      className="cursor-pointer hover:bg-muted/50"
                     >
                       {/* Ref */}
                       <td className="whitespace-nowrap px-5 py-4">
-                        <span className="font-mono text-xs font-semibold text-[#5e81f4]">{c.ref}</span>
+                        <span className="font-mono text-xs font-semibold text-primary">{c.ref}</span>
                       </td>
 
                       {/* Employee */}
@@ -615,16 +604,16 @@ export default function HRComplaintsPage() {
                               className="size-9 shrink-0 rounded-full object-cover"
                             />
                             {c.anonymous && (
-                              <span className="absolute -bottom-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-[#6b7280] ring-1 ring-white">
-                                <EyeOff className="size-2 text-white" />
+                              <span className="absolute -bottom-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-muted-foreground ring-1 ring-background">
+                                <EyeOff className="size-2 text-background" />
                               </span>
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate font-semibold text-[#1f2937]">
+                            <p className="truncate font-semibold text-foreground">
                               {c.anonymous ? "Anonymous" : c.name}
                             </p>
-                            <p className="truncate text-xs text-[#8181a5]">
+                            <p className="truncate text-xs text-muted-foreground">
                               {c.anonymous ? "Identity protected" : c.department}
                             </p>
                           </div>
@@ -640,8 +629,8 @@ export default function HRComplaintsPage() {
 
                       {/* Title */}
                       <td className="max-w-[220px] px-5 py-4">
-                        <p className="truncate font-medium text-[#1f2937]">{c.title}</p>
-                        <p className="mt-0.5 flex items-center gap-1 text-xs text-[#8181a5]">
+                        <p className="truncate font-medium text-foreground">{c.title}</p>
+                        <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
                           <MessageSquare className="size-3" />
                           {c.updates.length} update{c.updates.length !== 1 ? "s" : ""}
                         </p>
@@ -656,7 +645,7 @@ export default function HRComplaintsPage() {
                       </td>
 
                       {/* Submitted */}
-                      <td className="whitespace-nowrap px-5 py-4 text-[#667388]">{c.submittedOn}</td>
+                      <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">{c.submittedOn}</td>
 
                       {/* Status dropdown */}
                       <td className="px-5 py-4" onClick={e => e.stopPropagation()}>
@@ -667,7 +656,7 @@ export default function HRComplaintsPage() {
                       <td className="px-4 py-4">
                         <button
                           onClick={e => { e.stopPropagation(); setDetail(c) }}
-                          className="flex size-8 items-center justify-center rounded-lg text-[#8181a5] hover:bg-muted hover:text-[#5e81f4]"
+                          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
                           title="View complaint"
                         >
                           <Eye className="size-4" />
@@ -680,8 +669,8 @@ export default function HRComplaintsPage() {
                 {paginated.length === 0 && (
                   <tr>
                     <td colSpan={8} className="px-6 py-20 text-center">
-                      <ShieldAlert className="mx-auto mb-3 size-10 text-[#8181a5]/30" />
-                      <p className="text-sm text-[#8181a5]">
+                      <ShieldAlert className="mx-auto mb-3 size-10 text-muted-foreground/30" />
+                      <p className="text-sm text-muted-foreground">
                         {hasFilters ? "No complaints match your filters." : "No complaints have been filed yet."}
                       </p>
                     </td>
@@ -692,7 +681,7 @@ export default function HRComplaintsPage() {
 
             {/* Pagination */}
             <div className="flex items-center justify-between border-t border-border px-5 py-3">
-              <p className="text-xs text-[#8181a5]">
+              <p className="text-xs text-muted-foreground">
                 {filtered.length === 0
                   ? "No results"
                   : `Showing ${(page - 1) * PER_PAGE + 1}–${Math.min(page * PER_PAGE, filtered.length)} of ${filtered.length} complaint${filtered.length !== 1 ? "s" : ""}`}
@@ -701,7 +690,7 @@ export default function HRComplaintsPage() {
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="flex size-8 items-center justify-center rounded-lg text-[#4b5563] hover:bg-muted disabled:opacity-40"
+                  className="flex size-8 items-center justify-center rounded-lg text-foreground hover:bg-muted disabled:opacity-40"
                 >
                   <ChevronLeft className="size-4" />
                 </button>
@@ -711,7 +700,7 @@ export default function HRComplaintsPage() {
                     onClick={() => setPage(p)}
                     className={cn(
                       "flex size-8 items-center justify-center rounded-lg text-sm font-medium transition-colors",
-                      p === page ? "bg-[#5e81f4] text-white" : "text-[#8181a5] hover:bg-muted"
+                      p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
                     )}
                   >
                     {p}
@@ -720,7 +709,7 @@ export default function HRComplaintsPage() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="flex size-8 items-center justify-center rounded-lg text-[#4b5563] hover:bg-muted disabled:opacity-40"
+                  className="flex size-8 items-center justify-center rounded-lg text-foreground hover:bg-muted disabled:opacity-40"
                 >
                   <ChevronRight className="size-4" />
                 </button>

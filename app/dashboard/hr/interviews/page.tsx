@@ -198,11 +198,11 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px]"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="w-120 rounded-2xl bg-white shadow-2xl">
+      <div className="w-120 rounded-2xl bg-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-          <h2 className="text-sm font-semibold text-gray-900">Add Schedule</h2>
-          <button onClick={onClose} className="rounded-full p-1 text-gray-400 hover:bg-gray-100">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h2 className="text-sm font-semibold text-foreground">Add Schedule</h2>
+          <button onClick={onClose} className="rounded-full p-1 text-muted-foreground hover:bg-muted">
             <X className="size-4" />
           </button>
         </div>
@@ -215,39 +215,39 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
             onChange={(e) => setTitle(e.target.value)}
             placeholder="New event title"
             autoFocus
-            className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
 
           {/* Date */}
-          <div className="flex items-center gap-3 rounded-lg border border-gray-100 px-3 py-2.5 focus-within:border-blue-300">
-            <CalendarIcon className="size-4 shrink-0 text-gray-400" />
+          <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+            <CalendarIcon className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="flex-1 text-sm text-gray-700 outline-none"
+              className="flex-1 bg-transparent text-sm text-foreground outline-none"
             />
           </div>
 
           {/* Time range */}
           <div className="flex items-center gap-2">
-            <div className="flex flex-1 items-center gap-2 rounded-lg border border-gray-100 px-3 py-2.5 focus-within:border-blue-300">
-              <Clock className="size-3.5 shrink-0 text-gray-400" />
+            <div className="flex flex-1 items-center gap-2 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+              <Clock className="size-3.5 shrink-0 text-muted-foreground" />
               <input
                 type="time"
                 value={toTimeStr(startMin)}
                 onChange={(e) => setStartMin(parseTimeStr(e.target.value))}
-                className="w-full text-sm text-gray-700 outline-none"
+                className="w-full bg-transparent text-sm text-foreground outline-none"
               />
             </div>
-            <span className="text-sm text-gray-400">→</span>
-            <div className="flex flex-1 items-center gap-2 rounded-lg border border-gray-100 px-3 py-2.5 focus-within:border-blue-300">
-              <Clock className="size-3.5 shrink-0 text-gray-400" />
+            <span className="text-sm text-muted-foreground">→</span>
+            <div className="flex flex-1 items-center gap-2 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+              <Clock className="size-3.5 shrink-0 text-muted-foreground" />
               <input
                 type="time"
                 value={toTimeStr(endMin)}
                 onChange={(e) => setEndMin(parseTimeStr(e.target.value))}
-                className="w-full text-sm text-gray-700 outline-none"
+                className="w-full bg-transparent text-sm text-foreground outline-none"
               />
             </div>
           </div>
@@ -255,21 +255,21 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
           {/* Guest multi-select */}
           <div ref={guestRef} className="relative">
             <div
-              className="flex min-h-10.5 flex-wrap items-center gap-1.5 rounded-lg border border-gray-100 px-3 py-2 focus-within:border-blue-300 cursor-text"
+              className="flex min-h-10.5 flex-wrap items-center gap-1.5 rounded-lg border border-border px-3 py-2 focus-within:border-primary cursor-text"
               onClick={() => setShowDrop(true)}
             >
-              <UserPlus className="size-4 shrink-0 text-gray-400" />
+              <UserPlus className="size-4 shrink-0 text-muted-foreground" />
               {guests.map(g => (
                 <span
                   key={g.id}
-                  className="flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700"
+                  className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
                 >
                   <img src={g.photo} className="size-4 rounded-full object-cover" />
                   {g.name}
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setGuests(prev => prev.filter(x => x.id !== g.id)) }}
-                    className="ml-0.5 text-blue-400 hover:text-blue-700"
+                    className="ml-0.5 text-primary/60 hover:text-primary"
                   >
                     <X className="size-3" />
                   </button>
@@ -281,54 +281,54 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
                 onChange={(e) => { setGuestSearch(e.target.value); setShowDrop(true) }}
                 onFocus={() => setShowDrop(true)}
                 placeholder={guests.length === 0 ? "Add guest" : ""}
-                className="min-w-20 flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
+                className="min-w-20 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
 
             {showDrop && (
-              <div className="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-gray-100 bg-white shadow-lg">
+              <div className="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
                 {filteredCandidates.length > 0 ? filteredCandidates.map(c => (
                   <button
                     key={c.id}
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => { setGuests(prev => [...prev, c]); setGuestSearch(""); }}
-                    className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-gray-50"
+                    className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
                   >
                     <img src={c.photo} className="size-8 shrink-0 rounded-full object-cover" />
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-gray-800">{c.name}</p>
-                      <p className="truncate text-xs text-gray-400">{c.position}</p>
+                      <p className="truncate text-sm font-medium text-foreground">{c.name}</p>
+                      <p className="truncate text-xs text-muted-foreground">{c.position}</p>
                     </div>
                   </button>
                 )) : (
-                  <p className="px-3 py-3 text-xs text-gray-400">No matching candidates</p>
+                  <p className="px-3 py-3 text-xs text-muted-foreground">No matching candidates</p>
                 )}
               </div>
             )}
           </div>
 
           {/* Meet link */}
-          <div className="flex items-center gap-3 rounded-lg border border-gray-100 px-3 py-2.5 focus-within:border-blue-300">
-            <Link2 className="size-4 shrink-0 text-gray-400" />
+          <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+            <Link2 className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="url"
               value={meetLink}
               onChange={(e) => setMeetLink(e.target.value)}
               placeholder="https://meet.google.com/..."
-              className="flex-1 truncate text-sm text-blue-500 outline-none placeholder:text-gray-400"
+              className="flex-1 truncate bg-transparent text-sm text-primary outline-none placeholder:text-muted-foreground"
             />
           </div>
 
           {/* Description */}
-          <div className="flex items-center gap-3 rounded-lg border border-gray-100 px-3 py-2.5 focus-within:border-blue-300">
-            <AlignJustify className="size-4 shrink-0 text-gray-400" />
+          <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+            <AlignJustify className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="text"
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
               placeholder="Add description"
-              className="flex-1 text-sm text-gray-700 outline-none placeholder:text-gray-400"
+              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
 
@@ -340,27 +340,27 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
                 onClick={() => setColorIdx(i)}
                 className={cn(
                   "size-6 rounded-full border-2 transition-transform hover:scale-110",
-                  colorIdx === i ? "scale-110 border-gray-700" : "border-transparent"
+                  colorIdx === i ? "scale-110 border-foreground" : "border-transparent"
                 )}
                 style={{ backgroundColor: c.dot }}
               />
             ))}
           </div>
 
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p className="text-xs text-rose-500">{error}</p>}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 border-t border-gray-100 px-5 py-3">
+        <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-3">
           <button
             onClick={onClose}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="rounded-lg bg-gray-900 px-5 py-2 text-sm font-semibold text-white hover:bg-gray-700"
+            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             Save
           </button>
@@ -440,38 +440,38 @@ export default function InterviewsPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-hidden bg-white">
+      <main className="flex flex-1 flex-col overflow-hidden bg-card">
         {/* ── Top bar ── */}
-        <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-5 py-3">
+        <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3">
           {/* Left: month label + navigation */}
           <div className="flex items-center gap-3">
-            <h1 className="text-[15px] font-semibold text-gray-900">{headerLabel}</h1>
+            <h1 className="text-[15px] font-semibold text-foreground">{headerLabel}</h1>
             <button
               onClick={goToday}
-              className="rounded-md border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50"
+              className="rounded-md border border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted/50"
             >
               Today
             </button>
-            <button onClick={prevWeek} className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100">
+            <button onClick={prevWeek} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted">
               <ChevronLeft className="size-4" />
             </button>
-            <button onClick={nextWeek} className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100">
+            <button onClick={nextWeek} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted">
               <ChevronRight className="size-4" />
             </button>
           </div>
 
           {/* Right: icons + view toggle */}
           <div className="flex items-center gap-2">
-            <button className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
+            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
               <Search className="size-4" />
             </button>
-            <button className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
+            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
               <HelpCircle className="size-4" />
             </button>
-            <button className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
+            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
               <Settings className="size-4" />
             </button>
-            <div className="ml-1 flex rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+            <div className="ml-1 flex rounded-lg border border-border bg-muted/50 p-0.5">
               {(["Day","Week","Month"] as const).map(v => (
                 <button
                   key={v}
@@ -479,8 +479,8 @@ export default function InterviewsPage() {
                   className={cn(
                     "rounded-md px-3 py-1 text-xs font-medium transition-colors",
                     view === v
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {v}
@@ -498,11 +498,11 @@ export default function InterviewsPage() {
             <div className="flex min-w-0 flex-1 flex-col">
 
               {/* Sticky day-header row */}
-              <div className="sticky top-0 z-20 flex border-b border-gray-100 bg-white">
+              <div className="sticky top-0 z-20 flex border-b border-border bg-card">
                 {/* Spacer for time column */}
-                <div className="w-16 shrink-0 border-r border-gray-100">
+                <div className="w-16 shrink-0 border-r border-border">
                   <div className="flex h-14 items-end justify-center pb-2">
-                    <span className="text-[10px] font-medium text-gray-400">GMT+0</span>
+                    <span className="text-[10px] font-medium text-muted-foreground">GMT+0</span>
                   </div>
                 </div>
 
@@ -512,15 +512,15 @@ export default function InterviewsPage() {
                   return (
                     <div
                       key={i}
-                      className="flex flex-1 flex-col items-center justify-center gap-1 border-r border-gray-100 py-2 last:border-r-0"
+                      className="flex flex-1 flex-col items-center justify-center gap-1 border-r border-border py-2 last:border-r-0"
                     >
-                      <span className={cn("text-[11px] font-semibold uppercase tracking-wide", tod ? "text-blue-600" : "text-gray-400")}>
+                      <span className={cn("text-[11px] font-semibold uppercase tracking-wide", tod ? "text-primary" : "text-muted-foreground")}>
                         {DAY_ABBR[d.getDay()]}
                       </span>
                       <span
                         className={cn(
                           "flex size-8 items-center justify-center rounded-full text-sm font-bold",
-                          tod ? "bg-blue-600 text-white" : "text-gray-800"
+                          tod ? "bg-primary text-primary-foreground" : "text-foreground"
                         )}
                       >
                         {d.getDate()}
@@ -533,7 +533,7 @@ export default function InterviewsPage() {
               {/* Time grid */}
               <div className="flex flex-1">
                 {/* Time labels column */}
-                <div className="relative w-16 shrink-0 border-r border-gray-100">
+                <div className="relative w-16 shrink-0 border-r border-border">
                   <div style={{ height: `${(GRID_END - GRID_START) * HOUR_PX}px` }} className="relative">
                     {hours.map(h => (
                       <div
@@ -541,7 +541,7 @@ export default function InterviewsPage() {
                         className="absolute right-0 flex w-full justify-end pr-2"
                         style={{ top: `${(h - GRID_START) * HOUR_PX - 8}px` }}
                       >
-                        <span className="text-[10px] text-gray-400">
+                        <span className="text-[10px] text-muted-foreground">
                           {h === 12 ? "12 PM" : h > 12 ? `${h - 12} PM` : `${h} AM`}
                         </span>
                       </div>
@@ -558,7 +558,7 @@ export default function InterviewsPage() {
                   {hours.map(h => (
                     <div
                       key={h}
-                      className="pointer-events-none absolute left-0 right-0 border-t border-gray-100"
+                      className="pointer-events-none absolute left-0 right-0 border-t border-border"
                       style={{ top: `${(h - GRID_START) * HOUR_PX}px` }}
                     />
                   ))}
@@ -574,8 +574,8 @@ export default function InterviewsPage() {
                       <div
                         key={colIdx}
                         className={cn(
-                          "relative flex-1 cursor-pointer border-r border-gray-100 last:border-r-0",
-                          todDay && "bg-blue-50/30"
+                          "relative flex-1 cursor-pointer border-r border-border last:border-r-0",
+                          todDay && "bg-primary/5"
                         )}
                         onClick={(e) => {
                           const rect = e.currentTarget.getBoundingClientRect()

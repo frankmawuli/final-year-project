@@ -412,11 +412,12 @@ function InfoRow({
 // ── Main page ─────────────────────────────────────────────────
 export default function JobDetailPage() {
   const params = useParams()
-  const id = Number(params.id)
+  const rawId = String(params.id ?? "")
+  const numId = Number(rawId)
   // Prefer hardcoded seed data; fall back to jobs created at runtime via the store
   const job = useMemo(
-    () => JOBS[id] ?? jobsStore.get(id) ?? JOBS[1],
-    [id]
+    () => JOBS[numId] ?? jobsStore.get(numId) ?? JOBS[1],
+    [numId]
   )
 
   return (
@@ -530,7 +531,7 @@ export default function JobDetailPage() {
               {/* Action buttons */}
               <div className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-4 shadow-sm">
                 <Link
-                  href="/apply/apply"
+                  href={`/apply/apply?jobId=${rawId}`}
                   className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
                 >

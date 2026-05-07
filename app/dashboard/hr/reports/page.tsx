@@ -39,11 +39,11 @@ interface EmployeeReport {
 
 // ── Style maps ────────────────────────────────────────────────
 const typeBadge: Record<ReportType, string> = {
-  "Performance":  "bg-[#eef2ff] text-[#5e81f4]",
-  "Work Summary": "bg-[#f0fdf4] text-[#16a34a]",
-  "Incident":     "bg-[#fef2f2] text-[#dc2626]",
-  "Goal Update":  "bg-[#fffbeb] text-[#d97706]",
-  "Complaint":    "bg-[#f5f3ff] text-[#7c3aed]",
+  "Performance":  "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
+  "Work Summary": "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  "Incident":     "bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+  "Goal Update":  "bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
+  "Complaint":    "bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
 }
 
 const typeIcon: Record<ReportType, React.ElementType> = {
@@ -55,10 +55,10 @@ const typeIcon: Record<ReportType, React.ElementType> = {
 }
 
 const statusStyle: Record<ReportStatus, { badge: string; dot: string; icon: React.ElementType }> = {
-  "Submitted":    { badge: "border-[#d97706] text-[#d97706]", dot: "bg-[#d97706]", icon: Clock        },
-  "Under Review": { badge: "border-[#5e81f4] text-[#5e81f4]", dot: "bg-[#5e81f4]", icon: Clock        },
-  "Resolved":     { badge: "border-[#16a34a] text-[#16a34a]", dot: "bg-[#16a34a]", icon: CheckCircle2 },
-  "Closed":       { badge: "border-[#8181a5] text-[#8181a5]", dot: "bg-[#8181a5]", icon: XCircle      },
+  "Submitted":    { badge: "border-amber-500 text-amber-500",   dot: "bg-amber-500",   icon: Clock        },
+  "Under Review": { badge: "border-primary text-primary",       dot: "bg-primary",     icon: Clock        },
+  "Resolved":     { badge: "border-emerald-600 text-emerald-600", dot: "bg-emerald-600", icon: CheckCircle2 },
+  "Closed":       { badge: "border-muted-foreground text-muted-foreground", dot: "bg-muted-foreground", icon: XCircle },
 }
 
 const STATUS_OPTIONS: ReportStatus[] = ["Submitted", "Under Review", "Resolved", "Closed"]
@@ -198,7 +198,7 @@ function StatusDropdown({ value, onChange }: { value: ReportStatus; onChange: (s
         <ChevronDown className="size-3" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-30 mt-1 w-36 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+        <div className="absolute right-0 top-full z-30 mt-1 w-36 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
           {STATUS_OPTIONS.map((s) => (
             <button
               key={s}
@@ -227,28 +227,28 @@ function DetailPanel({ report, onClose, onStatusChange }: {
   return (
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
-      <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-white shadow-2xl">
+      <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-card shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-base font-semibold text-[#1f2937]">Report Detail</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
+          <h2 className="text-base font-semibold text-foreground">Report Detail</h2>
+          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {/* Employee hero */}
-          <div className="mb-5 flex items-center gap-4 rounded-xl border border-border bg-[#f8fafc] px-5 py-4">
+          <div className="mb-5 flex items-center gap-4 rounded-xl border border-border bg-muted/50 px-5 py-4">
             <img
               src={report.photo}
               alt={report.name}
-              className="size-14 shrink-0 rounded-full object-cover ring-2 ring-white shadow"
+              className="size-14 shrink-0 rounded-full object-cover ring-2 ring-background shadow"
             />
             <div className="min-w-0">
-              <p className="font-bold text-[#1f2937]">{report.name}</p>
-              <p className="text-xs text-[#8181a5]">{report.email}</p>
+              <p className="font-bold text-foreground">{report.name}</p>
+              <p className="text-xs text-muted-foreground">{report.email}</p>
               <div className="mt-1.5 flex items-center gap-2">
-                <span className="flex items-center gap-1 rounded-full bg-[#f0f0ff] px-2 py-0.5 text-[11px] text-[#8a8cd9]">
+                <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
                   <Building2 className="size-3" />
                   {report.department}
                 </span>
@@ -264,7 +264,7 @@ function DetailPanel({ report, onClose, onStatusChange }: {
                 <Icon className={cn("size-4", typeBadge[report.reportType].split(" ")[1])} />
               </div>
               <div>
-                <p className="font-semibold text-[#1f2937]">{report.title}</p>
+                <p className="font-semibold text-foreground">{report.title}</p>
                 <span className={cn("mt-1 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold", typeBadge[report.reportType])}>
                   {report.reportType}
                 </span>
@@ -272,25 +272,25 @@ function DetailPanel({ report, onClose, onStatusChange }: {
             </div>
 
             {/* Meta rows */}
-            <div className="space-y-2 rounded-xl border border-border bg-[#f8fafc] p-4 text-sm">
+            <div className="space-y-2 rounded-xl border border-border bg-muted/50 p-4 text-sm">
               {[
                 { icon: CalendarDays, label: "Period",       value: report.period      },
                 { icon: FileText,     label: "Submitted",    value: report.submittedOn },
               ].map(({ icon: Ic, label, value }) => (
                 <div key={label} className="flex items-center gap-3">
-                  <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-white shadow-sm">
-                    <Ic className="size-3.5 text-[#8181a5]" />
+                  <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-background shadow-sm">
+                    <Ic className="size-3.5 text-muted-foreground" />
                   </div>
-                  <span className="w-24 shrink-0 text-[#8181a5]">{label}</span>
-                  <span className="font-medium text-[#1f2937]">{value}</span>
+                  <span className="w-24 shrink-0 text-muted-foreground">{label}</span>
+                  <span className="font-medium text-foreground">{value}</span>
                 </div>
               ))}
               {report.score !== undefined && (
                 <div className="flex items-center gap-3">
-                  <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-white shadow-sm">
-                    <TrendingUp className="size-3.5 text-[#8181a5]" />
+                  <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-background shadow-sm">
+                    <TrendingUp className="size-3.5 text-muted-foreground" />
                   </div>
-                  <span className="w-24 shrink-0 text-[#8181a5]">Score</span>
+                  <span className="w-24 shrink-0 text-muted-foreground">Score</span>
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
                     {report.score} / 100
                   </span>
@@ -301,13 +301,13 @@ function DetailPanel({ report, onClose, onStatusChange }: {
 
           {/* Summary */}
           <div className="mb-5">
-            <p className="mb-2 text-sm font-semibold text-[#1f2937]">Summary</p>
-            <p className="text-sm leading-relaxed text-[#667388]">{report.summary}</p>
+            <p className="mb-2 text-sm font-semibold text-foreground">Summary</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">{report.summary}</p>
           </div>
 
           {/* Status update */}
           <div>
-            <p className="mb-2 text-sm font-semibold text-[#1f2937]">Update Status</p>
+            <p className="mb-2 text-sm font-semibold text-foreground">Update Status</p>
             <div className="flex flex-wrap gap-2">
               {STATUS_OPTIONS.map((s) => {
                 const { dot } = statusStyle[s]
@@ -320,7 +320,7 @@ function DetailPanel({ report, onClose, onStatusChange }: {
                       "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all",
                       active
                         ? cn("border-current", statusStyle[s].badge)
-                        : "border-border text-[#8181a5] hover:border-current hover:text-[#1f2937]"
+                        : "border-border text-muted-foreground hover:border-current hover:text-foreground"
                     )}
                   >
                     <span className={cn("size-2 rounded-full", dot)} />
@@ -358,12 +358,6 @@ export default function HRReportsPage() {
     return () => document.removeEventListener("mousedown", h)
   }, [])
 
-  // Derived stats
-  const total       = reports.length
-  const underReview = reports.filter(r => r.status === "Under Review").length
-  const resolved    = reports.filter(r => r.status === "Resolved").length
-  const closed      = reports.filter(r => r.status === "Closed").length
-
   // Filtering
   const filtered = reports.filter(r => {
     const matchSearch =
@@ -394,24 +388,21 @@ export default function HRReportsPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      {/* ── Main content ── */}
       <main className="flex flex-1 flex-col overflow-hidden">
-
-      
         {/* ── Toolbar ── */}
-        <div className="flex shrink-0 items-center gap-3 border-b border-border bg-white px-6 py-3">
+        <div className="flex shrink-0 items-center gap-3 border-b border-border bg-card px-6 py-3">
           {/* Search */}
-          <div className="flex flex-1 items-center gap-2 rounded-lg bg-[#f4f5f9] px-4 py-2.5">
-            <Search className="size-4 shrink-0 text-[#8181a5]" />
+          <div className="flex flex-1 items-center gap-2 rounded-lg bg-muted px-4 py-2.5">
+            <Search className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="text"
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1) }}
               placeholder="Search by name, title, department…"
-              className="flex-1 bg-transparent text-sm text-[#1c1c1c] outline-none placeholder:text-[#8181a5]"
+              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
             {search && (
-              <button onClick={() => setSearch("")} className="text-[#8181a5] hover:text-[#1c1c1c]">
+              <button onClick={() => setSearch("")} className="text-muted-foreground hover:text-foreground">
                 <X className="size-3.5" />
               </button>
             )}
@@ -424,8 +415,8 @@ export default function HRReportsPage() {
               className={cn(
                 "flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
                 typeFilter !== "All"
-                  ? "border-[#5e81f4] bg-[#eef2ff] text-[#5e81f4]"
-                  : "border-border text-[#8181a5] hover:bg-muted"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:bg-muted"
               )}
             >
               <SlidersHorizontal className="size-4" />
@@ -433,7 +424,7 @@ export default function HRReportsPage() {
               <ChevronDown className="size-3.5" />
             </button>
             {typeOpen && (
-              <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+              <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
                 <button
                   onClick={() => { setTypeFilter("All"); setTypeOpen(false); setPage(1) }}
                   className={cn("flex w-full px-4 py-2.5 text-left text-sm hover:bg-muted", typeFilter === "All" && "bg-muted/60 font-medium")}
@@ -460,17 +451,17 @@ export default function HRReportsPage() {
               className={cn(
                 "flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
                 statFilter !== "All"
-                  ? "border-[#5e81f4] bg-[#eef2ff] text-[#5e81f4]"
-                  : "border-border text-[#8181a5] hover:bg-muted"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:bg-muted"
               )}
             >
               Status
-              {statFilter !== "All" && <span className="size-2 rounded-full" style={{ backgroundColor: statusStyle[statFilter as ReportStatus].dot }} />}
-              {statFilter === "All" ? "" : ` · ${statFilter}`}
+              {statFilter !== "All" && <span className={cn("size-2 rounded-full", statusStyle[statFilter as ReportStatus].dot)} />}
+              {statFilter !== "All" && ` · ${statFilter}`}
               <ChevronDown className="size-3.5" />
             </button>
             {statusOpen && (
-              <div className="absolute right-0 top-full z-30 mt-1 w-40 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+              <div className="absolute right-0 top-full z-30 mt-1 w-40 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
                 <button
                   onClick={() => { setStatFilter("All"); setStatusOpen(false); setPage(1) }}
                   className={cn("flex w-full px-4 py-2.5 text-left text-sm hover:bg-muted", statFilter === "All" && "bg-muted/60 font-medium")}
@@ -494,7 +485,7 @@ export default function HRReportsPage() {
           {hasFilters && (
             <button
               onClick={resetFilters}
-              className="rounded-lg border border-border px-3 py-2.5 text-sm text-[#8181a5] hover:bg-muted"
+              className="rounded-lg border border-border px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted"
             >
               Clear
             </button>
@@ -503,14 +494,14 @@ export default function HRReportsPage() {
 
         {/* ── Table ── */}
         <div className="flex-1 overflow-auto p-6">
-          <div className="rounded-xl border border-border bg-white shadow-sm">
+          <div className="rounded-xl border border-border bg-card shadow-sm">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
                   {["Employee", "Department", "Report Type", "Title", "Period", "Submitted", "Status", ""].map(col => (
                     <th
                       key={col}
-                      className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#8181a5]"
+                      className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                     >
                       {col}
                     </th>
@@ -524,7 +515,7 @@ export default function HRReportsPage() {
                   return (
                     <tr
                       key={r.id}
-                      className="cursor-pointer hover:bg-[#f8fafc]"
+                      className="cursor-pointer hover:bg-muted/50"
                       onClick={() => setDetail(r)}
                     >
                       {/* Employee */}
@@ -536,14 +527,14 @@ export default function HRReportsPage() {
                             className="size-9 shrink-0 rounded-full object-cover"
                           />
                           <div className="min-w-0">
-                            <p className="truncate font-semibold text-[#1f2937]">{r.name}</p>
-                            <p className="truncate text-xs text-[#8181a5]">{r.email}</p>
+                            <p className="truncate font-semibold text-foreground">{r.name}</p>
+                            <p className="truncate text-xs text-muted-foreground">{r.email}</p>
                           </div>
                         </div>
                       </td>
 
                       {/* Department */}
-                      <td className="px-5 py-4 text-[#667388]">{r.department}</td>
+                      <td className="px-5 py-4 text-muted-foreground">{r.department}</td>
 
                       {/* Report type */}
                       <td className="px-5 py-4">
@@ -555,7 +546,7 @@ export default function HRReportsPage() {
 
                       {/* Title */}
                       <td className="max-w-[200px] px-5 py-4">
-                        <p className="truncate font-medium text-[#1f2937]">{r.title}</p>
+                        <p className="truncate font-medium text-foreground">{r.title}</p>
                         {r.score !== undefined && (
                           <span className="mt-0.5 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
                             {r.score}/100
@@ -564,10 +555,10 @@ export default function HRReportsPage() {
                       </td>
 
                       {/* Period */}
-                      <td className="whitespace-nowrap px-5 py-4 text-[#667388]">{r.period}</td>
+                      <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">{r.period}</td>
 
                       {/* Submitted */}
-                      <td className="whitespace-nowrap px-5 py-4 text-[#667388]">{r.submittedOn}</td>
+                      <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">{r.submittedOn}</td>
 
                       {/* Status */}
                       <td className="px-5 py-4" onClick={e => e.stopPropagation()}>
@@ -581,7 +572,7 @@ export default function HRReportsPage() {
                       <td className="px-4 py-4">
                         <button
                           onClick={e => { e.stopPropagation(); setDetail(r) }}
-                          className="flex size-8 items-center justify-center rounded-lg text-[#8181a5] hover:bg-muted hover:text-[#5e81f4]"
+                          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
                           title="View report"
                         >
                           <Eye className="size-4" />
@@ -593,7 +584,7 @@ export default function HRReportsPage() {
 
                 {paginated.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-6 py-16 text-center text-[#8181a5]">
+                    <td colSpan={8} className="px-6 py-16 text-center text-muted-foreground">
                       {hasFilters ? "No reports match your filters." : "No reports submitted yet."}
                     </td>
                   </tr>
@@ -603,7 +594,7 @@ export default function HRReportsPage() {
 
             {/* Pagination */}
             <div className="flex items-center justify-between border-t border-border px-5 py-3">
-              <p className="text-xs text-[#8181a5]">
+              <p className="text-xs text-muted-foreground">
                 {filtered.length === 0
                   ? "No results"
                   : `Showing ${(page - 1) * PER_PAGE + 1}–${Math.min(page * PER_PAGE, filtered.length)} of ${filtered.length} report${filtered.length !== 1 ? "s" : ""}`}
@@ -612,7 +603,7 @@ export default function HRReportsPage() {
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="flex size-8 items-center justify-center rounded-lg text-[#4b5563] hover:bg-muted disabled:opacity-40"
+                  className="flex size-8 items-center justify-center rounded-lg text-foreground hover:bg-muted disabled:opacity-40"
                 >
                   <ChevronLeft className="size-4" />
                 </button>
@@ -622,7 +613,7 @@ export default function HRReportsPage() {
                     onClick={() => setPage(p)}
                     className={cn(
                       "flex size-8 items-center justify-center rounded-lg text-sm font-medium transition-colors",
-                      p === page ? "bg-[#5e81f4] text-white" : "text-[#8181a5] hover:bg-muted"
+                      p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
                     )}
                   >
                     {p}
@@ -631,7 +622,7 @@ export default function HRReportsPage() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="flex size-8 items-center justify-center rounded-lg text-[#4b5563] hover:bg-muted disabled:opacity-40"
+                  className="flex size-8 items-center justify-center rounded-lg text-foreground hover:bg-muted disabled:opacity-40"
                 >
                   <ChevronRight className="size-4" />
                 </button>

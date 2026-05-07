@@ -24,7 +24,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>
   register: (fullName: string, email: string, password: string) => Promise<void>
   logout: () => void
-  requestResetPassword: () => Promise<void>
+  requestResetPassword: (email: string) => Promise<void>
   resetPassword: (email: string, otp: string, oldPassword: string, newPassword: string) => Promise<void>
 }
 
@@ -97,17 +97,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/auth/login")
   }, [accessToken, router])
 
-  const requestResetPassword = useCallback(async () => {
-    if (!accessToken) throw new Error("Not authenticated")
-    await authService.requestResetPassword(accessToken)
-  }, [accessToken])
+  const requestResetPassword = useCallback(async (email: string) => {
+    await authService.requestResetPassword(email)
+  }, [])
 
   const resetPassword = useCallback(
     async (email: string, otp: string, oldPassword: string, newPassword: string) => {
-      if (!accessToken) throw new Error("Not authenticated")
-      await authService.resetPassword(accessToken, email, otp, oldPassword, newPassword)
+      await authService.resetPassword(email, otp, oldPassword, newPassword)
     },
-    [accessToken],
+    [],
   )
 
   return (

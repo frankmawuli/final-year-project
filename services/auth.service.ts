@@ -37,21 +37,12 @@ export const authService = {
   refreshToken: (refreshToken: string) =>
     api.post<{ success: boolean; data: { accessToken: string } }>("/auth/refresh-token", { refreshToken }),
 
-  requestResetPassword: (accessToken: string) =>
-    api.post<{ success: boolean; message: string }>("/auth/request-reset-password", undefined, {
-      Authorization: `Bearer ${accessToken}`,
-    }),
+  requestResetPassword: (email: string) =>
+    api.post<{ success: boolean; message: string }>("/auth/request-reset-password", { email }),
 
-  resetPassword: (
-    accessToken: string,
-    email: string,
-    otp: string,
-    oldPassword: string,
-    newPassword: string
-  ) =>
+  resetPassword: (email: string, otp: string, oldPassword: string, newPassword: string) =>
     api.post<{ success: boolean; message: string }>(
       "/auth/reset-password",
       { email, otp, oldPassword, newPassword },
-      { Authorization: `Bearer ${accessToken}` }
     ),
 }

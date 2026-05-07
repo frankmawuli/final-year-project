@@ -1,14 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { DollarSign, BarChart2, Minus, CalendarDays, Clock, ChevronRight, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 
 // ── Assets ────────────────────────────────────────────────────
-const adminPhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
-
 const photos = {
   a: "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
   b: "/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png",
@@ -47,9 +44,9 @@ const payrollEmployees: PayrollEmployee[] = [
 ]
 
 const statusStyle: Record<PayrollEmployee["status"], string> = {
-  Paid:       "bg-emerald-50 text-emerald-600",
-  Pending:    "bg-amber-50 text-amber-600",
-  Processing: "bg-blue-50 text-[#2d68fe]",
+  Paid:       "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
+  Pending:    "bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
+  Processing: "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
 }
 
 // ── Data ──────────────────────────────────────────────────────
@@ -61,7 +58,7 @@ const stats = [
     changeLabel: "this month",
     positive:    true,
     Icon:        DollarSign,
-    iconBg:      "bg-[#2d68fe]",
+    iconBg:      "bg-primary",
   },
   {
     label:       "Total Gross",
@@ -70,7 +67,7 @@ const stats = [
     changeLabel: "before deductions",
     positive:    true,
     Icon:        BarChart2,
-    iconBg:      "bg-[#2d68fe]",
+    iconBg:      "bg-primary",
   },
   {
     label:       "Total Deductions",
@@ -79,7 +76,7 @@ const stats = [
     changeLabel: "taxes & benefits",
     positive:    false,
     Icon:        Minus,
-    iconBg:      "bg-[#eef0f6]",
+    iconBg:      "bg-muted",
   },
 ]
 
@@ -125,17 +122,17 @@ function EmployeesPayrollTab() {
   const fmt = (n: number) => `$${n.toLocaleString()}`
 
   return (
-    <div className="rounded-2xl bg-white shadow-sm">
+    <div className="rounded-2xl bg-card shadow-sm">
       {/* Table toolbar */}
       <div className="flex items-center justify-between border-b border-border px-6 py-4">
-        <h2 className="text-base font-semibold text-[#1c1c1c]">Employee Payroll — March 2026</h2>
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-[#f8fafc] px-3 py-2">
-          <Search className="size-4 shrink-0 text-[#8181a5]" />
+        <h2 className="text-base font-semibold text-foreground">Employee Payroll — March 2026</h2>
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-muted px-3 py-2">
+          <Search className="size-4 shrink-0 text-muted-foreground" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search employees…"
-            className="w-44 bg-transparent text-sm text-[#1c1c1c] outline-none placeholder:text-[#8181a5]"
+            className="w-44 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
           />
         </div>
       </div>
@@ -145,20 +142,20 @@ function EmployeesPayrollTab() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Employee</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Base Salary</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Department</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Bonus</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Deductions</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Net Pay</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Employee</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Base Salary</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Department</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Bonus</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Deductions</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Net Pay</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.map((emp) => {
               const netPay = emp.baseSalary + emp.bonus - emp.deductions
               return (
-                <tr key={emp.id} className="hover:bg-[#f8fafc]">
+                <tr key={emp.id} className="hover:bg-muted/50">
                   {/* Employee */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -168,17 +165,17 @@ function EmployeesPayrollTab() {
                         className="size-9 shrink-0 rounded-full object-cover"
                       />
                       <div>
-                        <p className="font-medium text-[#1c1c1c]">{emp.name}</p>
-                        <p className="text-xs text-[#8181a5]">{emp.email}</p>
+                        <p className="font-medium text-foreground">{emp.name}</p>
+                        <p className="text-xs text-muted-foreground">{emp.email}</p>
                       </div>
                     </div>
                   </td>
 
                   {/* Base Salary */}
-                  <td className="px-4 py-4 text-[#1c1c1c]">{fmt(emp.baseSalary)}</td>
+                  <td className="px-4 py-4 text-foreground">{fmt(emp.baseSalary)}</td>
 
                   {/* Department */}
-                  <td className="px-4 py-4 text-[#8181a5]">{emp.department}</td>
+                  <td className="px-4 py-4 text-muted-foreground">{emp.department}</td>
 
                   {/* Bonus */}
                   <td className="px-4 py-4 font-medium text-emerald-500">+{fmt(emp.bonus)}</td>
@@ -187,7 +184,7 @@ function EmployeesPayrollTab() {
                   <td className="px-4 py-4 font-medium text-rose-500">-{fmt(emp.deductions)}</td>
 
                   {/* Net Pay */}
-                  <td className="px-4 py-4 font-semibold text-[#1c1c1c]">{fmt(netPay)}</td>
+                  <td className="px-4 py-4 font-semibold text-foreground">{fmt(netPay)}</td>
 
                   {/* Status */}
                   <td className="px-4 py-4">
@@ -201,7 +198,7 @@ function EmployeesPayrollTab() {
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-[#8181a5]">
+                <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                   No employees match your search.
                 </td>
               </tr>
@@ -212,13 +209,13 @@ function EmployeesPayrollTab() {
 
       {/* Footer totals */}
       <div className="flex items-center justify-between border-t border-border px-6 py-4">
-        <p className="text-xs text-[#8181a5]">{filtered.length} of {payrollEmployees.length} employees</p>
+        <p className="text-xs text-muted-foreground">{filtered.length} of {payrollEmployees.length} employees</p>
         <div className="flex items-center gap-8 text-sm">
-          <span className="text-[#8181a5]">
-            Total base: <span className="font-semibold text-[#1c1c1c]">{fmt(filtered.reduce((s, e) => s + e.baseSalary, 0))}</span>
+          <span className="text-muted-foreground">
+            Total base: <span className="font-semibold text-foreground">{fmt(filtered.reduce((s, e) => s + e.baseSalary, 0))}</span>
           </span>
-          <span className="text-[#8181a5]">
-            Total net: <span className="font-semibold text-[#1c1c1c]">{fmt(filtered.reduce((s, e) => s + e.baseSalary + e.bonus - e.deductions, 0))}</span>
+          <span className="text-muted-foreground">
+            Total net: <span className="font-semibold text-foreground">{fmt(filtered.reduce((s, e) => s + e.baseSalary + e.bonus - e.deductions, 0))}</span>
           </span>
         </div>
       </div>
@@ -232,7 +229,6 @@ export default function PayrollPage() {
 
   return (
     <>
-
       {/* ── Text sidebar ── */}
       <HrNavigationPannel navItems={sidebarNav}/>
       {/* ── Main content ── */}
@@ -241,26 +237,26 @@ export default function PayrollPage() {
         {/* Stats row */}
         <div className="mb-8 grid grid-cols-3 gap-6">
           {stats.map(({ label, value, change, changeLabel, positive, Icon, iconBg }) => (
-            <div key={label} className="flex items-start justify-between rounded-2xl bg-white p-6 shadow-sm">
+            <div key={label} className="flex items-start justify-between rounded-2xl bg-card p-6 shadow-sm">
               <div>
-                <p className="mb-1 text-sm text-[#8181a5]">{label}</p>
-                <p className="mb-2 text-3xl font-bold tracking-tight text-[#1c1c1c]">{value}</p>
+                <p className="mb-1 text-sm text-muted-foreground">{label}</p>
+                <p className="mb-2 text-3xl font-bold tracking-tight text-foreground">{value}</p>
                 <div className="flex items-center gap-1.5">
                   <span className={cn("text-sm font-semibold", positive ? "text-emerald-500" : "text-rose-500")}>
                     ↑ {change}
                   </span>
-                  <span className="text-sm text-[#8181a5]">{changeLabel}</span>
+                  <span className="text-sm text-muted-foreground">{changeLabel}</span>
                 </div>
               </div>
               <div className={cn("flex size-11 shrink-0 items-center justify-center rounded-full", iconBg)}>
-                <Icon className={cn("size-5", positive ? "text-white" : "text-[#8181a5]")} />
+                <Icon className={cn("size-5", positive ? "text-primary-foreground" : "text-muted-foreground")} />
               </div>
             </div>
           ))}
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 flex w-fit items-center gap-1 rounded-xl border border-border bg-white p-1 shadow-sm">
+        <div className="mb-6 flex w-fit items-center gap-1 rounded-xl border border-border bg-card p-1 shadow-sm">
           {TABS.map((tab) => (
             <button
               key={tab}
@@ -268,8 +264,8 @@ export default function PayrollPage() {
               className={cn(
                 "rounded-lg px-5 py-2 text-sm font-medium transition-colors",
                 activeTab === tab
-                  ? "bg-white text-[#1c1c1c] shadow-sm ring-1 ring-border"
-                  : "text-[#8181a5] hover:text-[#1c1c1c]"
+                  ? "bg-background text-foreground shadow-sm ring-1 ring-border"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               {tab}
@@ -282,34 +278,34 @@ export default function PayrollPage() {
           <div className="grid grid-cols-[1fr_360px] gap-6">
 
             {/* Recent Payroll Runs */}
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="rounded-2xl bg-card p-6 shadow-sm">
               <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[#1c1c1c]">Recent Payroll Runs</h2>
-                <button className="text-sm font-medium text-[#5e81f4] hover:underline">View all</button>
+                <h2 className="text-lg font-semibold text-foreground">Recent Payroll Runs</h2>
+                <button className="text-sm font-medium text-primary hover:underline">View all</button>
               </div>
 
               <div className="flex flex-col divide-y divide-border">
                 {payrollRuns.map((run) => (
                   <div key={run.period} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                     <div className="flex items-center gap-4">
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50">
-                        <CalendarDays className="size-5 text-[#2d68fe]" />
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/30">
+                        <CalendarDays className="size-5 text-primary" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#1c1c1c]">{run.period}</p>
-                        <p className="text-xs text-[#8181a5]">
+                        <p className="text-sm font-semibold text-foreground">{run.period}</p>
+                        <p className="text-xs text-muted-foreground">
                           {run.employees} employees • {run.meta}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-5">
-                      <p className="text-sm font-bold text-[#1c1c1c]">{run.amount}</p>
+                      <p className="text-sm font-bold text-foreground">{run.amount}</p>
                       <span
                         className={cn(
                           "min-w-[90px] rounded-md px-3 py-1 text-center text-xs font-semibold",
                           run.status === "Scheduled"
-                            ? "bg-blue-50 text-[#2d68fe]"
-                            : "bg-emerald-50 text-emerald-600"
+                            ? "bg-blue-50 text-primary dark:bg-blue-900/30 dark:text-blue-400"
+                            : "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
                         )}
                       >
                         {run.status}
@@ -324,20 +320,20 @@ export default function PayrollPage() {
             <div className="flex flex-col gap-6">
 
               {/* Pay Distribution */}
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-5 text-lg font-semibold text-[#1c1c1c]">Pay Distribution</h2>
+              <div className="rounded-2xl bg-card p-6 shadow-sm">
+                <h2 className="mb-5 text-lg font-semibold text-foreground">Pay Distribution</h2>
                 <div className="flex flex-col gap-4">
                   {payDistribution.map(({ dept, amount }) => (
                     <div key={dept}>
                       <div className="mb-1.5 flex items-center justify-between">
-                        <span className="text-sm text-[#1c1c1c]">{dept}</span>
-                        <span className="text-sm font-semibold text-[#1c1c1c]">
+                        <span className="text-sm text-foreground">{dept}</span>
+                        <span className="text-sm font-semibold text-foreground">
                           ${amount.toLocaleString()}
                         </span>
                       </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-[#eef0f6]">
+                      <div className="h-2 overflow-hidden rounded-full bg-muted">
                         <div
-                          className="h-2 rounded-full bg-[#2d68fe] transition-all"
+                          className="h-2 rounded-full bg-primary transition-all"
                           style={{ width: `${(amount / maxPay) * 100}%` }}
                         />
                       </div>
@@ -347,17 +343,17 @@ export default function PayrollPage() {
               </div>
 
               {/* Upcoming */}
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-lg font-semibold text-[#1c1c1c]">Upcoming</h2>
-                <div className="flex items-center gap-3 rounded-xl bg-[#eef4ff] px-4 py-4">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#2d68fe]">
-                    <Clock className="size-4 text-white" />
+              <div className="rounded-2xl bg-card p-6 shadow-sm">
+                <h2 className="mb-4 text-lg font-semibold text-foreground">Upcoming</h2>
+                <div className="flex items-center gap-3 rounded-xl bg-primary/10 px-4 py-4">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary">
+                    <Clock className="size-4 text-primary-foreground" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-[#1c1c1c]">March payroll due</p>
-                    <p className="text-xs text-[#8181a5]">Processing begins March 29, 2026</p>
+                    <p className="text-sm font-semibold text-foreground">March payroll due</p>
+                    <p className="text-xs text-muted-foreground">Processing begins March 29, 2026</p>
                   </div>
-                  <ChevronRight className="size-4 text-[#8181a5]" />
+                  <ChevronRight className="size-4 text-muted-foreground" />
                 </div>
               </div>
 
@@ -372,9 +368,9 @@ export default function PayrollPage() {
 
         {/* ── Payroll Runs tab ── */}
         {activeTab === "Payroll Runs" && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl bg-white p-12 text-center shadow-sm">
-            <CalendarDays className="size-12 text-[#eef0f6]" />
-            <p className="text-base font-medium text-[#8181a5]">Full payroll runs history coming soon</p>
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl bg-card p-12 text-center shadow-sm">
+            <CalendarDays className="size-12 text-muted" />
+            <p className="text-base font-medium text-muted-foreground">Full payroll runs history coming soon</p>
           </div>
         )}
 

@@ -114,7 +114,7 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <aside className="flex h-full w-[220px] shrink-0 flex-col bg-white py-5 pl-4 pr-3 shadow-sm">
+    <aside className="flex h-full w-[220px] shrink-0 flex-col bg-sidebar py-5 pl-4 pr-3 shadow-sm">
       <p className="mb-3 px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
         Menu
       </p>

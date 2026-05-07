@@ -1,221 +1,48 @@
 "use client"
 
-import { useState } from "react"
-import { Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
+import { useAuth } from "@/context/auth-context"
+import { jobsService, type ApiApplicant, type ApiApplicantStatus } from "@/services/jobs.service"
 
-// ── Asset URLs ───────────────────────────────────────────────
-// ── Candidate photos ─────────────────────────────────────────
-const photos = {
-  tigerNixon:         "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
-  garrettWinters:     "/assets/2dba1db7966039308370470fce52b3b220f9a3fb.png",
-  ashtonCox:          "/assets/5f121b335ad17b18af3c3c797e7a5f1afc3ec39f.png",
-  tigerNixon2:        "/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
-  cedricKelly:        "/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
-  airiSatou:          "/assets/e4478e9b5a6f2c79870bedf6446dd7b9c9c09ee0.png",
-  brielleWilliamson:  "/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
-  herrodChandler:     "/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
-  rhonaDavidson:      "/assets/277048e308d3c618330fc9b64ac87f9bdc187ddd.png",
-  colleenHurst:       "/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
-  soonyaeKim:         "/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png",
-  jennaElliott:       "/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png",
-}
-
-// ── Types ─────────────────────────────────────────────────────
-interface Social {
-  facebook:  string
-  linkedin:  string
-  twitter:   string
-}
-
-interface Candidate {
-  id:       number
-  name:     string
-  photo:    string
-  email:    string
-  position: string
-  city:     string
-  salary:   string
-  social:   Social
-}
-
-// ── Candidate Data ─────────────────────────────────────────────
-const allCandidates: Candidate[] = [
-  {
-    id: 1,
-    name: "Tiger Nixon",
-    photo: photos.tigerNixon,
-    email: "brune33@gmail.com",
-    position: "Web Developer",
-    city: "Tokyo",
-    salary: "$433,060",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 2,
-    name: "Garrett Winters",
-    photo: photos.garrettWinters,
-    email: "garrett.winters@gmail.com",
-    position: "Accountant",
-    city: "San Francisco",
-    salary: "$433,060",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 3,
-    name: "Ashton Cox",
-    photo: photos.ashtonCox,
-    email: "ashton.cox@gmail.com",
-    position: "Technical Author",
-    city: "Edinburgh",
-    salary: "$320,800",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 4,
-    name: "Tiger Nixon",
-    photo: photos.tigerNixon2,
-    email: "tiger.nixon@gmail.com",
-    position: "Javascript Developer",
-    city: "Tokyo",
-    salary: "$170,750",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 5,
-    name: "Cedric Kelly",
-    photo: photos.cedricKelly,
-    email: "cedric.kelly@gmail.com",
-    position: "Integration Specialist",
-    city: "New York",
-    salary: "$86,000",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 6,
-    name: "Airi Satou",
-    photo: photos.airiSatou,
-    email: "airi.satou@gmail.com",
-    position: "Sales Assistant",
-    city: "Edinburgh",
-    salary: "$433,060",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 7,
-    name: "Brielle Williamson",
-    photo: photos.brielleWilliamson,
-    email: "brielle.w@gmail.com",
-    position: "Integration Specialist",
-    city: "Berlin",
-    salary: "$162,700",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 8,
-    name: "Herrod Chandler",
-    photo: photos.herrodChandler,
-    email: "herrod.chandler@gmail.com",
-    position: "Javascript Developer",
-    city: "Islamabad",
-    salary: "$372,000",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 9,
-    name: "Rhona Davidson",
-    photo: photos.rhonaDavidson,
-    email: "rhona.davidson@gmail.com",
-    position: "Software Engineer",
-    city: "Delhi",
-    salary: "$137,500",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 10,
-    name: "Colleen Hurst",
-    photo: photos.colleenHurst,
-    email: "colleen.hurst@gmail.com",
-    position: "Javascript Developer",
-    city: "New York",
-    salary: "$205,500",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 11,
-    name: "Sonya Kim",
-    photo: photos.soonyaeKim,
-    email: "sonya.kim@gmail.com",
-    position: "Software Engineer",
-    city: "Seoul",
-    salary: "$118,200",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
-  {
-    id: 12,
-    name: "Jenna Elliott",
-    photo: photos.jennaElliott,
-    email: "jenna.elliott@gmail.com",
-    position: "Product Designer",
-    city: "London",
-    salary: "$145,000",
-    social: {
-      facebook: "https://facebook.com",
-      linkedin: "https://linkedin.com",
-      twitter:  "https://x.com",
-    },
-  },
+// ── Status config ─────────────────────────────────────────────
+const STATUS_OPTIONS: { value: ApiApplicantStatus | ""; label: string }[] = [
+  { value: "",               label: "All"           },
+  { value: "PENDING_REVIEW", label: "Pending Review"},
+  { value: "INTERVIEW",      label: "Interview"     },
+  { value: "ACCEPTED",       label: "Accepted"      },
+  { value: "APPROVED",       label: "Approved"      },
+  { value: "REJECTED",       label: "Rejected"      },
 ]
 
-const ROWS_PER_PAGE = 8
-const TABLE_COLUMNS = "grid-cols-[minmax(0,2fr)_minmax(0,2fr)_96px_minmax(0,1.2fr)_minmax(0,1.5fr)]"
+const STATUS_STYLE: Record<ApiApplicantStatus, string> = {
+  PENDING_REVIEW: "bg-amber-100 text-amber-700",
+  INTERVIEW:      "bg-cyan-100 text-cyan-700",
+  ACCEPTED:       "bg-emerald-100 text-emerald-700",
+  APPROVED:       "bg-green-100 text-green-700",
+  REJECTED:       "bg-rose-100 text-rose-600",
+}
 
-// ── Social icon buttons ────────────────────────────────────────
+const STATUS_LABEL: Record<ApiApplicantStatus, string> = {
+  PENDING_REVIEW: "Pending Review",
+  INTERVIEW:      "Interview",
+  ACCEPTED:       "Accepted",
+  APPROVED:       "Approved",
+  REJECTED:       "Rejected",
+}
+
+// ── Sidebar nav ───────────────────────────────────────────────
+const sidebarNav = [
+  { label: "Job Listings",         active: false, href: "/dashboard/hr/jobs"       },
+  { label: "Applicants",           active: true,  href: "/dashboard/hr/applicants" },
+  { label: "Candidate Evaluation", active: false, href: "/dashboard/hr/evaluation" },
+  { label: "Interview Scheduling", active: false, href: "/dashboard/hr/interviews" },
+  { label: "History",              active: false, href: "#"                        },
+]
+
+// ── Social icon SVGs ──────────────────────────────────────────
 function FacebookIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="white" className="size-3">
@@ -241,176 +68,274 @@ function XIcon() {
   )
 }
 
-function SocialLinks({ social }: { social: Social }) {
+// ── Sub-components ────────────────────────────────────────────
+function CandidateAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | null }) {
+  if (avatarUrl) {
+    return <img src={avatarUrl} alt={name} className="size-9 shrink-0 rounded-full object-cover" />
+  }
+  const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
   return (
-    <div className="flex items-center gap-1">
-      <a
-        href={social.facebook}
-        target="_blank"
-        rel="noopener noreferrer"
-        title="Facebook profile"
-        className="flex size-6 items-center justify-center rounded-full bg-[#1877f2] transition-opacity hover:opacity-85"
-      >
-        <FacebookIcon />
-      </a>
-      <a
-        href={social.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        title="LinkedIn profile"
-        className="flex size-6 items-center justify-center rounded-full bg-[#0a66c2] transition-opacity hover:opacity-85"
-      >
-        <LinkedInIcon />
-      </a>
-      <a
-        href={social.twitter}
-        target="_blank"
-        rel="noopener noreferrer"
-        title="X (Twitter) profile"
-        className="flex size-6 items-center justify-center rounded-full bg-[#000000] transition-opacity hover:opacity-75"
-      >
-        <XIcon />
-      </a>
+    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+      {initials}
     </div>
   )
 }
 
-// ── Sidebar nav ───────────────────────────────────────────────
-const sidebarNav = [
-  { label: "Job Listings",         active: false, href: "/dashboard/hr/jobs"       },
-  { label: "Applicants",           active: true,  href: "/dashboard/hr/applicants" },
-  { label: "Candidate Evaluation", active: false, href: "/dashboard/hr/evaluation" },
-  { label: "Interview Scheduling", active: false, href: "/dashboard/hr/interviews"  },
-  { label: "History",              active: false, href: "#"                        },
-]
+function SocialLinks({ linkedin, twitter, facebook }: {
+  linkedin: string | null
+  twitter:  string | null
+  facebook: string | null
+}) {
+  const hasAny = linkedin || twitter || facebook
+  if (!hasAny) return <span className="text-xs text-muted-foreground/40">—</span>
+  return (
+    <div className="flex items-center gap-1">
+      {facebook && (
+        <a href={facebook} target="_blank" rel="noopener noreferrer" title="Facebook"
+          className="flex size-6 items-center justify-center rounded-full bg-[#1877f2] transition-opacity hover:opacity-85">
+          <FacebookIcon />
+        </a>
+      )}
+      {linkedin && (
+        <a href={linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn"
+          className="flex size-6 items-center justify-center rounded-full bg-[#0a66c2] transition-opacity hover:opacity-85">
+          <LinkedInIcon />
+        </a>
+      )}
+      {twitter && (
+        <a href={twitter} target="_blank" rel="noopener noreferrer" title="X (Twitter)"
+          className="flex size-6 items-center justify-center rounded-full bg-black transition-opacity hover:opacity-75">
+          <XIcon />
+        </a>
+      )}
+    </div>
+  )
+}
 
-// ── Main Page ─────────────────────────────────────────────────
+function fmtSalary(amount: number | null): string {
+  if (amount === null) return "—"
+  if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`
+  return `$${amount}`
+}
+
+// ── Layout ────────────────────────────────────────────────────
+const TABLE_COLUMNS = "grid-cols-[minmax(0,2fr)_minmax(0,2fr)_96px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)]"
+const PAGE_SIZE = 20
+
+// ── Main page ─────────────────────────────────────────────────
 export default function ApplicantsPage() {
-  const [search, setSearch] = useState("")
-  const [page, setPage]     = useState(1)
+  const { accessToken } = useAuth()
 
-  const filtered = allCandidates.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.position.toLowerCase().includes(search.toLowerCase()) ||
-      c.city.toLowerCase().includes(search.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.toLowerCase())
+  const [applicants, setApplicants] = useState<ApiApplicant[]>([])
+  const [search,     setSearch]     = useState("")
+  const [status,     setStatus]     = useState<ApiApplicantStatus | "">("")
+  const [page,       setPage]       = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total,      setTotal]      = useState(0)
+  const [loading,    setLoading]    = useState(false)
+  const [error,      setError]      = useState<string | null>(null)
+  const [showFilter, setShowFilter] = useState(false)
+
+  const fetchApplicants = useCallback(
+    async (searchVal = search, statusVal = status, pageVal = page) => {
+      if (!accessToken) return
+      setLoading(true)
+      setError(null)
+      try {
+        const res = await jobsService.getAllApplicants(
+          {
+            search: searchVal || undefined,
+            status: statusVal || undefined,
+            page:   pageVal,
+            limit:  PAGE_SIZE,
+          },
+          accessToken,
+        )
+        setApplicants(res.data)
+        setTotal(res.meta.total)
+        setTotalPages(res.meta.totalPages)
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Failed to load applicants")
+      } finally {
+        setLoading(false)
+      }
+    },
+    [accessToken], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
-  const paginated  = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE)
+  useEffect(() => { fetchApplicants() }, [fetchApplicants])
+
+  const handleSearch = (val: string) => {
+    setSearch(val)
+    setPage(1)
+    fetchApplicants(val, status, 1)
+  }
+
+  const handleStatus = (val: ApiApplicantStatus | "") => {
+    setStatus(val)
+    setPage(1)
+    fetchApplicants(search, val, 1)
+  }
+
+  const handlePage = (p: number) => {
+    setPage(p)
+    fetchApplicants(search, status, p)
+  }
 
   return (
     <>
-
-      {/* ── Text sidebar ── */}
       <HrNavigationPannel navItems={sidebarNav} />
 
-      {/* ── Main content ── */}
       <main className="flex flex-1 flex-col overflow-hidden p-6">
         {/* Search bar */}
-        <div className="mb-5 flex items-center gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
-          <Search className="size-5 shrink-0 text-[#8181a5]" />
+        <div className="mb-3 flex items-center gap-3 rounded-lg bg-card px-4 py-3 shadow-sm">
+          <Search className="size-5 shrink-0 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search ⌘K"
+            placeholder="Search by name or email…"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-            className="flex-1 bg-transparent text-sm text-[#1f2937] outline-none placeholder:text-[rgba(34,48,62,0.4)]"
+            onChange={(e) => handleSearch(e.target.value)}
+            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
           />
-          <button className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
+          <button
+            onClick={() => setShowFilter((f) => !f)}
+            className={cn(
+              "rounded-lg p-1.5 transition-colors",
+              showFilter ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted",
+            )}
+          >
             <SlidersHorizontal className="size-5" />
           </button>
         </div>
 
-        {/* Table card */}
-        <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-          {/* Table header */}
-          <div className={cn("grid items-center gap-x-4 border-b border-border px-6 py-3  ", TABLE_COLUMNS)}>
-            {["Candidate Name", "Email", "Social", "City", "Job Title"].map((col) => (
-              <span key={col} className="text-sm font-medium text-[#1f2937] ">
-                {col}
-              </span>
+        {/* Status filter pills */}
+        {showFilter && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {STATUS_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => handleStatus(opt.value as ApiApplicantStatus | "")}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                  status === opt.value
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground",
+                )}
+              >
+                {opt.label}
+              </button>
             ))}
           </div>
- 
-          {/* Rows */}
+        )}
+
+        {/* Table card */}
+        <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          {/* Header */}
+          <div className={cn("grid items-center gap-x-4 border-b border-border px-6 py-3", TABLE_COLUMNS)}>
+            {["Candidate", "Email", "Social", "Location", "Salary", "Status"].map((col) => (
+              <span key={col} className="text-sm font-medium text-foreground">{col}</span>
+            ))}
+          </div>
+
+          {/* Body */}
           <div className="flex-1 overflow-y-auto divide-y divide-border">
-            {paginated.length > 0 ? (
-              paginated.map((candidate) => (
+            {loading ? (
+              <div className="flex h-32 items-center justify-center">
+                <Loader2 className="size-6 animate-spin text-primary" />
+              </div>
+            ) : error ? (
+              <div className="flex h-32 items-center justify-center text-sm text-rose-600">{error}</div>
+            ) : applicants.length === 0 ? (
+              <div className="flex h-32 items-center justify-center text-sm text-muted-foreground/40">
+                No applicants found.
+              </div>
+            ) : (
+              applicants.map((app) => (
                 <div
-                  key={candidate.id}
+                  key={app.id}
                   className={cn(
-                    "grid items-center gap-x-4 px-6 py-3.5 transition-colors hover:bg-[#f8fafc]",
-                    TABLE_COLUMNS
+                    "grid items-center gap-x-4 px-6 py-3.5 transition-colors hover:bg-muted/50",
+                    TABLE_COLUMNS,
                   )}
                 >
-                  {/* Candidate Name */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={candidate.photo}
-                      alt={candidate.name}
-                      className="size-9 shrink-0 rounded-full object-cover"
-                    />
-                    <span className="truncate text-sm font-medium text-[#1f2937]">
-                      {candidate.name}
-                    </span>
+                  {/* Candidate */}
+                  <div className="flex min-w-0 items-center gap-3">
+                    <CandidateAvatar name={app.candidate.name} avatarUrl={app.candidate.avatarUrl} />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-foreground">{app.candidate.name}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">{app.job.title}</p>
+                    </div>
                   </div>
 
                   {/* Email */}
-                  <span className="truncate text-sm text-[#667388]">{candidate.email}</span>
+                  <span className="truncate text-sm text-muted-foreground">{app.candidate.email}</span>
 
                   {/* Social */}
-                  <div className="flex justify-start">
-                    <SocialLinks social={candidate.social} />
-                  </div>
+                  <SocialLinks
+                    linkedin={app.candidate.linkedin}
+                    twitter={app.candidate.twitter}
+                    facebook={app.candidate.facebook}
+                  />
 
-                  {/* City */}
-                  <span className="truncate text-sm text-[#667388] ">{candidate.city}</span>
+                  {/* Location */}
+                  <span className="truncate text-sm text-muted-foreground">
+                    {app.candidate.location ?? "—"}
+                  </span>
 
-                  {/* Job Title */}
-                  <span className="truncate text-sm text-[#667388]">{candidate.position}</span>
+                  {/* Salary */}
+                  <span className="text-sm text-muted-foreground">
+                    {fmtSalary(app.expectedSalary)}
+                  </span>
+
+                  {/* Status */}
+                  <span className={cn(
+                    "w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                    STATUS_STYLE[app.status] ?? "bg-muted text-muted-foreground",
+                  )}>
+                    {STATUS_LABEL[app.status] ?? app.status}
+                  </span>
                 </div>
               ))
-            ) : (
-              <div className="flex h-32 items-center justify-center text-sm text-[#8181a52f]">
-                No applicants match your search.
-              </div>
             )}
           </div>
         </div>
 
         {/* Pagination */}
-        <div className="mt-4 flex items-center justify-end gap-1">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="flex size-8 items-center justify-center rounded-full text-[#4b5563] transition-colors hover:bg-muted disabled:opacity-40"
-          >
-            <ChevronLeft className="size-4" />
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={cn(
-                "flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
-                p === page
-                  ? "bg-[#3b6feb] text-white"
-                  : "text-[#4b5563] hover:bg-muted"
-              )}
-            >
-              {p}
-            </button>
-          ))}
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-            className="flex size-8 items-center justify-center rounded-full text-[#4b5563] transition-colors hover:bg-muted disabled:opacity-40"
-          >
-            <ChevronRight className="size-4" />
-          </button>
-        </div>
+        {total > 0 && (
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              {total} applicant{total !== 1 ? "s" : ""}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => handlePage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => handlePage(p)}
+                  className={cn(
+                    "flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
+                    p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
+                  )}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePage(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </>
   )

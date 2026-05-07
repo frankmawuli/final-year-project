@@ -31,7 +31,7 @@ export function HRIconSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="flex w-[84px] shrink-0 flex-col items-center border-r border-border bg-white py-6">
+    <aside className="flex w-[84px] shrink-0 flex-col items-center border-r border-border bg-sidebar py-6">
       {/* Logo */}
       <Link href="/dashboard/hr" className="mb-6 flex size-[30px] items-center justify-center overflow-hidden">
         <img src={logoSvg} alt="CoreRecruiter" className="size-full" />
@@ -52,8 +52,8 @@ export function HRIconSidebar() {
               className={cn(
                 "relative flex size-12 items-center justify-center rounded-lg transition-colors",
                 isActive
-                  ? "bg-[#5e81f4]/10 text-[#5e81f4]"
-                  : "text-[#8181a5] hover:bg-muted hover:text-foreground"
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               <Icon className="size-[22px]" />
@@ -61,7 +61,7 @@ export function HRIconSidebar() {
                 <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-rose-500" />
               )}
               {isActive && (
-                <span className="absolute right-0 top-[12%] h-[76%] w-0.5 rounded-sm bg-[#5e81f4]" />
+                <span className="absolute right-0 top-[12%] h-[76%] w-0.5 rounded-sm bg-primary" />
               )}
             </Link>
           )
@@ -70,7 +70,7 @@ export function HRIconSidebar() {
 
       {/* Bottom */}
       <div className="flex flex-col items-center gap-1">
-        <button className="flex size-12 items-center justify-center rounded-lg text-[#8181a5] hover:bg-muted hover:text-foreground" title="Toggle theme">
+        <button className="flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground" title="Toggle theme">
           <Moon className="size-[22px]" />
         </button>
         <Link
@@ -79,13 +79,13 @@ export function HRIconSidebar() {
           className={cn(
             "relative flex size-12 items-center justify-center rounded-lg transition-colors",
             pathname === "/dashboard/hr/settings" || pathname.startsWith("/dashboard/hr/settings/")
-              ? "bg-[#5e81f4]/10 text-[#5e81f4]"
-              : "text-[#8181a5] hover:bg-muted hover:text-foreground"
+              ? "bg-primary/10 text-primary"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground"
           )}
         >
           <Settings className="size-[22px]" />
           {(pathname === "/dashboard/hr/settings" || pathname.startsWith("/dashboard/hr/settings/")) && (
-            <span className="absolute right-0 top-[12%] h-[76%] w-0.5 rounded-sm bg-[#5e81f4]" />
+            <span className="absolute right-0 top-[12%] h-[76%] w-0.5 rounded-sm bg-primary" />
           )}
         </Link>
       </div>

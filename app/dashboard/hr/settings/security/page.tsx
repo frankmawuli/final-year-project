@@ -27,14 +27,14 @@ function Card({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       <div className="mb-5 flex items-center gap-3">
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f3f4f6]">
-          <Icon className="size-4 text-[#6b7280]" />
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+          <Icon className="size-4 text-muted-foreground" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-[#111827]">{title}</p>
-          <p className="text-xs text-[#9ca3af]">{subtitle}</p>
+          <p className="text-sm font-semibold text-foreground">{title}</p>
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -50,12 +50,12 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       onClick={() => onChange(!checked)}
       className={cn(
         "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200",
-        checked ? "bg-[#5e81f4]" : "bg-[#e5e7eb]"
+        checked ? "bg-primary" : "bg-muted"
       )}
     >
       <span
         className={cn(
-          "pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm ring-0 transition-transform duration-200",
+          "pointer-events-none inline-block size-4 rounded-full bg-background shadow-sm ring-0 transition-transform duration-200",
           checked ? "translate-x-4" : "translate-x-0"
         )}
       />
@@ -64,7 +64,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 }
 
 function Divider() {
-  return <hr className="border-[#f3f4f6]" />
+  return <hr className="border-border" />
 }
 
 function Row({
@@ -79,8 +79,8 @@ function Row({
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
-        <p className="text-sm font-medium text-[#111827]">{label}</p>
-        {hint && <p className="text-xs text-[#9ca3af]">{hint}</p>}
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       </div>
       {children}
     </div>
@@ -92,7 +92,7 @@ function SaveRow({ onSave }: { onSave: () => void }) {
     <div className="flex justify-end pt-2">
       <button
         onClick={onSave}
-        className="rounded-xl bg-[#5e81f4] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#4c6ef5]"
+        className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
       >
         Save changes
       </button>
@@ -102,10 +102,10 @@ function SaveRow({ onSave }: { onSave: () => void }) {
 
 // ── Shared style strings ──────────────────────────────────────
 const inputCls =
-  "w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-3.5 py-2.5 text-sm text-[#111827] outline-none placeholder:text-[#d1d5db] focus:border-[#5e81f4] focus:bg-white focus:ring-2 focus:ring-[#5e81f4]/10"
+  "w-full rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 const selectCls =
-  "w-full appearance-none rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-3.5 py-2.5 pr-9 text-sm text-[#111827] outline-none focus:border-[#5e81f4] focus:bg-white focus:ring-2 focus:ring-[#5e81f4]/10"
+  "w-full appearance-none rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 pr-9 text-sm text-foreground outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 // ── Page ──────────────────────────────────────────────────────
 export default function SecurityPage() {
@@ -141,7 +141,7 @@ export default function SecurityPage() {
                   <option key={m} value={m}>{m} minutes</option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-[#9ca3af]" />
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
             </div>
           </Row>
         </div>
@@ -151,17 +151,17 @@ export default function SecurityPage() {
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[#374151]">Minimum Length</label>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Minimum Length</label>
               <div className="flex items-center gap-2">
                 <input type="number" min="6" max="32" value={minLen} onChange={e => setMinLen(e.target.value)} className={cn(inputCls, "w-24")} />
-                <span className="text-xs text-[#9ca3af]">chars</span>
+                <span className="text-xs text-muted-foreground">chars</span>
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[#374151]">Expiry (days)</label>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Expiry (days)</label>
               <div className="flex items-center gap-2">
                 <input type="number" min="0" value={expiry} onChange={e => setExpiry(e.target.value)} className={cn(inputCls, "w-24")} />
-                <span className="text-xs text-[#9ca3af]">0 = never</span>
+                <span className="text-xs text-muted-foreground">0 = never</span>
               </div>
             </div>
           </div>
@@ -189,7 +189,7 @@ export default function SecurityPage() {
           <Row label="Data Retention Period" hint="Auto-purge inactive employee data after">
             <div className="flex items-center gap-2">
               <input type="number" min="1" value={retention} onChange={e => setRetention(e.target.value)} className={cn(inputCls, "w-24")} />
-              <span className="text-xs text-[#9ca3af]">months</span>
+              <span className="text-xs text-muted-foreground">months</span>
             </div>
           </Row>
           <Divider />
@@ -204,25 +204,25 @@ export default function SecurityPage() {
       </Card>
 
       <Card title="Role-Based Access Control" subtitle="Permissions per role across the platform" icon={ShieldCheck}>
-        <div className="overflow-hidden rounded-xl border border-[#f3f4f6]">
+        <div className="overflow-hidden rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#f3f4f6] bg-[#f9fafb]">
-                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]">Role</th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]">Edit Data</th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]">Export</th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]">Delete</th>
+              <tr className="border-b border-border bg-muted/50">
+                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Role</th>
+                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Edit Data</th>
+                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Export</th>
+                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Delete</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f3f4f6]">
+            <tbody className="divide-y divide-border">
               {roles.map((r, i) => (
-                <tr key={r.role} className="hover:bg-[#f9fafb]">
+                <tr key={r.role} className="hover:bg-muted/50">
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-2">
-                      <div className="flex size-7 items-center justify-center rounded-lg bg-[#f0f0ff]">
-                        <UserCog className="size-3.5 text-[#8a8cd9]" />
+                      <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10">
+                        <UserCog className="size-3.5 text-primary" />
                       </div>
-                      <span className="font-medium text-[#111827]">{r.role}</span>
+                      <span className="font-medium text-foreground">{r.role}</span>
                     </div>
                   </td>
                   {(["canEdit", "canExport", "canDelete"] as const).map(perm => (
