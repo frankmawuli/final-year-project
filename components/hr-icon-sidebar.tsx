@@ -5,11 +5,8 @@ import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Briefcase,
-  CalendarDays,
-  MessageSquare,
   Users,
   Monitor,
-  Package,
   ClipboardList,
   Moon,
   Settings,
@@ -17,6 +14,7 @@ import {
 import { cn } from "@/lib/utils"
 
 const logoSvg = "/assets/db803ca622d556de5dc88a89ce27f842fcbf3c8b.svg"
+const chatbotSvg = "/assets/chatbot.svg"
 
 const navItems = [
   { icon: LayoutDashboard, href: "/dashboard/hr",            label: "Overview"  },
@@ -25,6 +23,7 @@ const navItems = [
     matchGroup: ["/dashboard/hr/employees", "/dashboard/hr/departments", "/dashboard/hr/payroll", "/dashboard/hr/leave", "/dashboard/hr/history"] },
   { icon: Monitor,         href: "/dashboard/hr/reports",    label: "Reports"   },
   { icon: ClipboardList,   href: "/dashboard/hr/tasks",      label: "Tasks"     },
+  { imgSrc: chatbotSvg,    href: "/dashboard/hr/assistant",  label: "Assistant" },
 ]
 
 export function HRIconSidebar() {
@@ -39,7 +38,7 @@ export function HRIconSidebar() {
 
       {/* Nav icons */}
       <nav className="flex flex-1 flex-col items-center gap-1">
-        {navItems.map(({ icon: Icon, href, label, matchGroup }) => {
+        {navItems.map(({ icon: Icon, imgSrc, href, label, matchGroup }) => {
           const badge = undefined
           const isActive = matchGroup
             ? matchGroup.some((p) => pathname === p || pathname.startsWith(p + "/"))
@@ -56,7 +55,11 @@ export function HRIconSidebar() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              <Icon className="size-[22px]" />
+              {imgSrc ? (
+                <img src={imgSrc} alt={label} className="size-5.5" />
+              ) : Icon ? (
+                <Icon className="size-5.5" />
+              ) : null}
               {badge && (
                 <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-rose-500" />
               )}
@@ -71,7 +74,7 @@ export function HRIconSidebar() {
       {/* Bottom */}
       <div className="flex flex-col items-center gap-1">
         <button className="flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground" title="Toggle theme">
-          <Moon className="size-[22px]" />
+          <Moon className="size-5.5" />
         </button>
         <Link
           href="/dashboard/hr/settings"
@@ -83,7 +86,7 @@ export function HRIconSidebar() {
               : "text-muted-foreground hover:bg-muted hover:text-foreground"
           )}
         >
-          <Settings className="size-[22px]" />
+          <Settings className="size-5.5" />
           {(pathname === "/dashboard/hr/settings" || pathname.startsWith("/dashboard/hr/settings/")) && (
             <span className="absolute right-0 top-[12%] h-[76%] w-0.5 rounded-sm bg-primary" />
           )}

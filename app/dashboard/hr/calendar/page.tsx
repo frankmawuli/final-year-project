@@ -19,11 +19,9 @@ import { cn } from "@/lib/utils"
 
 // ── Sidebar nav ───────────────────────────────────────────────
 const sidebarNav = [
-  { label: "Job Listings",         href: "/dashboard/hr/jobs"       },
-  { label: "Applicants",           href: "/dashboard/hr/applicants" },
-  { label: "Candidate Evaluation", href: "/dashboard/hr/evaluation" },
-  { label: "Interview Scheduling", href: "/dashboard/hr/interviews" },
-  { label: "History",              href: "#"                        },
+  { label: "Overview",         href: "/dashboard/hr/"       },
+  { label: "Calendar",           href: "/dashboard/hr/calendar" },
+  { label: "Announcements", href: "/dashboard/hr/announcement" },
 ]
 
 // ── Types ─────────────────────────────────────────────────────
