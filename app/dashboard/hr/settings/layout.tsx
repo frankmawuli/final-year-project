@@ -8,6 +8,7 @@ const navItems = [
   { label: "Leave & Attendance",     href: "/dashboard/hr/settings/leave"         },
   { label: "Notifications", href: "/dashboard/hr/settings/notifications" },
   { label: "Security",  href: "/dashboard/hr/settings/security"    },
+  { label: "Integrations", href: "/dashboard/hr/settings/integrations" },
 ]
 
 export default function SettingsLayout({

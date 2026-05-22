@@ -21,20 +21,21 @@ const CARDS_PER_PAGE = 6
 
 // ── Types ─────────────────────────────────────────────────────
 interface Member {
-  id:    number
-  name:  string
-  role:  string
-  email: string
-  photo: string
+  id:     string         // CUID from dept endpoint, or stringified number from employee endpoint
+  name:   string
+  role:   string
+  email:  string
+  photo:  string
+  deptId: number | null  // used to filter available vs already-assigned pool employees
 }
 
 interface Department {
   id:          number
   name:        string
   description: string
-  colorKey:    string   // derived from id — not in API
-  head:        string   // not in API, shown as "—"
-  memberCount: number   // from _count.employees
+  colorKey:    string
+  head:        string
+  memberCount: number
 }
 
 // ── Color palette ─────────────────────────────────────────────
@@ -69,23 +70,44 @@ function getCompanyIdFromToken(token: string): string | null {
   }
 }
 
-function mapDept(a: { id: number; name: string; description: string | null; _count?: { employees: number }; memberCount?: number }): Department {
+function mapDept(a: {
+  id: number
+  name: string
+  description: string | null
+  _count?: { employees: number }
+}): Department {
   return {
     id:          a.id,
     name:        a.name,
     description: a.description ?? "",
     colorKey:    getColorKey(a.id),
     head:        "—",
-    memberCount: a._count?.employees ?? a.memberCount ?? 0,
+    memberCount: a._count?.employees ?? 0,
   }
 }
 
-function mapDeptEmployee(e: ApiDeptEmployee): Member {
-  return { id: e.id, name: e.user.name, role: e.jobTitle ?? "", email: e.user.email, photo: e.user.avatarUrl ?? DEFAULT_PHOTO }
+// Maps a dept-endpoint employee (string CUID id, no jobTitle) to Member
+function mapDeptEmployee(e: ApiDeptEmployee, deptId: number): Member {
+  return {
+    id:     e.id,
+    name:   e.user.name,
+    role:   "",
+    email:  e.user.email,
+    photo:  e.user.avatarUrl ?? DEFAULT_PHOTO,
+    deptId: deptId,
+  }
 }
 
+// Maps an employee-endpoint record (numeric id, has jobTitle) to Member
 function mapPoolEmployee(e: ApiEmployee): Member {
-  return { id: e.id, name: e.user.name, role: e.jobTitle ?? "", email: e.user.email, photo: e.user.avatarUrl ?? DEFAULT_PHOTO }
+  return {
+    id:     String(e.id),
+    name:   e.user.name,
+    role:   e.jobTitle ?? "",
+    email:  e.user.email,
+    photo:  e.user.avatarUrl ?? DEFAULT_PHOTO,
+    deptId: e.department?.id ?? null,
+  }
 }
 
 // ── Dot menu ──────────────────────────────────────────────────
@@ -224,25 +246,28 @@ function MembersPanel({ dept, onClose, onMemberCountChange }: {
   const [pool,         setPool]         = useState<Member[]>([])
   const [loading,      setLoading]      = useState(true)
   const [panelError,   setPanelError]   = useState<string | null>(null)
-  const [savingId,     setSavingId]     = useState<number | null>(null)
+  const [savingId,     setSavingId]     = useState<string | null>(null)
   const [memberSearch, setMemberSearch] = useState("")
 
   useEffect(() => {
     if (!accessToken) return
     setLoading(true)
     Promise.all([
-      departmentService.get(dept.id, accessToken),
+      departmentService.members(dept.id, { status: "active", limit: 100 }, accessToken),
       employeeService.list({ limit: 100 }, accessToken),
     ])
-      .then(([deptRes, empRes]) => {
-        setMembers((deptRes.data.employees ?? []).map(mapDeptEmployee))
+      .then(([membersRes, empRes]) => {
+        setMembers(membersRes.data.map((e) => mapDeptEmployee(e, dept.id)))
         setPool(empRes.data.map(mapPoolEmployee))
       })
       .catch((e: unknown) => setPanelError(e instanceof Error ? e.message : "Failed to load members"))
       .finally(() => setLoading(false))
   }, [accessToken, dept.id])
 
-  const available = pool.filter((p) => !members.some((m) => m.id === p.id))
+  // Filter pool by deptId — avoids broken cross-list ID comparison (pool has numeric string ids,
+  // dept members have CUID string ids)
+  const available = pool.filter((p) => p.deptId !== dept.id)
+
   const displayed = members.filter(
     (m) =>
       m.name.toLowerCase().includes(memberSearch.toLowerCase()) ||
@@ -255,7 +280,8 @@ function MembersPanel({ dept, onClose, onMemberCountChange }: {
     setPanelError(null)
     try {
       await employeeService.update(m.id, { departmentId: dept.id }, accessToken)
-      setMembers((prev) => [...prev, m])
+      setMembers((prev) => [...prev, { ...m, deptId: dept.id }])
+      setPool((prev) => prev.map((p) => p.id === m.id ? { ...p, deptId: dept.id } : p))
       onMemberCountChange(dept.id, members.length + 1)
     } catch (e: unknown) {
       setPanelError(e instanceof Error ? e.message : "Failed to add member")
@@ -264,13 +290,18 @@ function MembersPanel({ dept, onClose, onMemberCountChange }: {
     }
   }
 
-  async function handleRemove(empId: number) {
+  async function handleRemove(empId: string) {
     if (!accessToken) return
     setSavingId(empId)
     setPanelError(null)
     try {
       await employeeService.update(empId, { departmentId: null }, accessToken)
+      const removed = members.find((m) => m.id === empId)
       setMembers((prev) => prev.filter((m) => m.id !== empId))
+      // Sync pool by email — the only common key between dept-member CUIDs and pool numeric ids
+      if (removed) {
+        setPool((prev) => prev.map((p) => p.email === removed.email ? { ...p, deptId: null } : p))
+      }
       onMemberCountChange(dept.id, members.length - 1)
     } catch (e: unknown) {
       setPanelError(e instanceof Error ? e.message : "Failed to remove member")
@@ -341,7 +372,7 @@ function MembersPanel({ dept, onClose, onMemberCountChange }: {
                 <img src={m.photo} alt={m.name} className="size-10 shrink-0 rounded-full object-cover" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-foreground">{m.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">{m.role}</p>
+                  <p className="truncate text-xs text-muted-foreground">{m.role || m.email}</p>
                 </div>
                 <button
                   onClick={() => handleRemove(m.id)}
@@ -380,7 +411,7 @@ function DeptFormModal({
 
   const inputCls = "w-full rounded-lg border border-border bg-muted/50 px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-transparent"
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSaving(true)
     setSaveErr(null)
@@ -476,7 +507,6 @@ export default function DepartmentsPage() {
   const [viewing,      setViewing]      = useState<Department | null>(null)
   const [editing,      setEditing]      = useState<Department | null | undefined>(undefined)
 
-  // Fetch on mount
   useEffect(() => {
     if (!accessToken) return
     setLoading(true)
@@ -496,7 +526,7 @@ export default function DepartmentsPage() {
     if (!accessToken) throw new Error("Not authenticated")
     if (existing) {
       const res = await departmentService.update(existing.id, payload, accessToken)
-      const updated = mapDept({ ...res.data, memberCount: existing.memberCount })
+      const updated = mapDept({ ...res.data, _count: { employees: existing.memberCount } })
       setDepartments((prev) => prev.map((d) => (d.id === existing.id ? updated : d)))
     } else {
       const companyId = getCompanyIdFromToken(accessToken)

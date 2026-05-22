@@ -1,9 +1,12 @@
 import { api } from "@/lib/api-client"
 
 export interface ApiDeptEmployee {
-  id:             number
-  employeeId:     string
-  jobTitle:       string | null
+  id:            string        // CUID e.g. "clemp789"
+  employeeId:    string        // display ID e.g. "EMP-001"
+  isActive:      boolean
+  createdAt:     string
+  departmentId?: number
+  companyId?:    string
   user: {
     id:        string
     name:      string
@@ -16,8 +19,17 @@ export interface ApiDepartment {
   id:          number
   name:        string
   description: string | null
-  _count?:     { employees: number; jobs?: number }
+  companyId?:  string
+  createdAt?:  string
   employees?:  ApiDeptEmployee[]   // only present on GET /:id
+  _count?:     { employees: number; jobs?: number }
+}
+
+export interface DeptMembersPagination {
+  total:      number
+  page:       number
+  pageSize:   number   // NOT "limit" — spec uses "pageSize"
+  totalPages: number
 }
 
 export const departmentService = {
@@ -31,7 +43,29 @@ export const departmentService = {
       Authorization: `Bearer ${token}`,
     }),
 
-  create: (body: { companyId: string; name: string; description?: string }, token: string) =>
+  members: (
+    id: number,
+    params: { status?: "active" | "inactive" | "all"; page?: number; limit?: number } = {},
+    token: string,
+  ) => {
+    const qs = new URLSearchParams()
+    if (params.status) qs.set("status", params.status)
+    if (params.page)   qs.set("page",   String(params.page))
+    if (params.limit)  qs.set("limit",  String(params.limit))
+    const q = qs.toString()
+    return api.get<{
+      success:    boolean
+      data:       ApiDeptEmployee[]
+      pagination: DeptMembersPagination
+    }>(`/departments/${id}/members${q ? `?${q}` : ""}`, {
+      Authorization: `Bearer ${token}`,
+    })
+  },
+
+  create: (
+    body: { companyId: string; name: string; description?: string },
+    token: string,
+  ) =>
     api.post<{ success: boolean; data: ApiDepartment }>("/departments", body, {
       Authorization: `Bearer ${token}`,
     }),

@@ -84,7 +84,7 @@ export const employeeService = {
     }),
 
   update: (
-    id: number,
+    id: string | number,
     body: {
       employeeId?: string
       jobTitle?: string
