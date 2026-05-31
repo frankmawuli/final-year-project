@@ -1,20 +1,25 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useMemo } from "react"
 import {
-  Search, SlidersHorizontal, ChevronDown, ChevronLeft, ChevronRight,
-  X, FileBarChart2, TrendingUp, AlertCircle, Target, MessageSquare,
-  Clock, CheckCircle2, XCircle, FileText, CalendarDays, Building2,
-  Eye,
+  ResponsiveContainer,
+  PieChart, Pie, Cell, Tooltip as ReTooltip, Legend,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  BarChart, Bar,
+} from "recharts"
+import {
+  TrendingUp, FileBarChart2, AlertCircle, Target, MessageSquare,
+  CheckCircle2, Clock, XCircle, FileText, CalendarDays, Building2,
+  X, ChevronRight,
 } from "lucide-react"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { cn } from "@/lib/utils"
 
 // ── Sidebar nav ───────────────────────────────────────────────
 const sidebarNav = [
-  { label: "All Reports",  href: "/dashboard/hr/reports"    },
-  { label: "Performance",  href: "#"                        },
-  { label: "Incidents",    href: "#"                        },
+  { label: "All Reports",  href: "/dashboard/hr/reports"            },
+  { label: "Performance",  href: "#"                                 },
+  { label: "Incidents",    href: "#"                                 },
   { label: "Complaints",   href: "/dashboard/hr/reports/complaints" },
 ]
 
@@ -55,14 +60,18 @@ const typeIcon: Record<ReportType, React.ElementType> = {
 }
 
 const statusStyle: Record<ReportStatus, { badge: string; dot: string; icon: React.ElementType }> = {
-  "Submitted":    { badge: "border-amber-500 text-amber-500",   dot: "bg-amber-500",   icon: Clock        },
-  "Under Review": { badge: "border-primary text-primary",       dot: "bg-primary",     icon: Clock        },
-  "Resolved":     { badge: "border-emerald-600 text-emerald-600", dot: "bg-emerald-600", icon: CheckCircle2 },
+  "Submitted":    { badge: "border-amber-500 text-amber-500",     dot: "bg-amber-500",     icon: Clock        },
+  "Under Review": { badge: "border-primary text-primary",         dot: "bg-primary",       icon: Clock        },
+  "Resolved":     { badge: "border-emerald-600 text-emerald-600", dot: "bg-emerald-600",   icon: CheckCircle2 },
   "Closed":       { badge: "border-muted-foreground text-muted-foreground", dot: "bg-muted-foreground", icon: XCircle },
 }
 
 const STATUS_OPTIONS: ReportStatus[] = ["Submitted", "Under Review", "Resolved", "Closed"]
 const TYPE_OPTIONS:   ReportType[]   = ["Performance", "Work Summary", "Incident", "Goal Update", "Complaint"]
+
+// ── Chart colour palettes ──────────────────────────────────────
+const TYPE_COLORS   = ["#2563eb", "#059669", "#dc2626", "#d97706", "#9333ea"]
+const STATUS_COLORS = ["#f59e0b", "#3b6feb", "#10b981", "#94a3b8"]
 
 // ── Seed data ─────────────────────────────────────────────────
 const photos: Record<string, string> = {
@@ -174,44 +183,92 @@ const seed: EmployeeReport[] = [
   },
 ]
 
-const PER_PAGE = 10
-
-// ── Status dropdown ───────────────────────────────────────────
-function StatusDropdown({ value, onChange }: { value: ReportStatus; onChange: (s: ReportStatus) => void }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-  const { badge } = statusStyle[value]
-
-  useEffect(() => {
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
-    document.addEventListener("mousedown", h)
-    return () => document.removeEventListener("mousedown", h)
-  }, [])
-
+// ── Shared tooltip ────────────────────────────────────────────
+function ChartTooltip({ active, payload, label }: {
+  active?:  boolean
+  payload?: { name: string; value: number }[]
+  label?:   string
+}) {
+  if (!active || !payload?.length) return null
   return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-opacity hover:opacity-80", badge)}
-      >
-        {value}
-        <ChevronDown className="size-3" />
-      </button>
-      {open && (
-        <div className="absolute right-0 top-full z-30 mt-1 w-36 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
-          {STATUS_OPTIONS.map((s) => (
-            <button
-              key={s}
-              onClick={() => { onChange(s); setOpen(false) }}
-              className={cn("flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium hover:bg-muted", s === value && "bg-muted/60")}
-            >
-              <span className={cn("size-2 rounded-full", statusStyle[s].dot)} />
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg">
+      {label && <p className="mb-1 text-xs font-semibold text-foreground">{label}</p>}
+      {payload.map((p, i) => (
+        <p key={i} className="text-xs text-muted-foreground">
+          <span className="font-bold text-foreground">{p.value}</span>{" "}{p.name}
+        </p>
+      ))}
     </div>
+  )
+}
+
+// ── KPI card ──────────────────────────────────────────────────
+function KpiCard({ label, value, sub, color, suffix }: {
+  label:   string
+  value:   number | string
+  sub:     string
+  color:   string
+  suffix?: string
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+      <div className="mt-2 flex items-end gap-1">
+        <span className="text-3xl font-bold leading-none" style={{ color }}>{value}</span>
+        {suffix && <span className="mb-0.5 text-sm text-muted-foreground">{suffix}</span>}
+      </div>
+      <p className="mt-1.5 text-xs text-muted-foreground">{sub}</p>
+    </div>
+  )
+}
+
+// ── Drill-down list panel ─────────────────────────────────────
+function DrillPanel({ label, items, onClose, onSelect }: {
+  label:    string
+  items:    EmployeeReport[]
+  onClose:  () => void
+  onSelect: (r: EmployeeReport) => void
+}) {
+  return (
+    <>
+      <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
+      <aside className="fixed right-0 top-0 z-40 flex h-full w-[380px] flex-col bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Filtered Reports</p>
+            <h2 className="mt-0.5 font-bold text-foreground">{label} · {items.length}</h2>
+          </div>
+          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+            <X className="size-5" />
+          </button>
+        </div>
+        <div className="flex-1 divide-y divide-border overflow-y-auto">
+          {items.map(r => {
+            const TypeIcon = typeIcon[r.reportType]
+            return (
+              <button
+                key={r.id}
+                onClick={() => onSelect(r)}
+                className="flex w-full items-start gap-3 px-5 py-4 text-left transition-colors hover:bg-muted/50"
+              >
+                <img src={r.photo} alt={r.name} className="mt-0.5 size-9 shrink-0 rounded-full object-cover" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="truncate font-semibold text-foreground">{r.name}</p>
+                    <span className={cn("shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", typeBadge[r.reportType])}>
+                      <TypeIcon className="size-2.5" />{r.reportType}
+                    </span>
+                  </div>
+                  <p className="truncate text-xs text-muted-foreground">{r.title}</p>
+                  <p className="text-xs text-muted-foreground">{r.department} · {r.submittedOn}</p>
+                </div>
+                <ChevronRight className="mt-1 size-4 shrink-0 text-muted-foreground" />
+              </button>
+            )
+          })}
+        </div>
+      </aside>
+    </>
   )
 }
 
@@ -221,14 +278,12 @@ function DetailPanel({ report, onClose, onStatusChange }: {
   onClose:        () => void
   onStatusChange: (s: ReportStatus) => void
 }) {
-  const Icon     = typeIcon[report.reportType]
-  const { badge } = statusStyle[report.status]
+  const Icon = typeIcon[report.reportType]
 
   return (
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
       <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-card shadow-2xl">
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="text-base font-semibold text-foreground">Report Detail</h2>
           <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
@@ -239,26 +294,20 @@ function DetailPanel({ report, onClose, onStatusChange }: {
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {/* Employee hero */}
           <div className="mb-5 flex items-center gap-4 rounded-xl border border-border bg-muted/50 px-5 py-4">
-            <img
-              src={report.photo}
-              alt={report.name}
-              className="size-14 shrink-0 rounded-full object-cover ring-2 ring-background shadow"
-            />
+            <img src={report.photo} alt={report.name} className="size-14 shrink-0 rounded-full object-cover ring-2 ring-background shadow" />
             <div className="min-w-0">
               <p className="font-bold text-foreground">{report.name}</p>
               <p className="text-xs text-muted-foreground">{report.email}</p>
               <div className="mt-1.5 flex items-center gap-2">
                 <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
-                  <Building2 className="size-3" />
-                  {report.department}
+                  <Building2 className="size-3" />{report.department}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Report meta */}
+          {/* Type + title */}
           <div className="mb-5 flex flex-col gap-3">
-            {/* Type + title */}
             <div className="flex items-start gap-3">
               <div className={cn("flex size-9 shrink-0 items-center justify-center rounded-xl", typeBadge[report.reportType].split(" ")[0])}>
                 <Icon className={cn("size-4", typeBadge[report.reportType].split(" ")[1])} />
@@ -271,11 +320,10 @@ function DetailPanel({ report, onClose, onStatusChange }: {
               </div>
             </div>
 
-            {/* Meta rows */}
             <div className="space-y-2 rounded-xl border border-border bg-muted/50 p-4 text-sm">
               {[
-                { icon: CalendarDays, label: "Period",       value: report.period      },
-                { icon: FileText,     label: "Submitted",    value: report.submittedOn },
+                { icon: CalendarDays, label: "Period",    value: report.period      },
+                { icon: FileText,     label: "Submitted", value: report.submittedOn },
               ].map(({ icon: Ic, label, value }) => (
                 <div key={label} className="flex items-center gap-3">
                   <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-background shadow-sm">
@@ -323,8 +371,7 @@ function DetailPanel({ report, onClose, onStatusChange }: {
                         : "border-border text-muted-foreground hover:border-current hover:text-foreground"
                     )}
                   >
-                    <span className={cn("size-2 rounded-full", dot)} />
-                    {s}
+                    <span className={cn("size-2 rounded-full", dot)} />{s}
                   </button>
                 )
               })}
@@ -338,301 +385,210 @@ function DetailPanel({ report, onClose, onStatusChange }: {
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function HRReportsPage() {
-  const [reports,     setReports]     = useState<EmployeeReport[]>(seed)
-  const [search,      setSearch]      = useState("")
-  const [typeFilter,  setTypeFilter]  = useState<ReportType | "All">("All")
-  const [statFilter,  setStatFilter]  = useState<ReportStatus | "All">("All")
-  const [page,        setPage]        = useState(1)
-  const [detail,      setDetail]      = useState<EmployeeReport | null>(null)
-  const [typeOpen,    setTypeOpen]    = useState(false)
-  const [statusOpen,  setStatusOpen]  = useState(false)
-  const typeRef   = useRef<HTMLDivElement>(null)
-  const statusRef = useRef<HTMLDivElement>(null)
+  const [reports, setReports] = useState<EmployeeReport[]>(seed)
+  const [drill,   setDrill]   = useState<{ label: string; items: EmployeeReport[] } | null>(null)
+  const [detail,  setDetail]  = useState<EmployeeReport | null>(null)
 
-  useEffect(() => {
-    const h = (e: MouseEvent) => {
-      if (typeRef.current   && !typeRef.current.contains(e.target as Node))   setTypeOpen(false)
-      if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false)
-    }
-    document.addEventListener("mousedown", h)
-    return () => document.removeEventListener("mousedown", h)
-  }, [])
+  // ── Derived chart data ──────────────────────────────────────
+  const typeCounts = useMemo(() =>
+    TYPE_OPTIONS.map(t => ({ name: t, value: reports.filter(r => r.reportType === t).length })),
+  [reports])
 
-  // Filtering
-  const filtered = reports.filter(r => {
-    const matchSearch =
-      r.name.toLowerCase().includes(search.toLowerCase())       ||
-      r.title.toLowerCase().includes(search.toLowerCase())      ||
-      r.department.toLowerCase().includes(search.toLowerCase()) ||
-      r.reportType.toLowerCase().includes(search.toLowerCase())
-    const matchType   = typeFilter  === "All" || r.reportType === typeFilter
-    const matchStatus = statFilter  === "All" || r.status     === statFilter
-    return matchSearch && matchType && matchStatus
-  })
+  const statusCounts = useMemo(() =>
+    STATUS_OPTIONS.map(s => ({ name: s, value: reports.filter(r => r.status === s).length })),
+  [reports])
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
-  const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+  const deptCounts = useMemo(() => {
+    const depts = [...new Set(reports.map(r => r.department))]
+    return depts
+      .map(d => ({ department: d, count: reports.filter(r => r.department === d).length }))
+      .sort((a, b) => b.count - a.count)
+  }, [reports])
 
+  const timeData = useMemo(() => {
+    const ordered = ["Jan", "Feb", "Mar", "Apr"]
+    const map = new Map(ordered.map(m => [m, 0]))
+    reports.forEach(r => {
+      const m = new Date(r.submittedOn).toLocaleDateString("en-US", { month: "short" })
+      map.set(m, (map.get(m) ?? 0) + 1)
+    })
+    return ordered.map(month => ({ month, count: map.get(month) ?? 0 }))
+  }, [reports])
+
+  const kpi = useMemo(() => {
+    const active   = reports.filter(r => r.status === "Submitted" || r.status === "Under Review").length
+    const resolved = reports.filter(r => r.status === "Resolved"  || r.status === "Closed").length
+    const scores   = reports.filter(r => r.score !== undefined).map(r => r.score!)
+    const avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0
+    return { total: reports.length, active, resolved, avgScore }
+  }, [reports])
+
+  // ── Handlers ────────────────────────────────────────────────
   function updateStatus(id: number, status: ReportStatus) {
     setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r))
     if (detail?.id === id) setDetail(prev => prev ? { ...prev, status } : prev)
   }
 
-  function resetFilters() {
-    setSearch(""); setTypeFilter("All"); setStatFilter("All"); setPage(1)
+  function openDrill(label: string, items: EmployeeReport[]) {
+    setDetail(null)
+    setDrill({ label, items })
   }
 
-  const hasFilters = search !== "" || typeFilter !== "All" || statFilter !== "All"
+  function selectFromDrill(r: EmployeeReport) {
+    setDrill(null)
+    setDetail(r)
+  }
 
   return (
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-hidden">
-        {/* ── Toolbar ── */}
-        <div className="flex shrink-0 items-center gap-3 border-b border-border bg-card px-6 py-3">
-          {/* Search */}
-          <div className="flex flex-1 items-center gap-2 rounded-lg bg-muted px-4 py-2.5">
-            <Search className="size-4 shrink-0 text-muted-foreground" />
-            <input
-              type="text"
-              value={search}
-              onChange={e => { setSearch(e.target.value); setPage(1) }}
-              placeholder="Search by name, title, department…"
-              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
-            />
-            {search && (
-              <button onClick={() => setSearch("")} className="text-muted-foreground hover:text-foreground">
-                <X className="size-3.5" />
-              </button>
-            )}
+      <main className="flex-1 overflow-auto p-6">
+        <div className="space-y-6">
+
+          {/* ── KPI cards ── */}
+          <div className="grid grid-cols-4 gap-4">
+            <KpiCard label="Total Reports"      value={kpi.total}    sub="All submissions"         color="#3b6feb"  />
+            <KpiCard label="Active"             value={kpi.active}   sub="Submitted or in review"  color="#f59e0b"  />
+            <KpiCard label="Resolved"           value={kpi.resolved} sub="Resolved and closed"     color="#10b981"  />
+            <KpiCard label="Avg Perf Score"     value={kpi.avgScore} sub="Across scored reports"   color="#9333ea" suffix="/100" />
           </div>
 
-          {/* Type filter */}
-          <div ref={typeRef} className="relative">
-            <button
-              onClick={() => setTypeOpen(o => !o)}
-              className={cn(
-                "flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
-                typeFilter !== "All"
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border text-muted-foreground hover:bg-muted"
-              )}
-            >
-              <SlidersHorizontal className="size-4" />
-              {typeFilter === "All" ? "Type" : typeFilter}
-              <ChevronDown className="size-3.5" />
-            </button>
-            {typeOpen && (
-              <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
-                <button
-                  onClick={() => { setTypeFilter("All"); setTypeOpen(false); setPage(1) }}
-                  className={cn("flex w-full px-4 py-2.5 text-left text-sm hover:bg-muted", typeFilter === "All" && "bg-muted/60 font-medium")}
-                >
-                  All Types
-                </button>
-                {TYPE_OPTIONS.map(t => (
-                  <button
-                    key={t}
-                    onClick={() => { setTypeFilter(t); setTypeOpen(false); setPage(1) }}
-                    className={cn("flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm hover:bg-muted", typeFilter === t && "bg-muted/60 font-medium")}
-                  >
-                    <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", typeBadge[t])}>{t}</span>
-                  </button>
-                ))}
+          {/* ── Charts grid ── */}
+          <div className="grid grid-cols-[3fr_2fr] gap-6">
+
+            {/* Left column */}
+            <div className="space-y-6">
+
+              {/* Submissions over time */}
+              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+                <p className="mb-1 font-semibold text-foreground">Submissions Over Time</p>
+                <p className="mb-4 text-xs text-muted-foreground">Report volume per month</p>
+                <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart data={timeData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor="#3b6feb" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#3b6feb" stopOpacity={0}    />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <ReTooltip content={<ChartTooltip />} />
+                    <Area
+                      type="monotone"
+                      dataKey="count"
+                      name="Reports"
+                      stroke="#3b6feb"
+                      strokeWidth={2}
+                      fill="url(#areaGrad)"
+                      dot={{ fill: "#3b6feb", strokeWidth: 0, r: 4 }}
+                      activeDot={{ r: 5 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
-            )}
-          </div>
 
-          {/* Status filter */}
-          <div ref={statusRef} className="relative">
-            <button
-              onClick={() => setStatusOpen(o => !o)}
-              className={cn(
-                "flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
-                statFilter !== "All"
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border text-muted-foreground hover:bg-muted"
-              )}
-            >
-              Status
-              {statFilter !== "All" && <span className={cn("size-2 rounded-full", statusStyle[statFilter as ReportStatus].dot)} />}
-              {statFilter !== "All" && ` · ${statFilter}`}
-              <ChevronDown className="size-3.5" />
-            </button>
-            {statusOpen && (
-              <div className="absolute right-0 top-full z-30 mt-1 w-40 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
-                <button
-                  onClick={() => { setStatFilter("All"); setStatusOpen(false); setPage(1) }}
-                  className={cn("flex w-full px-4 py-2.5 text-left text-sm hover:bg-muted", statFilter === "All" && "bg-muted/60 font-medium")}
-                >
-                  All Statuses
-                </button>
-                {STATUS_OPTIONS.map(s => (
-                  <button
-                    key={s}
-                    onClick={() => { setStatFilter(s); setStatusOpen(false); setPage(1) }}
-                    className={cn("flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm hover:bg-muted", statFilter === s && "bg-muted/60 font-medium")}
-                  >
-                    <span className={cn("size-2 rounded-full", statusStyle[s].dot)} />
-                    {s}
-                  </button>
-                ))}
+              {/* Department bar chart */}
+              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+                <p className="mb-1 font-semibold text-foreground">Reports by Department</p>
+                <p className="mb-4 text-xs text-muted-foreground">Click a bar to see individual reports</p>
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={deptCounts} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
+                    <XAxis type="number" tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <YAxis type="category" dataKey="department" tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} width={80} />
+                    <ReTooltip content={<ChartTooltip />} cursor={{ fill: "var(--muted)" }} />
+                    <Bar
+                      dataKey="count"
+                      name="Reports"
+                      fill="#3b6feb"
+                      radius={[0, 4, 4, 0]}
+                      maxBarSize={22}
+                      cursor="pointer"
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      onClick={(data: any) => data?.department && openDrill(data.department as string, reports.filter(r => r.department === data.department))}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            )}
-          </div>
+            </div>
 
-          {hasFilters && (
-            <button
-              onClick={resetFilters}
-              className="rounded-lg border border-border px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted"
-            >
-              Clear
-            </button>
-          )}
-        </div>
+            {/* Right column */}
+            <div className="space-y-6">
 
-        {/* ── Table ── */}
-        <div className="flex-1 overflow-auto p-6">
-          <div className="rounded-xl border border-border bg-card shadow-sm">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  {["Employee", "Department", "Report Type", "Title", "Period", "Submitted", "Status", ""].map(col => (
-                    <th
-                      key={col}
-                      className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              {/* Report type donut */}
+              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+                <p className="mb-1 font-semibold text-foreground">Report Types</p>
+                <p className="mb-2 text-xs text-muted-foreground">Click a slice to see reports</p>
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie
+                      data={typeCounts}
+                      cx="50%"
+                      cy="42%"
+                      innerRadius={52}
+                      outerRadius={78}
+                      paddingAngle={2}
+                      dataKey="value"
+                      cursor="pointer"
+                      onClick={(d: { name?: string }) => d.name && openDrill(d.name, reports.filter(r => r.reportType === (d.name as ReportType)))}
                     >
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {paginated.map(r => {
-                  const TypeIcon = typeIcon[r.reportType]
-                  const { badge } = statusStyle[r.status]
-                  return (
-                    <tr
-                      key={r.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => setDetail(r)}
+                      {typeCounts.map((_, i) => <Cell key={i} fill={TYPE_COLORS[i]} stroke="none" />)}
+                    </Pie>
+                    <ReTooltip content={<ChartTooltip />} />
+                    <Legend
+                      iconType="circle"
+                      iconSize={7}
+                      formatter={(v) => <span className="text-xs text-foreground">{v}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Status donut */}
+              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+                <p className="mb-1 font-semibold text-foreground">By Status</p>
+                <p className="mb-2 text-xs text-muted-foreground">Click a slice to see reports</p>
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie
+                      data={statusCounts}
+                      cx="50%"
+                      cy="42%"
+                      innerRadius={52}
+                      outerRadius={78}
+                      paddingAngle={2}
+                      dataKey="value"
+                      cursor="pointer"
+                      onClick={(d: { name?: string }) => d.name && openDrill(d.name, reports.filter(r => r.status === (d.name as ReportStatus)))}
                     >
-                      {/* Employee */}
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={r.photo}
-                            alt={r.name}
-                            className="size-9 shrink-0 rounded-full object-cover"
-                          />
-                          <div className="min-w-0">
-                            <p className="truncate font-semibold text-foreground">{r.name}</p>
-                            <p className="truncate text-xs text-muted-foreground">{r.email}</p>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Department */}
-                      <td className="px-5 py-4 text-muted-foreground">{r.department}</td>
-
-                      {/* Report type */}
-                      <td className="px-5 py-4">
-                        <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold", typeBadge[r.reportType])}>
-                          <TypeIcon className="size-3" />
-                          {r.reportType}
-                        </span>
-                      </td>
-
-                      {/* Title */}
-                      <td className="max-w-[200px] px-5 py-4">
-                        <p className="truncate font-medium text-foreground">{r.title}</p>
-                        {r.score !== undefined && (
-                          <span className="mt-0.5 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-                            {r.score}/100
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Period */}
-                      <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">{r.period}</td>
-
-                      {/* Submitted */}
-                      <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">{r.submittedOn}</td>
-
-                      {/* Status */}
-                      <td className="px-5 py-4" onClick={e => e.stopPropagation()}>
-                        <StatusDropdown
-                          value={r.status}
-                          onChange={s => updateStatus(r.id, s)}
-                        />
-                      </td>
-
-                      {/* View */}
-                      <td className="px-4 py-4">
-                        <button
-                          onClick={e => { e.stopPropagation(); setDetail(r) }}
-                          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
-                          title="View report"
-                        >
-                          <Eye className="size-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-
-                {paginated.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-16 text-center text-muted-foreground">
-                      {hasFilters ? "No reports match your filters." : "No reports submitted yet."}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-
-            {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-border px-5 py-3">
-              <p className="text-xs text-muted-foreground">
-                {filtered.length === 0
-                  ? "No results"
-                  : `Showing ${(page - 1) * PER_PAGE + 1}–${Math.min(page * PER_PAGE, filtered.length)} of ${filtered.length} report${filtered.length !== 1 ? "s" : ""}`}
-              </p>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="flex size-8 items-center justify-center rounded-lg text-foreground hover:bg-muted disabled:opacity-40"
-                >
-                  <ChevronLeft className="size-4" />
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                  <button
-                    key={p}
-                    onClick={() => setPage(p)}
-                    className={cn(
-                      "flex size-8 items-center justify-center rounded-lg text-sm font-medium transition-colors",
-                      p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
-                    )}
-                  >
-                    {p}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="flex size-8 items-center justify-center rounded-lg text-foreground hover:bg-muted disabled:opacity-40"
-                >
-                  <ChevronRight className="size-4" />
-                </button>
+                      {statusCounts.map((_, i) => <Cell key={i} fill={STATUS_COLORS[i]} stroke="none" />)}
+                    </Pie>
+                    <ReTooltip content={<ChartTooltip />} />
+                    <Legend
+                      iconType="circle"
+                      iconSize={7}
+                      formatter={(v) => <span className="text-xs text-foreground">{v}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
         </div>
       </main>
 
-      {/* ── Detail panel ── */}
+      {drill && (
+        <DrillPanel
+          label={drill.label}
+          items={drill.items}
+          onClose={() => setDrill(null)}
+          onSelect={selectFromDrill}
+        />
+      )}
+
       {detail && (
         <DetailPanel
           report={detail}

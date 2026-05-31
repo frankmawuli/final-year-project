@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.push("/onboarding")
 
       }else if(role === "HR_ADMIN" ){
-        router.push("/admin")
+        router.push("/dashboard/hr")
       } 
       
       else{

@@ -35,7 +35,8 @@
       "mcp__figma__get_design_context",
       "Bash(dir D:\\\\core-recruiter\\\\lib *)",
       "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
-      "Bash(grep -E \"\\\\.\\(ts|tsx|js|jsx\\)$\")"
+      "Bash(grep -E \"\\\\.\\(ts|tsx|js|jsx\\)$\")",
+      "Bash(node *)"
     ]
   }
 }
