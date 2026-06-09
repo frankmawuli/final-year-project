@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, Loader2, CalendarPlus } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { useAuth } from "@/context/auth-context"
@@ -119,12 +120,13 @@ function fmtSalary(amount: number | null): string {
 }
 
 // ── Layout ────────────────────────────────────────────────────
-const TABLE_COLUMNS = "grid-cols-[minmax(0,2fr)_minmax(0,2fr)_96px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)]"
+const TABLE_COLUMNS = "grid-cols-[minmax(0,2fr)_minmax(0,2fr)_96px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.4fr)_40px]"
 const PAGE_SIZE = 20
 
 // ── Main page ─────────────────────────────────────────────────
 export default function ApplicantsPage() {
   const { accessToken } = useAuth()
+  const router = useRouter()
 
   const [applicants, setApplicants] = useState<ApiApplicant[]>([])
   const [search,     setSearch]     = useState("")
@@ -232,7 +234,7 @@ export default function ApplicantsPage() {
         <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
           {/* Header */}
           <div className={cn("grid items-center gap-x-4 border-b border-border px-6 py-3", TABLE_COLUMNS)}>
-            {["Candidate", "Email", "Social", "Location", "Salary", "Status"].map((col) => (
+            {["Candidate", "Email", "Social", "Location", "Salary", "Status", ""].map((col) => (
               <span key={col} className="text-sm font-medium text-foreground">{col}</span>
             ))}
           </div>
@@ -294,6 +296,25 @@ export default function ApplicantsPage() {
                   )}>
                     {STATUS_LABEL[app.status] ?? app.status}
                   </span>
+
+                  {/* Schedule interview */}
+                  <button
+                    title="Schedule Interview"
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        jobId:           app.jobId,
+                        jobTitle:        app.job.title,
+                        candidateId:     app.candidate.id,
+                        candidateName:   app.candidate.name,
+                        candidateEmail:  app.candidate.email,
+                        candidateAvatar: app.candidate.avatarUrl ?? "",
+                      })
+                      router.push(`/dashboard/hr/interviews?${params.toString()}`)
+                    }}
+                    className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                  >
+                    <CalendarPlus className="size-4" />
+                  </button>
                 </div>
               ))
             )}

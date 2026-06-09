@@ -416,7 +416,7 @@ export default function JobsPage() {
               <div className="w-10 h-[3px] bg-primary rounded-full mt-2" />
             </div>
             <Link
-              href="#"
+              href="jobs/job-listing"
               className="inline-flex items-center gap-1 text-[13.5px] font-medium text-primary hover:underline"
             >
               View All Jobs
