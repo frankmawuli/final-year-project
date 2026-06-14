@@ -32,7 +32,7 @@ export function JobSidebar({
   const [salaryOpen, setSalaryOpen] = useState(true);
 
   return (
-    <aside className="w-[210px] shrink-0">
+    <aside className="w-full">
       {/* Type of Employment */}
       <div className="mb-1">
         <button

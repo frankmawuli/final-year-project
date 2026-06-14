@@ -13,13 +13,13 @@ export function HeroSection() {
               AI-Powered HR &amp; Recruitment Platform
             </div>
             <h1 className="mb-6 text-5xl font-bold leading-[1.1] tracking-tight lg:text-[3.5rem]">
-              <span className="block text-gray-900">Hire Better.</span>
-              <span className="block text-primary">Manage Smarter.</span>
-              <span className="block text-gray-900">Grow Together.</span>
+              <span className="block text-gray-900">Hire Better</span>
+              <span className="block text-primary">Manage Smarter</span>
+              <span className="block text-gray-900">Grow Together</span>
             </h1>
             <p className="mb-8 max-w-md text-base leading-relaxed text-gray-500">
               CoreRecruiter helps HR teams attract top talent, streamline hiring, onboard employees,
-              and manage your entire workforce in one intelligent platform.
+              and manage your entire workforce in one intelligent platform
             </p>
             <div className="mb-8 flex flex-wrap items-center gap-3">
               <Button className="h-11 gap-2 bg-primary px-6 text-white hover:bg-primary/90">

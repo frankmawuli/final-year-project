@@ -1,5 +1,64 @@
 import { api } from "@/lib/api-client"
 
+// ── Public API types ───────────────────────────────────────────────────────────
+export type PublicJobStatus      = "active" | "closed" | "draft"
+export type PublicJobType        = "full_time" | "part_time" | "contract" | "internship"
+export type PublicJobArrangement = "remote" | "on_site" | "hybrid"
+export type PublicJobLevel       = "junior" | "mid" | "senior" | "lead" | "executive"
+
+export interface PublicJobListItem {
+  id:               string
+  title:            string
+  slug:             string
+  description:      string
+  requirements:     string[]
+  responsibilities: string[]
+  company: {
+    id:       string
+    name:     string
+    logo_url: string | null
+    initials: string
+    website:  string | null
+    size:     string | null
+  }
+  location: {
+    city:        string | null
+    country:     string | null
+    remote:      boolean
+    arrangement: PublicJobArrangement
+  }
+  employment: {
+    type:             PublicJobType
+    experience_level: PublicJobLevel
+    department:       string | null
+  }
+  compensation: {
+    min:      number | null
+    max:      number | null
+    currency: string
+    period:   string
+    display:  string
+  }
+  tags: string[]
+  meta: {
+    status:     PublicJobStatus
+    deadline:   string | null
+    posted_at:  string | null
+    updated_at: string | null
+  }
+}
+
+export type PublicJobDetail = PublicJobListItem
+
+interface PublicPagination {
+  page:        number
+  per_page:    number
+  total:       number
+  total_pages: number
+  next_cursor: string | null
+}
+
+// ── Private API types ──────────────────────────────────────────────────────────
 export type ApiJobStatus       = "OPEN" | "CLOSED" | "DRAFT"
 export type ApiJobType         = "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERNSHIP"
 export type ApiJobLevel        = "JUNIOR" | "MID_LEVEL" | "SENIOR" | "LEAD" | "EXECUTIVE"
@@ -188,8 +247,33 @@ export const jobsService = {
       { Authorization: `Bearer ${token}` },
     ),
 
+  listPublic: (
+    params: {
+      keyword?:    string
+      location?:   PublicJobArrangement
+      type?:       PublicJobType
+      salary_min?: number
+      page?:       number
+      per_page?:   number
+    } = {},
+  ) => {
+    const qs = new URLSearchParams()
+    if (params.keyword)    qs.set("keyword",    params.keyword)
+    if (params.location)   qs.set("location",   params.location)
+    if (params.type)       qs.set("type",       params.type)
+    if (params.salary_min) qs.set("salary_min", String(params.salary_min))
+    if (params.page)       qs.set("page",       String(params.page))
+    if (params.per_page)   qs.set("per_page",   String(params.per_page))
+    const q = qs.toString()
+    return api.get<{
+      data:             PublicJobListItem[]
+      pagination:       PublicPagination
+      filters_applied:  Record<string, string | null>
+    }>(`/public/jobs${q ? `?${q}` : ""}`)
+  },
+
   getPublicById: (id: string) =>
-    api.get<{ success: boolean; data: ApiJobDetail }>(`/jobs/${id}`),
+    api.get<{ data: PublicJobDetail }>(`/public/jobs/${id}`),
 
   create: (body: JobCreateBody, token: string) =>
     api.post<{ success: boolean; data: ApiJobDetail }>(

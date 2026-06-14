@@ -534,7 +534,7 @@ function Step1({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <FieldLabel required>Email Address</FieldLabel>
           <TextInput
@@ -658,7 +658,7 @@ function Step3({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <FieldLabel required>Year of Graduation</FieldLabel>
           <SelectInput
@@ -757,8 +757,8 @@ function Step4({
             Additional Links
           </p>
           {data.extraLinks.map((link, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <div className="w-[130px] shrink-0">
+            <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <div className="w-full sm:w-[130px] sm:shrink-0">
                 <input
                   value={link.label}
                   onChange={(e) => updateExtraLink(i, "label", e.target.value)}
@@ -766,21 +766,21 @@ function Step4({
                   className="h-[44px] w-full rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary"
                 />
               </div>
-              <div className="flex-1">
+              <div className="flex w-full sm:flex-1 gap-2">
                 <input
                   value={link.url}
                   onChange={(e) => updateExtraLink(i, "url", e.target.value)}
                   placeholder="https://…"
-                  className="h-[44px] w-full rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary"
+                  className="h-[44px] flex-1 rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary"
                 />
+                <button
+                  type="button"
+                  onClick={() => removeExtraLink(i)}
+                  className="flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-rose-50 hover:text-rose-500"
+                >
+                  <Trash2 className="size-4" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => removeExtraLink(i)}
-                className="flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-rose-50 hover:text-rose-500"
-              >
-                <Trash2 className="size-4" />
-              </button>
             </div>
           ))}
         </div>
@@ -901,7 +901,7 @@ function Step5({
 // ── Left sidebar ────────────────────────────────────────────────
 function SidebarStepList({ current }: { current: number }) {
   return (
-    <aside className="flex w-[260px] shrink-0 flex-col bg-primary/5 p-6">
+    <aside className="hidden sm:flex w-[260px] shrink-0 flex-col bg-primary/5 p-6">
       <div className="mb-8">
         <div
           className="flex size-9 items-center justify-center rounded-xl"
@@ -978,7 +978,7 @@ function SidebarStepList({ current }: { current: number }) {
 // ── Success screen ──────────────────────────────────────────────
 function SuccessScreen({ onBack }: { onBack: () => void }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
+    <div className="flex flex-1 flex-col items-center justify-center p-5 sm:p-8 text-center">
       <div
         className="mb-5 flex size-16 items-center justify-center rounded-full"
         style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
@@ -992,7 +992,7 @@ function SuccessScreen({ onBack }: { onBack: () => void }) {
       <p className="mb-8 text-[13px] text-muted-foreground">
         Our team will review your profile and reach out within 5–7 business days.
       </p>
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <button
           type="button"
           onClick={onBack}
@@ -1141,22 +1141,45 @@ export default function JobApplicationPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+    <div className="flex min-h-screen items-center justify-center bg-background p-3 sm:p-6">
       <div className="flex w-full max-w-[940px] overflow-hidden rounded-2xl bg-card shadow-xl">
 
-        {/* Sidebar */}
+        {/* Sidebar – hidden on mobile */}
         <SidebarStepList current={step} />
 
         {/* Form area */}
         {submitted ? (
           <SuccessScreen onBack={() => router.push("/apply")} />
         ) : (
-          <div className="flex flex-1 flex-col p-8">
+          <div className="flex flex-1 flex-col p-5 sm:p-8">
+            {/* Mobile-only progress indicator */}
+            <div className="sm:hidden mb-5">
+              <div className="mb-2 flex items-center justify-between text-[11px]">
+                <span className="font-semibold uppercase tracking-wider text-primary">
+                  Step {step} of {STEPS.length}
+                </span>
+                <span className="text-muted-foreground">
+                  {Math.round(((step - 1) / STEPS.length) * 100)}% complete
+                </span>
+              </div>
+              <div className="flex gap-1">
+                {STEPS.map((s) => (
+                  <div
+                    key={s.id}
+                    className={cn(
+                      "h-1.5 flex-1 rounded-full transition-colors duration-300",
+                      s.id < step ? "bg-primary" : s.id === step ? "bg-primary/40" : "bg-muted"
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+
             {/* Header */}
             <p className="mb-1 text-[12px] font-semibold uppercase tracking-widest text-primary">
               STEP {step} OF {STEPS.length}
             </p>
-            <h1 className="mb-1 text-[24px] font-bold leading-tight tracking-tight text-foreground">
+            <h1 className="mb-1 text-[20px] sm:text-[24px] font-bold leading-tight tracking-tight text-foreground">
               {stepLabels[step]}
             </h1>
             <p className="mb-6 text-[13px] text-muted-foreground">{stepSubtitles[step]}</p>

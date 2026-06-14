@@ -166,7 +166,7 @@ export default function AnnouncementPage() {
           bodyText,
           recipientType: toMode,
           status: "SENT",
-          recipientEmployeeId: toMode === "INDIVIDUAL" ? selected!.employeeId : null,
+          ...(toMode === "INDIVIDUAL" && { recipientEmployeeId: selected!.user.id }),
         },
         accessToken,
       )

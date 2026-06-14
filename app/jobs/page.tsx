@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { jobsService, type PublicJobListItem } from "@/services/jobs.service";
+import { PUBLIC_TYPE_LABEL, PUBLIC_LOCATION_LABEL } from "@/components/jobs/constants";
 import {
   Search,
   MapPin,
@@ -22,6 +24,8 @@ import {
   Twitter,
   Instagram,
   Brush,
+  Menu,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -68,50 +72,15 @@ const FEATURES = [
   },
 ];
 
-const JOBS = [
-  {
-    company: "Uiverse",
-    initials: "UI",
-    bg: "bg-[#22c55e]",
-    title: "Product Designer",
-    type: "Full-time • Remote",
-    tags: ["Figma", "UI/UX", "Design"],
-    salary: "$60k – $80k",
-    posted: "5d ago",
-  },
-  {
-    company: "TechNova",
-    initials: "TN",
-    bg: "bg-[#14b8a6]",
-    title: "Frontend Developer",
-    type: "Full-time • Hybrid",
-    tags: ["React", "TypeScript", "Tailwind"],
-    salary: "$70k – $95k",
-    posted: "1d ago",
-  },
-  {
-    company: "BrightLine",
-    initials: "BL",
-    bg: "bg-[#f97316]",
-    title: "Digital Marketing Specialist",
-    type: "Full-time • Remote",
-    tags: ["SEO", "Google Ads", "Analytics"],
-    salary: "$50k – $70k",
-    posted: "3d ago",
-  },
-  {
-    company: "DataSphere",
-    initials: "DS",
-    bg: "bg-[#3b82f6]",
-    title: "Data Analyst",
-    type: "Full-time • On-site",
-    tags: ["SQL", "Python", "Tableau"],
-    salary: "$50k – $75k",
-    posted: "2d ago",
-  },
-];
 
 const POPULAR_SEARCHES = ["Designer", "Developer", "Marketing", "Sales", "Remote"];
+
+const LOGO_COLORS = ["#22c55e", "#14b8a6", "#f97316", "#3b82f6", "#8b5cf6", "#ec4899"]
+function logoColor(initials: string): string {
+  let h = 0
+  for (const c of initials) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff
+  return LOGO_COLORS[Math.abs(h) % LOGO_COLORS.length]
+}
 
 const FOOTER_LINKS: Record<string, string[]> = {
   "For Job Seekers": ["Browse Jobs", "Create Profile", "Career Tips", "Job Alerts"],
@@ -125,35 +94,43 @@ const AVATAR_COLORS = ["bg-orange-400", "bg-blue-400", "bg-green-400"];
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function JobsPage() {
-  const [keyword, setKeyword] = useState("");
-  const [location, setLocation] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [keyword,       setKeyword]       = useState("");
+  const [location,      setLocation]      = useState("");
+  const [showDropdown,  setShowDropdown]  = useState(false);
+  const [popularJobs,   setPopularJobs]   = useState<PublicJobListItem[]>([]);
+  const [showMobileNav, setShowMobileNav] = useState(false);
 
-  const filteredJobs = keyword
-    ? JOBS.filter(
+  useEffect(() => {
+    jobsService.listPublic({ per_page: 4 })
+      .then((res) => setPopularJobs(res.data))
+      .catch(() => null);
+  }, []);
+
+  const filteredDropdown = keyword
+    ? popularJobs.filter(
         (j) =>
           j.title.toLowerCase().includes(keyword.toLowerCase()) ||
-          j.company.toLowerCase().includes(keyword.toLowerCase()) ||
+          j.company.name.toLowerCase().includes(keyword.toLowerCase()) ||
           j.tags.some((t) => t.toLowerCase().includes(keyword.toLowerCase()))
       )
-    : JOBS;
+    : popularJobs;
 
   return (
     <div className="min-h-screen bg-white font-sans text-foreground antialiased">
       {/* ── Navbar ─────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4 sm:gap-8">
           {/* Logo */}
           <Link href="/jobs" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm leading-none">C</span>
             </div>
-            <span className="font-semibold text-[15px] text-foreground">
+            <span className="font-semibold text-[15px] text-foreground hidden sm:block">
               CoreRecruiter Jobs
             </span>
           </Link>
 
-          {/* Nav links */}
+          {/* Nav links – desktop */}
           <nav className="hidden md:flex items-center gap-7">
             {NAV_LINKS.map(({ label, active, dropdown, link }) => (
               <Link
@@ -172,26 +149,62 @@ export default function JobsPage() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="#"
-              className="text-[13.5px] font-medium text-foreground hover:text-primary transition-colors"
+              className="hidden md:block text-[13.5px] font-medium text-foreground hover:text-primary transition-colors"
             >
               Login
             </Link>
             <Link
               href="#"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground text-[13.5px] font-semibold px-4 py-2 rounded-lg transition-colors"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground text-[13.5px] font-semibold px-3 sm:px-4 py-2 rounded-lg transition-colors"
             >
               Post a Job
             </Link>
+            {/* Hamburger – mobile only */}
+            <button
+              className="md:hidden p-1.5 text-foreground"
+              onClick={() => setShowMobileNav((o) => !o)}
+              aria-label="Toggle menu"
+            >
+              {showMobileNav ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile nav drawer */}
+        {showMobileNav && (
+          <nav className="md:hidden bg-card border-t border-border px-4 py-3 flex flex-col gap-1">
+            {NAV_LINKS.map(({ label, active, dropdown, link }) => (
+              <Link
+                key={label}
+                href={link}
+                onClick={() => setShowMobileNav(false)}
+                className={`flex items-center justify-between py-2.5 px-2 text-[14px] font-medium rounded-lg transition-colors ${
+                  active ? "text-primary bg-primary/5" : "text-foreground hover:text-primary hover:bg-muted"
+                }`}
+              >
+                <span>{label}</span>
+                {dropdown && <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+              </Link>
+            ))}
+            <div className="border-t border-border mt-2 pt-2">
+              <Link
+                href="#"
+                onClick={() => setShowMobileNav(false)}
+                className="block py-2.5 px-2 text-[14px] font-medium text-foreground hover:text-primary transition-colors"
+              >
+                Login
+              </Link>
+            </div>
+          </nav>
+        )}
       </header>
 
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="bg-card pt-16 pb-20 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 flex items-center gap-10 lg:gap-16">
+      <section className="bg-card pt-10 sm:pt-16 pb-12 sm:pb-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-10 lg:gap-16">
           {/* Left */}
           <div className="flex-1 min-w-0 max-w-[580px]">
             {/* Pill badge */}
@@ -200,7 +213,7 @@ export default function JobsPage() {
             </div>
 
             {/* Headline */}
-            <h1 className="text-[42px] lg:text-[48px] leading-[1.15] font-bold text-foreground mb-4">
+            <h1 className="text-[30px] sm:text-[38px] lg:text-[48px] leading-[1.15] font-bold text-foreground mb-4">
               Find Jobs That
               <br />
               <span className="text-primary">Match Your Future</span>
@@ -213,9 +226,9 @@ export default function JobsPage() {
 
             {/* Search bar */}
             <div className="relative mb-5">
-            <div className="flex items-center bg-card shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] border border-border rounded-xl p-1.5 gap-1">
-              <div className="flex items-center gap-2 flex-1 px-3 py-1.5">
-                <Search className="w-4 h-4 text-muted-foreground shrink-0 " />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-card shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] border border-border rounded-xl p-1.5 gap-1">
+              <div className="flex items-center gap-2 flex-1 px-3 py-2 sm:py-1.5">
+                <Search className="w-4 h-4 text-muted-foreground shrink-0" />
                 <input
                   type="text"
                   placeholder="Job title or keyword"
@@ -226,8 +239,9 @@ export default function JobsPage() {
                   className="flex-1 text-[13.5px] outline-none bg-transparent text-foreground placeholder:text-muted-foreground min-w-0"
                 />
               </div>
-              <div className="w-px h-8 bg-border shrink-0" />
-              <div className="flex items-center gap-2 flex-1 px-3 py-1.5">
+              <div className="hidden sm:block w-px h-8 bg-border shrink-0" />
+              <div className="sm:hidden h-px bg-border mx-2" />
+              <div className="flex items-center gap-2 flex-1 px-3 py-2 sm:py-1.5">
                 <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
                 <input
                   type="text"
@@ -237,28 +251,36 @@ export default function JobsPage() {
                   className="flex-1 text-[13.5px] outline-none bg-transparent text-foreground placeholder:text-muted-foreground min-w-0"
                 />
               </div>
-              <button className="bg-primary hover:bg-primary/90 text-primary-foreground text-[13.5px] font-semibold px-5 py-2.5 rounded-lg transition-colors shrink-0">
+              <div className="sm:hidden h-px bg-border mx-2" />
+              <button className="bg-primary hover:bg-primary/90 text-primary-foreground text-[13.5px] font-semibold px-5 py-2.5 rounded-lg transition-colors sm:shrink-0 w-full sm:w-auto">
                 Search Jobs
               </button>
             </div>
 
             {/* Keyword dropdown */}
-            {showDropdown && filteredJobs.length > 0 && (
+            {showDropdown && filteredDropdown.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
-                {filteredJobs.map((job) => (
+                {filteredDropdown.map((job) => (
                   <button
-                    key={job.title + job.company}
+                    key={job.id}
                     onMouseDown={() => { setKeyword(job.title); setShowDropdown(false); }}
                     className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
                   >
-                    <div className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${job.bg}`}>
-                      <span className="text-[10px] font-bold text-white">{job.initials}</span>
+                    <div
+                      className="flex size-9 shrink-0 items-center justify-center rounded-lg"
+                      style={{ backgroundColor: logoColor(job.company.initials) }}
+                    >
+                      <span className="text-[10px] font-bold text-white">{job.company.initials}</span>
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13.5px] font-medium text-foreground">{job.title}</p>
-                      <p className="text-[11.5px] text-muted-foreground">{job.company} · {job.type}</p>
+                      <p className="text-[11.5px] text-muted-foreground">
+                        {job.company.name} · {PUBLIC_TYPE_LABEL[job.employment.type]}
+                      </p>
                     </div>
-                    <span className="shrink-0 text-[12px] font-semibold text-foreground">{job.salary}</span>
+                    <span className="shrink-0 text-[12px] font-semibold text-foreground">
+                      {job.compensation.display}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -345,8 +367,8 @@ export default function JobsPage() {
       </section>
 
       {/* ── Top Categories ──────────────────────────────────────────────────── */}
-      <section className="py-16 bg-white  lg:my-20">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-12 sm:py-16 bg-white lg:my-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Section title */}
           <div className="text-center mb-10">
             <h2 className="text-[22px] font-bold text-foreground">Top Categories</h2>
@@ -388,10 +410,10 @@ export default function JobsPage() {
       </section>
 
       {/* ── Features ────────────────────────────────────────────────────────── */}
-      <section className="py-6 bg-white my-20 ">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-primary/10 rounded-2xl px-10 py-12">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="py-6 bg-white my-12 sm:my-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="bg-primary/10 rounded-2xl px-4 sm:px-10 py-8 sm:py-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
               {FEATURES.map(({ Icon, title, desc }) => (
                 <div key={title} className="flex flex-col items-center text-center">
                   <div className="w-14 h-14 rounded-2xl bg-card shadow-sm flex items-center justify-center mb-4">
@@ -407,8 +429,8 @@ export default function JobsPage() {
       </section>
 
       {/* ── Popular Jobs ─────────────────────────────────────────────────────── */}
-      <section className="py-16 bg-white  lg:my-20">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-12 sm:py-16 bg-white lg:my-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Header */}
           <div className="flex items-end justify-between mb-8">
             <div>
@@ -426,33 +448,46 @@ export default function JobsPage() {
 
           {/* Cards grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {JOBS.map((job) => (
-              <div
-                key={job.title + job.company}
-                className="p-5 rounded-xl border border-border bg-card hover:shadow-md transition-all cursor-pointer"
+            {popularJobs.map((job) => (
+              <Link
+                key={job.id}
+                href={`/apply/${job.id}`}
+                className="p-5 rounded-xl border border-border bg-card hover:shadow-md transition-all cursor-pointer block"
               >
                 {/* Company row */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div
-                      className={`w-10 h-10 rounded-xl ${job.bg} flex items-center justify-center shrink-0`}
-                    >
-                      <span className="text-white font-bold text-[11px]">
-                        {job.initials}
-                      </span>
-                    </div>
+                    {job.company.logo_url ? (
+                      <img
+                        src={job.company.logo_url}
+                        alt={job.company.name}
+                        className="w-10 h-10 rounded-xl object-cover shrink-0"
+                      />
+                    ) : (
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: logoColor(job.company.initials) }}
+                      >
+                        <span className="text-white font-bold text-[11px]">{job.company.initials}</span>
+                      </div>
+                    )}
                     <span className="text-[11.5px] text-muted-foreground font-medium">
-                      {job.company}
+                      {job.company.name}
                     </span>
                   </div>
-                  <button className="text-muted-foreground/50 hover:text-primary transition-colors mt-0.5">
+                  <button
+                    className="text-muted-foreground/50 hover:text-primary transition-colors mt-0.5"
+                    onClick={(e) => e.preventDefault()}
+                  >
                     <Bookmark className="w-4 h-4" />
                   </button>
                 </div>
 
                 {/* Title */}
                 <h3 className="text-[14px] font-semibold text-foreground mb-1">{job.title}</h3>
-                <p className="text-[11.5px] text-muted-foreground mb-3">{job.type}</p>
+                <p className="text-[11.5px] text-muted-foreground mb-3">
+                  {PUBLIC_TYPE_LABEL[job.employment.type]} · {PUBLIC_LOCATION_LABEL[job.location.arrangement]}
+                </p>
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-1.5 mb-4">
@@ -469,20 +504,24 @@ export default function JobsPage() {
                 {/* Salary + date */}
                 <div className="flex items-center justify-between">
                   <span className="text-[13.5px] font-semibold text-foreground">
-                    {job.salary}
+                    {job.compensation.display}
                   </span>
-                  <span className="text-[11px] text-muted-foreground">{job.posted}</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    {job.meta.posted_at
+                      ? new Date(job.meta.posted_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                      : "—"}
+                  </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── CTA Banner ───────────────────────────────────────────────────────── */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="relative overflow-hidden rounded-2xl bg-primary py-12 px-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <section className="py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="relative overflow-hidden rounded-2xl bg-primary py-10 sm:py-12 px-6 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-6">
             {/* Dot pattern overlay */}
             <div
               className="absolute inset-y-0 left-0 w-40 pointer-events-none"
@@ -512,11 +551,11 @@ export default function JobsPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────────────────── */}
-      <footer className="bg-card border-t border-border pt-14 pb-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-10">
+      <footer className="bg-card border-t border-border pt-10 sm:pt-14 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 sm:gap-10 mb-10">
             {/* Brand column */}
-            <div className="md:col-span-1">
+            <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                   <span className="text-primary-foreground font-bold text-sm leading-none">C</span>

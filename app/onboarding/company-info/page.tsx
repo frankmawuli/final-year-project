@@ -716,7 +716,7 @@ export default function CompanyOnboardingPage() {
         await onboardingService.bulkInvite(accessToken, csvFile)
       }
 
-      router.push("/dasboard/hr")
+      router.push("/dashboard/hr")
     } catch (err) {
       setSubmitError(err instanceof ApiError ? err.message : "Setup failed. Please try again.")
     } finally {
