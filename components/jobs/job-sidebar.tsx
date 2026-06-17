@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { FilterCheckbox } from "./FilterCheckbox";
-import { DualRangeSlider } from "./DualRangeSlider";
-import type { FilterItem } from "../data";
+import { FilterCheckbox } from "./filter-checkbox";
+import { DualRangeSlider } from "./dual-range-slider";
+import type { FilterItem } from "@/app/jobs/(listing)/job-listing/data";
 
 type Props = {
   employmentFilters: FilterItem[];

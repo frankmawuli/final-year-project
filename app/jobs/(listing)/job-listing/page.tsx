@@ -8,9 +8,9 @@ import {
   EMPLOYMENT_MAP,
   SENIORITY_MAP,
 } from "./data";
-import { SearchBar } from "./components/SearchBar";
-import { JobSidebar } from "./components/JobSidebar";
-import { JobCard } from "./components/JobCard";
+import { SearchBar } from "@/components/jobs/search-bar";
+import { JobSidebar } from "@/components/jobs/job-sidebar";
+import { JobCard } from "@/components/jobs/job-card";
 import {
   jobsService,
   type PublicJobListItem,
@@ -118,7 +118,7 @@ export default function JobListingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F6F8]">
+    <>
       <SearchBar
         searchTags={searchTags}
         allJobTitles={allJobTitles}
@@ -134,7 +134,9 @@ export default function JobListingPage() {
 
       <div className="max-w-[1340px] mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row gap-6">
         {/* Sidebar – hidden on mobile unless filter toggle is active */}
-        <div className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-52.5 md:shrink-0`}>
+        <div
+          className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-52.5 md:shrink-0 md:sticky md:top-6 md:self-start md:max-h-[calc(100vh-3rem)] md:overflow-y-auto`}
+        >
           <JobSidebar
             employmentFilters={employmentFilters}
             onEmploymentChange={(idx, v) =>
@@ -228,6 +230,6 @@ export default function JobListingPage() {
           )}
         </main>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,95 +1,109 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Building2, Check, Share2, Trash2 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { ApiJobListItem } from "@/services/jobs.service"
-import { LOCATION_LABEL, TYPE_LABEL, formatSalary } from "./constants"
-import { StatusBadge } from "./status-badge"
+import { useState } from "react";
+import Link from "next/link";
+import { MapPin, MoreHorizontal, Heart } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { PublicJobListItem } from "@/services/jobs.service";
+import { PUBLIC_TYPE_LABEL, PUBLIC_LEVEL_LABEL } from "@/components/jobs/constants";
 
-export function JobCard({
-  job,
-  onDelete,
-  onPublish,
-}: {
-  job: ApiJobListItem
-  onDelete: (id: string) => void
-  onPublish: (id: string) => void
-}) {
-  const [copied, setCopied] = useState(false)
+const LOGO_COLORS = [
+  "#1B5E20", "#E65100", "#1565C0", "#0D47A1",
+  "#1A237E", "#212121", "#0277BD", "#2E7D32", "#0057FF", "#880E4F",
+]
 
-  const handleShare = () => {
-    const url = `${window.location.origin}/apply/${job.id}`
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
+function logoColor(initials: string): string {
+  let hash = 0
+  for (const c of initials) hash = (hash * 31 + c.charCodeAt(0)) & 0xffffffff
+  return LOGO_COLORS[Math.abs(hash) % LOGO_COLORS.length]
+}
+
+function postedLabel(iso: string | null): string {
+  if (!iso) return "—"
+  return new Date(iso).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+}
+
+export function JobCard({ job }: { job: PublicJobListItem }) {
+  const [saved, setSaved] = useState(false)
+  const { city, country, arrangement } = job.location
+  const loc = [city, country].filter(Boolean).join(", ").toUpperCase() || arrangement.replace("_", "-").toUpperCase()
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
+    <Link
+      href={`/apply/${job.id}`}
+      className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex flex-col gap-3 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer"
+    >
       <div className="flex items-start justify-between">
-        <StatusBadge status={job.status} />
-        <Building2 className="size-6 text-muted-foreground" strokeWidth={1.5} />
-      </div>
-
-      <div>
-        <p className="text-sm font-semibold text-foreground">{job.title}</p>
-        <p className="text-xs font-medium text-primary">{job.department?.name ?? "—"}</p>
-      </div>
-
-      <p className="text-[10px] text-muted-foreground">
-        {LOCATION_LABEL[job.workLocation]} · {TYPE_LABEL[job.type]} · {job._count.applications} applicants
-      </p>
-
-      <div>
-        <p className="text-sm font-semibold text-foreground">
-          {formatSalary(job.salaryMin, job.salaryMax)}
-        </p>
-        <p className="text-[10px] text-muted-foreground">{job.experience ?? "—"} experience</p>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <Link
-          href={`/dashboard/hr/jobs/${job.id}`}
-          className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
-        >
-          View Details
-        </Link>
-        <Link
-          href="/dashboard/hr/applicants"
-          className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
-        >
-          Applications ({job._count.applications})
-        </Link>
-        {job.status === "DRAFT" && (
-          <button
-            onClick={() => onPublish(job.id)}
-            className="rounded-lg border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+        {job.company.logo_url ? (
+          <img
+            src={job.company.logo_url}
+            alt={job.company.name}
+            className="w-10 h-10 rounded-lg object-cover shrink-0"
+          />
+        ) : (
+          <div
+            className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-[11px] text-white shrink-0"
+            style={{ backgroundColor: logoColor(job.company.initials) }}
           >
-            Publish
-          </button>
+            {job.company.initials}
+          </div>
         )}
-        <div className="ml-auto flex items-center gap-1">
-          <button
-            onClick={handleShare}
-            title={copied ? "Copied!" : "Copy application link"}
-            className={cn(
-              "rounded-lg p-1.5 transition-colors",
-              copied ? "text-emerald-500" : "text-muted-foreground hover:text-primary",
-            )}
-          >
-            {copied ? <Check className="size-3.5" /> : <Share2 className="size-3.5" />}
-          </button>
-          <button
-            onClick={() => onDelete(job.id)}
-            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:text-rose-500"
-          >
-            <Trash2 className="size-3.5" />
-          </button>
-        </div>
+        <button
+          className="text-[#9CA3AF] hover:text-foreground transition-colors mt-0.5"
+          onClick={(e) => e.preventDefault()}
+        >
+          <MoreHorizontal className="w-4 h-4" />
+        </button>
       </div>
-    </div>
+
+      <div>
+        <h3 className="font-semibold text-[13.5px] text-foreground leading-snug">{job.title}</h3>
+        <p className="text-[10px] font-medium text-[#9CA3AF] uppercase tracking-[0.06em] mt-0.5">
+          {job.company.name}
+        </p>
+      </div>
+
+      <div className="flex items-center gap-1">
+        <MapPin className="w-[11px] h-[11px] text-[#9CA3AF] shrink-0" />
+        <span className="text-[10.5px] text-[#9CA3AF] uppercase tracking-[0.04em]">{loc}</span>
+      </div>
+
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[11px] text-[#6B7280]">
+          {PUBLIC_LEVEL_LABEL[job.employment.experience_level]}
+        </span>
+        <span className="text-[#D1D5DB] text-[11px]">•</span>
+        <span className="text-[11px] text-[#6B7280]">
+          {PUBLIC_TYPE_LABEL[job.employment.type]}
+        </span>
+        <span className="text-[#D1D5DB] text-[11px]">•</span>
+        <span className="text-[11.5px] text-foreground font-semibold">
+          {job.compensation.display}
+        </span>
+      </div>
+
+      <p className="text-[11.5px] text-[#6B7280] leading-[1.6] line-clamp-3">{job.description}</p>
+
+      <div className="flex flex-wrap gap-1.5">
+        {job.tags.map((tag) => (
+          <span
+            key={tag}
+            className="text-[10.5px] text-[#6B7280] border border-[#E5E7EB] px-2.5 py-[3px] rounded-md font-medium"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between pt-2 border-t border-[#F3F4F6]">
+        <span className="text-[11px] text-[#9CA3AF]">{postedLabel(job.meta.posted_at)}</span>
+        <button
+          className={cn("transition-colors", saved ? "text-red-500" : "text-[#D1D5DB] hover:text-red-400")}
+          onClick={(e) => { e.preventDefault(); setSaved((s) => !s) }}
+        >
+          <Heart className={cn("w-[14px] h-[14px]", saved && "fill-red-500")} />
+        </button>
+      </div>
+    </Link>
   )
 }

@@ -8,7 +8,7 @@ import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { useAuth } from "@/context/auth-context"
 import { jobsService, type ApiJobListItem, type ApiJobDetail } from "@/services/jobs.service"
 import { departmentService, type ApiDepartment } from "@/services/departments.service"
-import { JobCard } from "@/components/jobs/job-card"
+import { JobCard } from "@/components/jobs/job-card-hr"
 import { AddListingModal } from "@/components/jobs/add-listing-modal"
 
 const sidebarNav = [
