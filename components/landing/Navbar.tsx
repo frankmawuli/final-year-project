@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 const navLinks = [
   { label: "Product", hasDropdown: true },
@@ -15,9 +16,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
-            C
-          </div>
+          <Logo width={46} height={46} />
           <span className="text-sm font-bold text-gray-900">CoreRecruiter</span>
         </Link>
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Facebook, Linkedin, Twitter, Instagram } from "lucide-react";
+import { LogoJobs } from "@/components/logo";
 
 const FOOTER_LINKS: Record<string, string[]> = {
   "For Job Seekers": ["Browse Jobs", "Create Profile", "Career Tips", "Job Alerts"],
@@ -16,9 +17,7 @@ export function Footer() {
           {/* Brand column */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm leading-none">C</span>
-              </div>
+              <LogoJobs width={46} height={46} />
               <span className="font-semibold text-[14px] text-foreground">
                 CoreRecruiter Jobs
               </span>

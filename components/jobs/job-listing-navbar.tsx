@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, Bell, MessageSquare, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LogoJobs } from "@/components/logo";
 
 const NAV_LINKS = [
   { label: "Find Jobs", href: "/jobs/job-listing", active: true },
@@ -32,9 +33,7 @@ export function JobListingNavbar() {
         {/* Logo + nav links */}
         <div className="flex items-center gap-8">
           <Link href="/jobs" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm leading-none">C</span>
-            </div>
+            <LogoJobs width={46} height={46} />
             <span className="font-bold text-[16px] text-foreground hidden sm:block">
               CoreRecruiter
             </span>

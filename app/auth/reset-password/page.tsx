@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/context/auth-context"
 import { ApiError } from "@/lib/api-client"
+import { Logo } from "@/components/logo"
 
 type Step = "request" | "reset" | "done"
 
@@ -68,11 +69,7 @@ export default function ResetPasswordPage() {
         <div className="absolute -bottom-32 -left-32 h-112 w-md rounded-full bg-white/10" />
 
         <div className="relative flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
+          <Logo width={52} height={52} />
           <span className="text-lg font-semibold tracking-tight">CoreRecruiter</span>
         </div>
 
@@ -100,11 +97,7 @@ export default function ResetPasswordPage() {
         <div className="w-full max-w-sm space-y-8">
           {/* Mobile logo */}
           <div className="flex items-center gap-2 lg:hidden">
-            <div className="gradient-primary flex h-9 w-9 items-center justify-center rounded-xl">
-              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
+            <Logo width={52} height={52} />
             <span className="text-lg font-semibold">CoreRecruiter</span>
           </div>
 

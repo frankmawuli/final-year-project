@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronDown, Menu, X } from "lucide-react";
+import { LogoJobs } from "@/components/logo";
 
 const NAV_LINKS = [
   { label: "Home", active: true, link: "/jobs" },
@@ -20,9 +21,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4 sm:gap-8">
         {/* Logo */}
         <Link href="/jobs" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm leading-none">C</span>
-          </div>
+          <LogoJobs width={46} height={46} />
           <span className="font-semibold text-[15px] text-foreground hidden sm:block">
             CoreRecruiter Jobs
           </span>

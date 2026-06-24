@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Send, Linkedin, Facebook, Twitter, Instagram } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 function FooterCol({ heading, links }: { heading: string; links: string[] }) {
   return (
@@ -27,9 +28,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-3 lg:col-span-2">
             <Link href="/" className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
-                C
-              </div>
+              <Logo width={46} height={46} />
               <span className="text-sm font-bold text-gray-900">CoreRecruiter</span>
             </Link>
             <p className="mb-6 max-w-[200px] text-sm leading-relaxed text-gray-500">
