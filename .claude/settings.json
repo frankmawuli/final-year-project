@@ -14,7 +14,8 @@
       "Read(//d/core-recruiter-server1/src/routes/**)"
     ],
     "additionalDirectories": [
-      "D:\\core-recruiter-server1\\src\\Modules\\applicant"
+      "D:\\core-recruiter-server1\\src\\Modules\\applicant",
+      "D:\\core-recruiter-server1\\src\\validator"
     ]
   }
 }

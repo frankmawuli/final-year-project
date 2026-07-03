@@ -48,13 +48,13 @@ export function Navbar() {
         {/* Actions */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <Link
-            href="/login"
+            href="/jobs/login"
             className="hidden md:block text-[13.5px] font-medium text-foreground hover:text-primary transition-colors"
           >
             Login
           </Link>
           <Link
-            href="/signup"
+            href="/jobs/signup"
             className="bg-primary hover:bg-primary/90 text-primary-foreground text-[13.5px] font-semibold px-3 sm:px-4 py-2 rounded-lg transition-colors"
           >
             Sign Up
@@ -88,7 +88,7 @@ export function Navbar() {
           ))}
           <div className="border-t border-border mt-2 pt-2">
             <Link
-              href="/login"
+              href="/jobs/login"
               onClick={() => setShowMobileNav(false)}
               className="block py-2.5 px-2 text-[14px] font-medium text-foreground hover:text-primary transition-colors"
             >

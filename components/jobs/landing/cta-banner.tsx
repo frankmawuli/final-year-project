@@ -27,7 +27,7 @@ export function CtaBanner() {
             </p>
           </div>
           <Link
-            href="/signup"
+            href="/jobs/signup"
             className="relative z-10 shrink-0 bg-primary-foreground text-primary font-semibold text-[13.5px] px-6 py-3 rounded-lg hover:bg-primary-foreground/90 transition-colors flex items-center gap-2"
           >
             Create Profile
