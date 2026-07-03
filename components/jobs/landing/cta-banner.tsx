@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 export function CtaBanner() {
@@ -25,10 +26,13 @@ export function CtaBanner() {
               Create your profile and get matched with the best opportunities.
             </p>
           </div>
-          <button className="relative z-10 shrink-0 bg-primary-foreground text-primary font-semibold text-[13.5px] px-6 py-3 rounded-lg hover:bg-primary-foreground/90 transition-colors flex items-center gap-2">
+          <Link
+            href="/signup"
+            className="relative z-10 shrink-0 bg-primary-foreground text-primary font-semibold text-[13.5px] px-6 py-3 rounded-lg hover:bg-primary-foreground/90 transition-colors flex items-center gap-2"
+          >
             Create Profile
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
       </div>
     </section>

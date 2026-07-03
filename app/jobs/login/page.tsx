@@ -5,35 +5,31 @@ import Link from "next/link"
 import { Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
 import { ApiError } from "@/lib/api-client"
 import { Logo } from "@/components/logo"
 
-export default function SignUpPage() {
-  const { register } = useAuth()
-  const [fullName, setFullName] = useState("")
+type Role = "hr" | "employee"
+
+export default function LoginPage() {
+  const { login } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.")
-      return
-    }
-
     setLoading(true)
     try {
-      await register(fullName, email, password)
+      await login(email, password)
     } catch (err) {
-      if (err instanceof ApiError) {
+      if (err instanceof ApiError && err.status === 403) {
+        setError("Email not verified. Please check your inbox.")
+      } else if (err instanceof ApiError) {
         setError(err.message)
       } else {
         setError("Something went wrong. Please try again.")
@@ -53,7 +49,7 @@ export default function SignUpPage() {
         <div className="relative space-y-12">
           <div className="flex items-center gap-2">
             <Logo width={52} height={52} />
-            <span className="text-lg font-semibold tracking-tight">CoreRecruiter</span>
+            <span className="text-lg font-semibold tracking-tight">CoreRecruiter Jobs</span>
           </div>
 
           <div className="space-y-4">
@@ -77,9 +73,11 @@ export default function SignUpPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">Create an account</h2>
-            <p className="text-sm text-muted-foreground">Fill in details to get started</p>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h2>
+            <p className="text-sm text-muted-foreground">Sign in to your account to continue</p>
           </div>
+
+      
 
           {/* Form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -88,21 +86,6 @@ export default function SignUpPage() {
                 {error}
               </p>
             )}
-
-            <div className="space-y-1.5">
-              <label htmlFor="fullName" className="text-sm font-medium text-foreground">
-                Full Name
-              </label>
-              <Input
-                id="fullName"
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="John Doe"
-                className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
-              />
-            </div>
 
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-foreground">
@@ -120,9 +103,14 @@ export default function SignUpPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Password
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="text-sm font-medium text-foreground">
+                  Password
+                </label>
+                <Link href="/auth/reset-password" className="text-xs font-medium text-primary hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <Input
                   id="password"
@@ -143,37 +131,13 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="h-11 rounded-xl border-border bg-card px-4 pr-10 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
-              </div>
-            </div>
-
             <Button
               type="submit"
               size="lg"
               disabled={loading}
               className="gradient-primary h-11 w-full rounded-xl border-0 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
             >
-              {loading ? "Creating account…" : "Sign up"}
+              {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
 
@@ -199,9 +163,9 @@ export default function SignUpPage() {
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link href="/auth/login" className="font-medium text-primary hover:underline">
-              Sign in
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/signup" className="font-medium text-primary hover:underline">
+              Create account
             </Link>
           </p>
         </div>
