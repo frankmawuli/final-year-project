@@ -1,457 +1,639 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight, X, Plus, MoreHorizontal } from "lucide-react"
-import { cn } from "@/lib/utils"
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  HelpCircle,
+  Settings,
+  X,
+  Calendar as CalendarIcon,
+  Clock,
+  UserPlus,
+  Link2,
+  AlignJustify,
+} from "lucide-react"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
+import { cn } from "@/lib/utils"
 
-// ── Assets ────────────────────────────────────────────────────
-const adminPhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
+// ── Sidebar nav ───────────────────────────────────────────────
+const sidebarNav = [
+  { label: "Overview",         href: "/dashboard/hr/"       },
+  { label: "Calendar",           href: "/dashboard/hr/calendar" },
+  { label: "Announcements", href: "/dashboard/hr/announcement" },
+]
 
 // ── Types ─────────────────────────────────────────────────────
-interface CalEvent {
-  id:     number
-  title:  string
-  start:  string   // "YYYY-MM-DD"
-  end:    string   // "YYYY-MM-DD" (inclusive)
-  bg:     string
-  border: string
-  text:   string
+interface CandidateOption {
+  id:       number
+  name:     string
+  photo:    string
+  email:    string
+  position: string
+}
+
+interface Interview {
+  id:       number
+  title:    string
+  date:     string   // "YYYY-MM-DD"
+  startMin: number   // minutes from midnight
+  endMin:   number   // minutes from midnight
+  colorIdx: number
+  guests?:  string[]
+  meetLink?: string
+  desc?:    string
 }
 
 // ── Color palette ─────────────────────────────────────────────
-const PALETTE = [
-  { bg: "#f4fcff", border: "#2dccff", text: "#2dccff" },
-  { bg: "#eeffe5", border: "#533fe4", text: "#533fe4" },
-  { bg: "#ebf4ff", border: "#1877f2", text: "#1877f2" },
-  { bg: "#efe5ff", border: "#6e39cb", text: "#6e39cb" },
-  { bg: "#fff1d4", border: "#ffa800", text: "#ffa800" },
-  { bg: "#fff5d8", border: "#fbbc05", text: "#fbbc05" },
-  { bg: "#fff5f5", border: "#f93131", text: "#f93131" },
-  { bg: "#dcfce7", border: "#22c55e", text: "#22c55e" },
+const COLORS = [
+  { bg: "#fce7f3", text: "#9d174d", dot: "#f472b6" },
+  { bg: "#ccfbf1", text: "#0f766e", dot: "#2dd4bf" },
+  { bg: "#dbeafe", text: "#1d4ed8", dot: "#60a5fa" },
+  { bg: "#fef3c7", text: "#92400e", dot: "#fbbf24" },
+  { bg: "#f3f4f6", text: "#374151", dot: "#9ca3af" },
 ]
 
-// ── Seed events ───────────────────────────────────────────────
-let _nextId = 8
-const seedEvents: CalEvent[] = [
-  { id: 1, title: "Weekend festival",     start: "2026-03-05", end: "2026-03-08", ...PALETTE[0] },
-  { id: 2, title: "Weekend festival",     start: "2026-03-10", end: "2026-03-11", ...PALETTE[1] },
-  { id: 3, title: "Eid festival",         start: "2026-03-14", end: "2026-03-14", ...PALETTE[2] },
-  { id: 4, title: "Design conference",    start: "2026-03-19", end: "2026-03-19", ...PALETTE[3] },
-  { id: 5, title: "Glastonbury festival", start: "2026-03-22", end: "2026-03-22", ...PALETTE[4] },
-  { id: 6, title: "Design conference",    start: "2026-03-25", end: "2026-03-25", ...PALETTE[5] },
-  { id: 7, title: "Glastonbury festival", start: "2026-03-28", end: "2026-03-29", ...PALETTE[6] },
+// ── Candidate pool ────────────────────────────────────────────
+const CANDIDATES: CandidateOption[] = [
+  { id:1,  name:"Tiger Nixon",        photo:"/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png", email:"tiger.nixon@gmail.com",       position:"Web Developer"          },
+  { id:2,  name:"Garrett Winters",    photo:"/assets/2dba1db7966039308370470fce52b3b220f9a3fb.png", email:"garrett.winters@gmail.com",   position:"Accountant"             },
+  { id:3,  name:"Ashton Cox",         photo:"/assets/5f121b335ad17b18af3c3c797e7a5f1afc3ec39f.png", email:"ashton.cox@gmail.com",        position:"Technical Author"       },
+  { id:4,  name:"Cedric Kelly",       photo:"/assets/635a3bf857069957b4442100197a1e910ea3121d.png", email:"cedric.kelly@gmail.com",      position:"Integration Specialist"  },
+  { id:5,  name:"Airi Satou",         photo:"/assets/e4478e9b5a6f2c79870bedf6446dd7b9c9c09ee0.png", email:"airi.satou@gmail.com",        position:"Sales Assistant"        },
+  { id:6,  name:"Brielle Williamson", photo:"/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png", email:"brielle.w@gmail.com",         position:"Integration Specialist"  },
+  { id:7,  name:"Herrod Chandler",    photo:"/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png", email:"herrod.chandler@gmail.com",   position:"Javascript Developer"   },
+  { id:8,  name:"Rhona Davidson",     photo:"/assets/277048e308d3c618330fc9b64ac87f9bdc187ddd.png", email:"rhona.davidson@gmail.com",    position:"Software Engineer"      },
+  { id:9,  name:"Colleen Hurst",      photo:"/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png", email:"colleen.hurst@gmail.com",     position:"Javascript Developer"   },
+  { id:10, name:"Sonya Kim",          photo:"/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png", email:"sonya.kim@gmail.com",         position:"Software Engineer"      },
+  { id:11, name:"Jenna Elliott",      photo:"/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png", email:"jenna.elliott@gmail.com",     position:"Product Designer"       },
 ]
 
-// ── Date helpers ──────────────────────────────────────────────
-function parseDate(s: string): Date {
-  const [y, m, d] = s.split("-").map(Number)
-  return new Date(y, m - 1, d)
-}
+// ── Grid constants ────────────────────────────────────────────
+const HOUR_PX    = 64
+const GRID_START = 7   // 7 AM
+const GRID_END   = 20  // 8 PM
 
-function toIso(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
-}
-
-function getCalendarWeeks(year: number, month: number): Date[][] {
-  const first = new Date(year, month, 1)
-  const start = new Date(first)
-  start.setDate(start.getDate() - first.getDay())
-  const weeks: Date[][] = []
-  for (let w = 0; w < 6; w++) {
-    const week: Date[] = []
-    for (let d = 0; d < 7; d++) {
-      week.push(new Date(start))
-      start.setDate(start.getDate() + 1)
-    }
-    weeks.push(week)
-  }
-  return weeks
-}
-
-function eventsForWeek(events: CalEvent[], week: Date[]) {
-  const wStart = week[0]
-  const wEnd   = week[6]
-  return events
-    .filter((e) => {
-      const es = parseDate(e.start)
-      const ee = parseDate(e.end)
-      return ee >= wStart && es <= wEnd
-    })
-    .map((e) => {
-      const es = parseDate(e.start)
-      const ee = parseDate(e.end)
-      const msPerDay = 86400000
-      const startCol = Math.max(0, Math.round((es.getTime() - wStart.getTime()) / msPerDay))
-      const endCol   = Math.min(6, Math.round((ee.getTime() - wStart.getTime()) / msPerDay))
-      return { event: e, startCol, endCol }
-    })
-}
-
+// ── Static data ───────────────────────────────────────────────
 const MONTH_NAMES = [
   "January","February","March","April","May","June",
   "July","August","September","October","November","December",
 ]
-const DAY_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+const DAY_ABBR = ["SUN","MON","TUE","WED","THU","FRI","SAT"]
 
-// ── Sidebar nav ───────────────────────────────────────────────
-const sidebarNav = [
-  { label: "Overview",  href: "/dashboard/hr"          },
-  { label: "Calendar",  href: "/dashboard/hr/calendar" },
-  { label: "Analytics", href: "/dashboard/hr/reports"  },
-]
-
-// ── Add-event modal ───────────────────────────────────────────
-interface AddEventModalProps {
-  onClose: () => void
-  onAdd:   (e: CalEvent) => void
-  defaultDate?: string
+// ── Helpers ───────────────────────────────────────────────────
+function toIso(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`
 }
 
-function AddEventModal({ onClose, onAdd, defaultDate }: AddEventModalProps) {
-  const [title,      setTitle]      = useState("")
-  const [start,      setStart]      = useState(defaultDate ?? toIso(new Date()))
-  const [end,        setEnd]        = useState(defaultDate ?? toIso(new Date()))
-  const [colorIdx,   setColorIdx]   = useState(0)
-  const [error,      setError]      = useState("")
+function getWeekStart(d: Date): Date {
+  const s = new Date(d)
+  s.setDate(s.getDate() - s.getDay())
+  s.setHours(0, 0, 0, 0)
+  return s
+}
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!title.trim()) { setError("Event title is required."); return }
-    if (end < start)   { setError("End date cannot be before start date."); return }
-    onAdd({
-      id:    _nextId++,
+function fmtTime(min: number): string {
+  const h  = Math.floor(min / 60)
+  const m  = min % 60
+  const ap = h >= 12 ? "pm" : "am"
+  const hh = h % 12 || 12
+  return m === 0 ? `${hh}${ap}` : `${hh}.${String(m).padStart(2,"0")}${ap}`
+}
+
+function toTimeStr(min: number) {
+  return `${String(Math.floor(min/60)).padStart(2,"0")}:${String(min%60).padStart(2,"0")}`
+}
+
+function parseTimeStr(s: string) {
+  const [h, m] = s.split(":").map(Number)
+  return h * 60 + m
+}
+
+// ── Seed interviews (relative to today's week) ────────────────
+let _nextId = 10
+
+function makeSeed(): Interview[] {
+  const ws = getWeekStart(new Date())
+  const d = (offset: number) => {
+    const dt = new Date(ws)
+    dt.setDate(dt.getDate() + offset)
+    return toIso(dt)
+  }
+  return [
+    { id:1, title:"Sarah Adams – Frontend Dev",   date:d(1), startMin:9*60,     endMin:10*60,    colorIdx:2, guests:["sarah.adams@email.com"], meetLink:"https://meet.google.com/abc-defg" },
+    { id:2, title:"John Lee – Backend Engineer",  date:d(2), startMin:10*60,    endMin:11*60,    colorIdx:1 },
+    { id:3, title:"Maria Silva – UX Designer",    date:d(3), startMin:9*60,     endMin:9*60+30,  colorIdx:0 },
+    { id:4, title:"Team Sync",                    date:d(1), startMin:11*60,    endMin:11*60+30, colorIdx:3 },
+    { id:5, title:"David Chen – Product Mgr",     date:d(4), startMin:14*60,    endMin:15*60,    colorIdx:4 },
+    { id:6, title:"Amara Osei – Data Analyst",    date:d(0), startMin:9*60,     endMin:9*60+30,  colorIdx:2 },
+    { id:7, title:"Panel Review",                 date:d(3), startMin:13*60,    endMin:14*60,    colorIdx:1 },
+    { id:8, title:"Kevin Mensah – DevOps",        date:d(5), startMin:10*60,    endMin:11*60,    colorIdx:0 },
+    { id:9, title:"Offer Discussion",             date:d(2), startMin:14*60+30, endMin:15*60,    colorIdx:3 },
+  ]
+}
+
+// ── Add Schedule Modal ────────────────────────────────────────
+interface ModalProps {
+  onClose:       () => void
+  onSave:        (iv: Interview) => void
+  defaultDate?:  string
+  defaultStart?: number
+  defaultEnd?:   number
+}
+
+function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, defaultEnd = 10*60 ,}: ModalProps) {
+  const [title,       setTitle]       = useState("")
+  const [date,        setDate]        = useState(defaultDate ?? toIso(new Date()))
+  const [startMin,    setStartMin]    = useState(defaultStart)
+  const [endMin,      setEndMin]      = useState(defaultEnd)
+  const [guests,      setGuests]      = useState<CandidateOption[]>([])
+  const [guestSearch, setGuestSearch] = useState("")
+  const [showDrop,    setShowDrop]    = useState(false)
+  const [meetLink,    setMeetLink]    = useState("https://meet.google.com/new")
+  const [desc,        setDesc]        = useState("")
+  const [colorIdx,    setColorIdx]    = useState(2)
+  const [error,       setError]       = useState("")
+  const guestRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (guestRef.current && !guestRef.current.contains(e.target as Node)) {
+        setShowDrop(false)
+      }
+    }
+    document.addEventListener("mousedown", handleOutside)
+    return () => document.removeEventListener("mousedown", handleOutside)
+  }, [])
+
+  const filteredCandidates = CANDIDATES.filter(
+    c => !guests.some(g => g.id === c.id) &&
+    (guestSearch === "" ||
+      c.name.toLowerCase().includes(guestSearch.toLowerCase()) ||
+      c.position.toLowerCase().includes(guestSearch.toLowerCase()) ||
+      c.email.toLowerCase().includes(guestSearch.toLowerCase()))
+  )
+
+  function handleSave() {
+    if (!title.trim())    { setError("Please enter an event title."); return }
+    if (endMin <= startMin) { setError("End time must be after start time."); return }
+    onSave({
+      id: _nextId++,
       title: title.trim(),
-      start,
-      end,
-      ...PALETTE[colorIdx],
+      date,
+      startMin,
+      endMin,
+      colorIdx,
+      guests:   guests.length > 0 ? guests.map(g => g.email) : undefined,
+      meetLink: meetLink || undefined,
+      desc:     desc     || undefined,
     })
     onClose()
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px]"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className="w-120 rounded-2xl bg-card shadow-2xl">
         {/* Header */}
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-[#1c1c1c]">Add Event</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
-            <X className="size-5" />
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h2 className="text-sm font-semibold text-foreground">Add Schedule</h2>
+          <button onClick={onClose} className="rounded-full p-1 text-muted-foreground hover:bg-muted">
+            <X className="size-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2.5 px-5 py-4">
           {/* Title */}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#324054]">Event Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="New event title"
+            autoFocus
+            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+
+          {/* Date */}
+          <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+            <CalendarIcon className="size-4 shrink-0 text-muted-foreground" />
             <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Team meeting"
-              className="w-full rounded-lg border border-border px-3 py-2.5 text-sm text-[#1c1c1c] outline-none focus:border-[#5e81f4] focus:ring-2 focus:ring-[#5e81f4]/20"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="flex-1 bg-transparent text-sm text-foreground outline-none"
             />
           </div>
 
-          {/* Dates */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#324054]">Start Date</label>
+          {/* Time range */}
+          <div className="flex items-center gap-2">
+            <div className="flex flex-1 items-center gap-2 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+              <Clock className="size-3.5 shrink-0 text-muted-foreground" />
               <input
-                type="date"
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
-                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm text-[#1c1c1c] outline-none focus:border-[#5e81f4] focus:ring-2 focus:ring-[#5e81f4]/20"
+                type="time"
+                value={toTimeStr(startMin)}
+                onChange={(e) => setStartMin(parseTimeStr(e.target.value))}
+                className="w-full bg-transparent text-sm text-foreground outline-none"
               />
             </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#324054]">End Date</label>
+            <span className="text-sm text-muted-foreground">→</span>
+            <div className="flex flex-1 items-center gap-2 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+              <Clock className="size-3.5 shrink-0 text-muted-foreground" />
               <input
-                type="date"
-                value={end}
-                min={start}
-                onChange={(e) => setEnd(e.target.value)}
-                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm text-[#1c1c1c] outline-none focus:border-[#5e81f4] focus:ring-2 focus:ring-[#5e81f4]/20"
+                type="time"
+                value={toTimeStr(endMin)}
+                onChange={(e) => setEndMin(parseTimeStr(e.target.value))}
+                className="w-full bg-transparent text-sm text-foreground outline-none"
               />
             </div>
           </div>
 
-          {/* Color */}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#324054]">Color</label>
-            <div className="flex gap-2">
-              {PALETTE.map((c, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setColorIdx(i)}
-                  className={cn(
-                    "size-7 rounded-full border-2 transition-transform",
-                    colorIdx === i ? "scale-110 border-[#1c1c1c]" : "border-transparent"
-                  )}
-                  style={{ backgroundColor: c.border }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Preview */}
-          {title && (
+          {/* Guest multi-select */}
+          <div ref={guestRef} className="relative">
             <div
-              className="flex h-7 items-center overflow-hidden rounded-sm"
-              style={{ backgroundColor: PALETTE[colorIdx].bg }}
+              className="flex min-h-10.5 flex-wrap items-center gap-1.5 rounded-lg border border-border px-3 py-2 focus-within:border-primary cursor-text"
+              onClick={() => setShowDrop(true)}
             >
-              <div className="h-full w-[3px] shrink-0" style={{ backgroundColor: PALETTE[colorIdx].border }} />
-              <span className="ml-2 truncate text-xs font-medium" style={{ color: PALETTE[colorIdx].text }}>
-                {title}
-              </span>
+              <UserPlus className="size-4 shrink-0 text-muted-foreground" />
+              {guests.map(g => (
+                <span
+                  key={g.id}
+                  className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                >
+                  <img src={g.photo} className="size-4 rounded-full object-cover" />
+                  {g.name}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setGuests(prev => prev.filter(x => x.id !== g.id)) }}
+                    className="ml-0.5 text-primary/60 hover:text-primary"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </span>
+              ))}
+              <input
+                type="text"
+                value={guestSearch}
+                onChange={(e) => { setGuestSearch(e.target.value); setShowDrop(true) }}
+                onFocus={() => setShowDrop(true)}
+                placeholder={guests.length === 0 ? "Add guest" : ""}
+                className="min-w-20 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              />
             </div>
-          )}
 
-          {error && <p className="text-sm text-rose-500">{error}</p>}
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 rounded-lg border border-border py-2.5 text-sm font-medium text-[#324054] hover:bg-muted"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 rounded-lg bg-[#5e81f4] py-2.5 text-sm font-semibold text-white hover:bg-[#4a6ee0]"
-            >
-              Add Event
-            </button>
+            {showDrop && (
+              <div className="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
+                {filteredCandidates.length > 0 ? filteredCandidates.map(c => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setGuests(prev => [...prev, c]); setGuestSearch(""); }}
+                    className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
+                  >
+                    <img src={c.photo} className="size-8 shrink-0 rounded-full object-cover" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-foreground">{c.name}</p>
+                      <p className="truncate text-xs text-muted-foreground">{c.position}</p>
+                    </div>
+                  </button>
+                )) : (
+                  <p className="px-3 py-3 text-xs text-muted-foreground">No matching candidates</p>
+                )}
+              </div>
+            )}
           </div>
-        </form>
+
+          {/* Meet link */}
+          <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+            <Link2 className="size-4 shrink-0 text-muted-foreground" />
+            <input
+              type="url"
+              value={meetLink}
+              onChange={(e) => setMeetLink(e.target.value)}
+              placeholder="https://meet.google.com/..."
+              className="flex-1 truncate bg-transparent text-sm text-primary outline-none placeholder:text-muted-foreground"
+            />
+          </div>
+
+          {/* Description */}
+          <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+            <AlignJustify className="size-4 shrink-0 text-muted-foreground" />
+            <input
+              type="text"
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+              placeholder="Add description"
+              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            />
+          </div>
+
+          {/* Color pickers */}
+          <div className="flex items-center gap-2 pt-1">
+            {COLORS.map((c, i) => (
+              <button
+                key={i}
+                onClick={() => setColorIdx(i)}
+                className={cn(
+                  "size-6 rounded-full border-2 transition-transform hover:scale-110",
+                  colorIdx === i ? "scale-110 border-foreground" : "border-transparent"
+                )}
+                style={{ backgroundColor: c.dot }}
+              />
+            ))}
+          </div>
+
+          {error && <p className="text-xs text-rose-500">{error}</p>}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-3">
+          <button
+            onClick={onClose}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+          >
+            Save
+          </button>
+        </div>
       </div>
     </div>
   )
 }
 
-// ── Event pill (inside week row) ───────────────────────────────
-function EventPill({
-  event, startCol, endCol, onDelete,
-}: {
-  event:    CalEvent
-  startCol: number
-  endCol:   number
-  onDelete: (id: number) => void
-}) {
-  const [hovered, setHovered] = useState(false)
-  const span = endCol - startCol + 1
-
-  return (
-    <div
-      className="absolute bottom-[6px] flex h-[22px] cursor-pointer items-center overflow-hidden rounded-sm"
-      style={{
-        left:            `calc(${(startCol / 7) * 100}% + 2px)`,
-        width:           `calc(${(span / 7) * 100}% - 4px)`,
-        backgroundColor: event.bg,
-        zIndex:          10,
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div className="h-full w-[3px] shrink-0" style={{ backgroundColor: event.border }} />
-      <span className="ml-1 flex-1 truncate text-[10px]" style={{ color: event.text }}>
-        {event.title}
-      </span>
-      {hovered && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onDelete(event.id) }}
-          className="mr-1 shrink-0 rounded"
-          style={{ color: event.text }}
-        >
-          <X className="size-3" />
-        </button>
-      )}
-    </div>
-  )
-}
-
 // ── Main Page ─────────────────────────────────────────────────
-export default function CalendarPage() {
-  const today  = new Date()
-  const [year,     setYear]     = useState(2026)
-  const [month,    setMonth]    = useState(2)  // 0-indexed; 2 = March
-  const [events,   setEvents]   = useState<CalEvent[]>(seedEvents)
-  const [showModal, setShowModal] = useState(false)
-  const [clickedDate, setClickedDate] = useState<string | undefined>()
+export default function InterviewsPage() {
+  const today = new Date()
 
-  const weeks = getCalendarWeeks(year, month)
+  const [weekStart,   setWeekStart]   = useState(() => getWeekStart(today))
+  const [view,        setView]        = useState<"Day"|"Week"|"Month">("Week")
+  const [interviews,  setInterviews]  = useState<Interview[]>(() => makeSeed())
+  const [showModal,   setShowModal]   = useState(false)
+  const [modalDate,   setModalDate]   = useState<string>()
+  const [modalStart,  setModalStart]  = useState<number>()
+  const [modalEnd,    setModalEnd]    = useState<number>()
 
-  function prevMonth() {
-    if (month === 0) { setYear(y => y - 1); setMonth(11) }
-    else setMonth(m => m - 1)
+  // Build week days array
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart)
+    d.setDate(d.getDate() + i)
+    return d
+  })
+
+  const endDay  = weekDays[6]
+  const wsMonth = weekStart.getMonth()
+  const wsYear  = weekStart.getFullYear()
+  const headerLabel =
+    wsMonth === endDay.getMonth()
+      ? `${MONTH_NAMES[wsMonth]} ${wsYear}`
+      : `${MONTH_NAMES[wsMonth].slice(0,3)} – ${MONTH_NAMES[endDay.getMonth()].slice(0,3)} ${endDay.getFullYear()}`
+
+  function prevWeek() {
+    setWeekStart(p => { const d = new Date(p); d.setDate(d.getDate()-7); return d })
   }
-  function nextMonth() {
-    if (month === 11) { setYear(y => y + 1); setMonth(0) }
-    else setMonth(m => m + 1)
+  function nextWeek() {
+    setWeekStart(p => { const d = new Date(p); d.setDate(d.getDate()+7); return d })
   }
-  function goToday() {
-    setYear(today.getFullYear())
-    setMonth(today.getMonth())
+  function goToday() { setWeekStart(getWeekStart(today)) }
+
+  function isToday(d: Date) {
+    return d.getFullYear() === today.getFullYear() &&
+           d.getMonth()    === today.getMonth()    &&
+           d.getDate()     === today.getDate()
   }
 
-  function addEvent(e: CalEvent) {
-    setEvents(prev => [...prev, e])
-  }
-  function deleteEvent(id: number) {
-    setEvents(prev => prev.filter(e => e.id !== id))
+  // Current-time line position (minutes from grid start)
+  const nowMin  = today.getHours() * 60 + today.getMinutes()
+  const nowTop  = ((nowMin - GRID_START * 60) / 60) * HOUR_PX
+
+  // Hours array
+  const hours = Array.from({ length: GRID_END - GRID_START }, (_, i) => GRID_START + i)
+
+  function getDayInterviews(iso: string) {
+    return interviews.filter(iv => iv.date === iso)
   }
 
-  function openModalForDate(iso: string) {
-    setClickedDate(iso)
+  function openModal(dayIso: string, clickY: number) {
+    const rawMin    = GRID_START * 60 + (clickY / HOUR_PX) * 60
+    const rounded   = Math.round(rawMin / 30) * 30
+    const clamped   = Math.max(GRID_START * 60, Math.min(GRID_END * 60 - 30, rounded))
+    setModalDate(dayIso)
+    setModalStart(clamped)
+    setModalEnd(clamped + 60)
     setShowModal(true)
   }
 
-  const isToday = (d: Date) =>
-    d.getFullYear() === today.getFullYear() &&
-    d.getMonth()    === today.getMonth()    &&
-    d.getDate()     === today.getDate()
+  function addInterview(iv: Interview) {
+    setInterviews(prev => [...prev, iv])
+  }
 
   return (
     <>
-
-      {/* ── Text sidebar ── */}
       <HrNavigationPannel navItems={sidebarNav} />
 
-      {/* ── Main content ── */}
-      <main className="flex flex-1 flex-col overflow-auto p-6">
+      <main className="flex flex-1 flex-col overflow-hidden bg-card">
+        {/* ── Top bar ── */}
+        <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3">
+          {/* Left: month label + navigation */}
+          <div className="flex items-center gap-3">
+            <h1 className="text-[15px] font-semibold text-foreground">{headerLabel}</h1>
+            <button
+              onClick={goToday}
+              className="rounded-md border border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted/50"
+            >
+              Today
+            </button>
+            <button onClick={prevWeek} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted">
+              <ChevronLeft className="size-4" />
+            </button>
+            <button onClick={nextWeek} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted">
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
 
-        {/* Top bar */}
-        <div className="mb-4 flex items-center justify-end">
-          <button
-            onClick={() => { setClickedDate(undefined); setShowModal(true) }}
-            className="flex items-center gap-2 rounded-[10px] bg-[#5e81f4] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#4a6ee0]"
-          >
-            <Plus className="size-4" />
-            Add Event
-          </button>
+          {/* Right: icons + view toggle */}
+          <div className="flex items-center gap-2">
+            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
+              <Search className="size-4" />
+            </button>
+            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
+              <HelpCircle className="size-4" />
+            </button>
+            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
+              <Settings className="size-4" />
+            </button>
+            <div className="ml-1 flex rounded-lg border border-border bg-muted/50 p-0.5">
+              {(["Day","Week","Month"] as const).map(v => (
+                <button
+                  key={v}
+                  onClick={() => setView(v)}
+                  className={cn(
+                    "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                    view === v
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Calendar card */}
-        <div className="flex-1 rounded-lg bg-white shadow-[0_0_4px_rgba(0,0,0,0.15)]">
+        {/* ── Calendar body ── */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Scrollable container */}
+          <div className="flex flex-1 overflow-auto">
+            {/* Inner width wrapper */}
+            <div className="flex min-w-0 flex-1 flex-col">
 
-          {/* Calendar header */}
-          <div className="flex items-center justify-between px-6 py-4">
-            {/* Month nav */}
-            <div className="flex items-center gap-3">
-              <button onClick={prevMonth} className="rounded p-1 hover:bg-muted">
-                <ChevronLeft className="size-4 text-[#3a3541]" />
-              </button>
-              <span className="text-base font-medium text-[#3a3541]">
-                {MONTH_NAMES[month]} {year}
-              </span>
-              <button onClick={nextMonth} className="rounded p-1 hover:bg-muted">
-                <ChevronRight className="size-4 text-[#3a3541]" />
-              </button>
-            </div>
+              {/* Sticky day-header row */}
+              <div className="sticky top-0 z-20 flex border-b border-border bg-card">
+                {/* Spacer for time column */}
+                <div className="w-16 shrink-0 border-r border-border">
+                  <div className="flex h-14 items-end justify-center pb-2">
+                    <span className="text-[10px] font-medium text-muted-foreground">GMT+0</span>
+                  </div>
+                </div>
 
-            {/* Right controls */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={goToday}
-                className="rounded-lg bg-[#eee4ff] px-3 py-1 text-sm font-medium text-[#6e39cb] hover:bg-[#e0d0ff]"
-              >
-                Today
-              </button>
-              <div className="flex items-center gap-1 text-sm text-[#3a3541]">
-                <span>Sort By:</span>
-                <span className="text-[#89868d]">Month</span>
-                <ChevronLeft className="size-3 rotate-[-90deg] text-[#89868d]" />
-              </div>
-              <button className="rounded p-1 hover:bg-muted">
-                <MoreHorizontal className="size-4 text-[#89868d]" />
-              </button>
-            </div>
-          </div>
-
-          {/* Day headers */}
-          <div className="grid grid-cols-7 border-t border-[#dbdcde]">
-            {DAY_NAMES.map((d) => (
-              <div
-                key={d}
-                className="border-b border-r border-[#dbdcde] bg-[#f4f5f9] px-2 py-3 text-center text-sm font-medium text-[#3a3541] last:border-r-0"
-              >
-                {d}
-              </div>
-            ))}
-          </div>
-
-          {/* Week rows */}
-          {weeks.map((week, wIdx) => {
-            const weekEvents = eventsForWeek(events, week)
-            const isLastRow  = wIdx === weeks.length - 1
-            return (
-              <div
-                key={wIdx}
-                className={cn("relative", !isLastRow && "border-b border-[#dbdcde]")}
-                style={{ height: "80px" }}
-              >
-                {/* Day cells */}
-                <div className="absolute inset-0 grid grid-cols-7">
-                  {week.map((day, dIdx) => {
-                    const inMonth = day.getMonth() === month
-                    const isTod   = isToday(day)
-                    const iso     = toIso(day)
-                    const isFirst = wIdx === 0
-                    const isLast  = wIdx === weeks.length - 1
-                    return (
-                      <div
-                        key={dIdx}
-                        onClick={() => openModalForDate(iso)}
+                {/* Day headers */}
+                {weekDays.map((d, i) => {
+                  const tod = isToday(d)
+                  return (
+                    <div
+                      key={i}
+                      className="flex flex-1 flex-col items-center justify-center gap-1 border-r border-border py-2 last:border-r-0"
+                    >
+                      <span className={cn("text-[11px] font-semibold uppercase tracking-wide", tod ? "text-primary" : "text-muted-foreground")}>
+                        {DAY_ABBR[d.getDay()]}
+                      </span>
+                      <span
                         className={cn(
-                          "cursor-pointer border-r border-[#dbdcde] p-2 last:border-r-0 hover:bg-[#f8fafc]",
-                          !inMonth && "bg-[#fafbff]",
-                          isFirst && dIdx === 0 && "rounded-bl-none",
-                          isLast  && dIdx === 6 && "rounded-br-none"
+                          "flex size-8 items-center justify-center rounded-full text-sm font-bold",
+                          tod ? "bg-primary text-primary-foreground" : "text-foreground"
                         )}
                       >
-                        <span
-                          className={cn(
-                            "inline-flex size-6 items-center justify-center rounded-full text-sm font-medium",
-                            isTod
-                              ? "bg-[#5e81f4] text-white"
-                              : inMonth
-                              ? "text-[#3a3541]"
-                              : "text-[#89868d]"
-                          )}
-                        >
-                          {day.getDate()}
+                        {d.getDate()}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Time grid */}
+              <div className="flex flex-1">
+                {/* Time labels column */}
+                <div className="relative w-16 shrink-0 border-r border-border">
+                  <div style={{ height: `${(GRID_END - GRID_START) * HOUR_PX}px` }} className="relative">
+                    {hours.map(h => (
+                      <div
+                        key={h}
+                        className="absolute right-0 flex w-full justify-end pr-2"
+                        style={{ top: `${(h - GRID_START) * HOUR_PX - 8}px` }}
+                      >
+                        <span className="text-[10px] text-muted-foreground">
+                          {h === 12 ? "12 PM" : h > 12 ? `${h - 12} PM` : `${h} AM`}
                         </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Day columns */}
+                <div
+                  className="relative flex flex-1"
+                  style={{ height: `${(GRID_END - GRID_START) * HOUR_PX}px` }}
+                >
+                  {/* Horizontal hour lines */}
+                  {hours.map(h => (
+                    <div
+                      key={h}
+                      className="pointer-events-none absolute left-0 right-0 border-t border-border"
+                      style={{ top: `${(h - GRID_START) * HOUR_PX}px` }}
+                    />
+                  ))}
+
+                  {/* Vertical day columns */}
+                  {weekDays.map((day, colIdx) => {
+                    const iso     = toIso(day)
+                    const todDay  = isToday(day)
+                    const dayIvs  = getDayInterviews(iso)
+                    const showNow = todDay && nowMin >= GRID_START * 60 && nowMin <= GRID_END * 60
+
+                    return (
+                      <div
+                        key={colIdx}
+                        className={cn(
+                          "relative flex-1 cursor-pointer border-r border-border last:border-r-0",
+                          todDay && "bg-primary/5"
+                        )}
+                        onClick={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect()
+                          openModal(iso, e.clientY - rect.top)
+                        }}
+                      >
+                        {/* Current-time red line */}
+                        {showNow && (
+                          <div
+                            className="pointer-events-none absolute left-0 right-0 z-20 flex items-center"
+                            style={{ top: `${nowTop}px` }}
+                          >
+                            <div className="size-2.5 shrink-0 rounded-full bg-red-500" />
+                            <div className="h-px flex-1 bg-red-400" />
+                          </div>
+                        )}
+
+                        {/* Interview event blocks */}
+                        {dayIvs.map(iv => {
+                          const c      = COLORS[iv.colorIdx]
+                          const top    = ((iv.startMin - GRID_START * 60) / 60) * HOUR_PX
+                          const height = Math.max(22, ((iv.endMin - iv.startMin) / 60) * HOUR_PX - 2)
+                          return (
+                            <div
+                              key={iv.id}
+                              className="absolute left-1 right-1 overflow-hidden rounded-md px-2 py-1 text-xs shadow-sm"
+                              style={{
+                                top:             `${top}px`,
+                                height:          `${height}px`,
+                                backgroundColor: c.bg,
+                                color:           c.text,
+                                zIndex:          10,
+                              }}
+                              onClick={e => e.stopPropagation()}
+                            >
+                              <p className="truncate font-semibold leading-tight">{iv.title}</p>
+                              <p className="mt-0.5 text-[10px] opacity-75">
+                                {fmtTime(iv.startMin)} – {fmtTime(iv.endMin)}
+                              </p>
+                            </div>
+                          )
+                        })}
                       </div>
                     )
                   })}
                 </div>
-
-                {/* Event bars */}
-                {weekEvents.map(({ event, startCol, endCol }, eIdx) => (
-                  <EventPill
-                    key={event.id}
-                    event={event}
-                    startCol={startCol}
-                    endCol={endCol}
-                    onDelete={deleteEvent}
-                  />
-                ))}
               </div>
-            )
-          })}
+            </div>
+          </div>
         </div>
       </main>
 
-      {/* Add Event modal */}
+      {/* ── Add Schedule Modal ── */}
       {showModal && (
-        <AddEventModal
+        <AddScheduleModal
           onClose={() => setShowModal(false)}
-          onAdd={addEvent}
-          defaultDate={clickedDate}
+          onSave={addInterview}
+          defaultDate={modalDate}
+          defaultStart={modalStart}
+          defaultEnd={modalEnd}
         />
       )}
     </>

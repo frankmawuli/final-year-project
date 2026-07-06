@@ -3,9 +3,11 @@
 import { useState, useRef } from "react"
 import {
   AlertCircle, CheckCircle2, Clock, ShieldAlert, Eye, EyeOff,
-  MessageSquare, ChevronRight, Plus, X, Paperclip, Send,
+  MessageSquare, ChevronRight, Plus, X, Paperclip, Send, Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { uploadService } from "@/services/upload.service"
 
 // ── Types ────────────────────────────────────────────────────────
 type ComplaintCategory = "Workplace Harassment" | "Discrimination" | "Safety Concern" | "Manager Conduct" | "Policy Violation" | "Other"
@@ -13,16 +15,17 @@ type ComplaintStatus   = "Submitted" | "Under Investigation" | "Resolved" | "Clo
 type ComplaintPriority = "Low" | "Medium" | "High" | "Critical"
 
 interface Complaint {
-  id:          number
-  ref:         string
-  title:       string
-  category:    ComplaintCategory
-  priority:    ComplaintPriority
-  submittedOn: string
-  status:      ComplaintStatus
-  anonymous:   boolean
-  description: string
-  updates:     { date: string; text: string }[]
+  id:             number
+  ref:            string
+  title:          string
+  category:       ComplaintCategory
+  priority:       ComplaintPriority
+  submittedOn:    string
+  status:         ComplaintStatus
+  anonymous:      boolean
+  description:    string
+  attachmentUrl?: string
+  updates:        { date: string; text: string }[]
 }
 
 // ── Style maps ───────────────────────────────────────────────────
@@ -195,34 +198,64 @@ function NewComplaintForm({ onSubmit, onCancel }: {
   onSubmit: (c: Complaint) => void
   onCancel: () => void
 }) {
-  const [title,       setTitle]       = useState("")
-  const [category,    setCategory]    = useState<ComplaintCategory>("Other")
-  const [priority,    setPriority]    = useState<ComplaintPriority>("Medium")
-  const [description, setDescription] = useState("")
-  const [anonymous,   setAnonymous]   = useState(false)
-  const [error,       setError]       = useState("")
+  const { accessToken } = useAuth()
+  const [title,             setTitle]             = useState("")
+  const [category,          setCategory]          = useState<ComplaintCategory>("Other")
+  const [priority,          setPriority]          = useState<ComplaintPriority>("Medium")
+  const [description,       setDescription]       = useState("")
+  const [anonymous,         setAnonymous]         = useState(false)
+  const [error,             setError]             = useState("")
+  const [fileName,          setFileName]          = useState("")
+  const [attachmentUrl,     setAttachmentUrl]     = useState<string | null>(null)
+  const [attachmentLoading, setAttachmentLoading] = useState(false)
+  const [attachmentError,   setAttachmentError]   = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
-  const [fileName, setFileName] = useState("")
 
   const fieldCls = "w-full rounded-lg border border-border bg-muted/40 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+
+  async function handleAttachmentChange(file: File) {
+    const allowed = ["application/pdf", "image/jpeg", "image/png"]
+    if (!allowed.includes(file.type)) {
+      setAttachmentError("Only PDF, JPG, or PNG files are accepted.")
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAttachmentError("File exceeds the 5 MB limit.")
+      return
+    }
+    setFileName(file.name)
+    setAttachmentError(null)
+    setAttachmentLoading(true)
+    try {
+      const result = await uploadService.document(file, accessToken ?? "")
+      setAttachmentUrl(result.url)
+    } catch {
+      setAttachmentError("Attachment upload failed. Please try again.")
+      setFileName("")
+    } finally {
+      setAttachmentLoading(false)
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim())       { setError("Please provide a complaint title."); return }
     if (!description.trim()) { setError("Please describe the issue."); return }
+    if (attachmentLoading)   { setError("Please wait for the attachment to finish uploading."); return }
 
     const now = new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
     onSubmit({
-      id:          _nextId++,
-      ref:         `CMP-${_nextRef++}`,
-      title:       title.trim(),
+      id:             _nextId++,
+      ref:            `CMP-${_nextRef++}`,
+      title:          title.trim(),
       category,
       priority,
-      submittedOn: now,
-      status:      "Submitted",
+      submittedOn:    now,
+      status:         "Submitted",
       anonymous,
-      description: description.trim(),
-      updates:     [{ date: now, text: "Complaint received and queued for review by HR." }],
+      description:    description.trim(),
+      ...(attachmentUrl ? { attachmentUrl } : {}),
+      updates:        [{ date: now, text: "Complaint received and queued for review by HR." }],
     })
   }
 
@@ -279,25 +312,38 @@ function NewComplaintForm({ onSubmit, onCancel }: {
             <p className="mt-1 text-right text-xs text-muted-foreground">{description.length} characters</p>
           </div>
 
-          {/* Attachment (UI only) */}
+          {/* Attachment */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-foreground">
               Attachment <span className="text-muted-foreground">(optional)</span>
             </label>
             <button
               type="button"
-              onClick={() => fileRef.current?.click()}
-              className="flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/50"
+              onClick={() => !attachmentLoading && fileRef.current?.click()}
+              disabled={attachmentLoading}
+              className="flex w-full items-center gap-2.5 rounded-lg border border-dashed border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/50 disabled:opacity-60"
             >
-              <Paperclip className="size-4 shrink-0" />
-              {fileName || "Attach a file (PDF, PNG, JPG — max 10 MB)"}
+              {attachmentLoading
+                ? <Loader2 className="size-4 shrink-0 animate-spin" />
+                : <Paperclip className="size-4 shrink-0" />
+              }
+              {attachmentLoading
+                ? `Uploading ${fileName}…`
+                : fileName || "Attach a file (PDF, PNG, JPG — max 5 MB)"
+              }
             </button>
+            {attachmentError && (
+              <p className="mt-1 text-xs text-rose-500">{attachmentError}</p>
+            )}
             <input
               ref={fileRef}
               type="file"
               accept=".pdf,.png,.jpg,.jpeg"
               className="hidden"
-              onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
+              onChange={(e) => {
+                const f = e.target.files?.[0]
+                if (f) handleAttachmentChange(f)
+              }}
             />
           </div>
 

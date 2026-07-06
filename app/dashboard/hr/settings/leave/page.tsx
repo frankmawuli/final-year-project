@@ -20,14 +20,14 @@ function Card({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       <div className="mb-5 flex items-center gap-3">
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f3f4f6]">
-          <Icon className="size-4 text-[#6b7280]" />
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+          <Icon className="size-4 text-muted-foreground" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-[#111827]">{title}</p>
-          <p className="text-xs text-[#9ca3af]">{subtitle}</p>
+          <p className="text-sm font-semibold text-foreground">{title}</p>
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -43,12 +43,12 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       onClick={() => onChange(!checked)}
       className={cn(
         "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200",
-        checked ? "bg-[#5e81f4]" : "bg-[#e5e7eb]"
+        checked ? "bg-primary" : "bg-muted"
       )}
     >
       <span
         className={cn(
-          "pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm ring-0 transition-transform duration-200",
+          "pointer-events-none inline-block size-4 rounded-full bg-background shadow-sm ring-0 transition-transform duration-200",
           checked ? "translate-x-4" : "translate-x-0"
         )}
       />
@@ -57,7 +57,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 }
 
 function Divider() {
-  return <hr className="border-[#f3f4f6]" />
+  return <hr className="border-border" />
 }
 
 function Row({
@@ -72,8 +72,8 @@ function Row({
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
-        <p className="text-sm font-medium text-[#111827]">{label}</p>
-        {hint && <p className="text-xs text-[#9ca3af]">{hint}</p>}
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       </div>
       {children}
     </div>
@@ -85,7 +85,7 @@ function SaveRow({ onSave }: { onSave: () => void }) {
     <div className="flex justify-end pt-2">
       <button
         onClick={onSave}
-        className="rounded-xl bg-[#5e81f4] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#4c6ef5]"
+        className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
       >
         Save changes
       </button>
@@ -95,10 +95,10 @@ function SaveRow({ onSave }: { onSave: () => void }) {
 
 // ── Shared style strings ──────────────────────────────────────
 const inputCls =
-  "w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-3.5 py-2.5 text-sm text-[#111827] outline-none placeholder:text-[#d1d5db] focus:border-[#5e81f4] focus:bg-white focus:ring-2 focus:ring-[#5e81f4]/10"
+  "w-full rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 const selectCls =
-  "w-full appearance-none rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-3.5 py-2.5 pr-9 text-sm text-[#111827] outline-none focus:border-[#5e81f4] focus:bg-white focus:ring-2 focus:ring-[#5e81f4]/10"
+  "w-full appearance-none rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 pr-9 text-sm text-foreground outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 // ── Page ──────────────────────────────────────────────────────
 export default function LeavePage() {
@@ -125,9 +125,9 @@ export default function LeavePage() {
       <Card title="Leave Types & Entitlements" subtitle="Categories of leave and annual day allocations" icon={CalendarDays}>
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-[1fr_80px_64px] gap-3 px-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]">Leave Type</span>
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]">Days / yr</span>
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]">Paid</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Leave Type</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Days / yr</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Paid</span>
           </div>
           {leaveTypes.map((lt, i) => (
             <div key={lt.id} className="grid grid-cols-[1fr_80px_64px] items-center gap-3">
@@ -153,7 +153,7 @@ export default function LeavePage() {
           ))}
           <button
             onClick={() => setLeaveTypes(p => [...p, { id: Date.now(), name: "", days: "0", paid: true }])}
-            className="flex w-fit items-center gap-1.5 rounded-xl border border-dashed border-[#e5e7eb] px-3 py-2 text-xs font-medium text-[#6b7280] hover:border-[#5e81f4] hover:text-[#5e81f4]"
+            className="flex w-fit items-center gap-1.5 rounded-xl border border-dashed border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary hover:text-primary"
           >
             <Plus className="size-3.5" /> Add Leave Type
           </button>
@@ -178,7 +178,7 @@ export default function LeavePage() {
                     onChange={e => setMaxCarry(e.target.value)}
                     className={cn(inputCls, "w-20 text-center")}
                   />
-                  <span className="text-xs text-[#9ca3af]">days</span>
+                  <span className="text-xs text-muted-foreground">days</span>
                 </div>
               </Row>
             </>
@@ -193,25 +193,25 @@ export default function LeavePage() {
       <Card title="Approval & Tracking" subtitle="Who approves leave and how attendance is recorded" icon={CalendarDays}>
         <div className="flex flex-col gap-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-[#374151]">Approval Chain</label>
+            <label className="mb-1.5 block text-xs font-medium text-foreground">Approval Chain</label>
             <div className="relative max-w-xs">
               <select value={approvalChain} onChange={e => setApprovalChain(e.target.value)} className={selectCls}>
                 {["Direct Manager Only", "HR Only", "Manager then HR", "Auto-approve"].map(v => (
                   <option key={v}>{v}</option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-[#9ca3af]" />
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-[#374151]">Attendance Tracking Method</label>
+            <label className="mb-1.5 block text-xs font-medium text-foreground">Attendance Tracking Method</label>
             <div className="relative max-w-xs">
               <select value={trackingMethod} onChange={e => setTrackingMethod(e.target.value)} className={selectCls}>
                 {["App Check-in", "Biometric Scanner", "Manual Entry", "IP-based", "QR Code"].map(v => (
                   <option key={v}>{v}</option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-[#9ca3af]" />
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
             </div>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function LeavePage() {
       <Card title="Overtime Policy" subtitle="Rules for hours worked beyond the standard schedule" icon={CalendarDays}>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-[#374151]">Overtime Multiplier</label>
+            <label className="mb-1.5 block text-xs font-medium text-foreground">Overtime Multiplier</label>
             <div className="flex items-center gap-2">
               <input
                 type="number"
@@ -231,11 +231,11 @@ export default function LeavePage() {
                 onChange={e => setOvertimeRate(e.target.value)}
                 className={cn(inputCls, "w-24")}
               />
-              <span className="text-xs text-[#9ca3af]">× base rate</span>
+              <span className="text-xs text-muted-foreground">× base rate</span>
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-[#374151]">Max Overtime / Month</label>
+            <label className="mb-1.5 block text-xs font-medium text-foreground">Max Overtime / Month</label>
             <div className="flex items-center gap-2">
               <input
                 type="number"
@@ -244,7 +244,7 @@ export default function LeavePage() {
                 onChange={e => setMaxOvertimeHrs(e.target.value)}
                 className={cn(inputCls, "w-24")}
               />
-              <span className="text-xs text-[#9ca3af]">hours</span>
+              <span className="text-xs text-muted-foreground">hours</span>
             </div>
           </div>
         </div>

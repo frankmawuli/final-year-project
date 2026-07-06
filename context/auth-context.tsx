@@ -24,8 +24,9 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>
   register: (fullName: string, email: string, password: string) => Promise<void>
   logout: () => void
-  requestResetPassword: () => Promise<void>
+  requestResetPassword: (email: string) => Promise<void>
   resetPassword: (email: string, otp: string, oldPassword: string, newPassword: string) => Promise<void>
+  changePassword: (oldPassword: string, newPassword: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -55,24 +56,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(
     async (email: string, password: string) => {
       const res = await authService.login(email, password)
-      const { id, name, email: userEmail, role, accessToken: at, refreshToken: rt, numberOfLogins } = res.data
-      const u: User = { id, name, email: userEmail, role, numberOfLogins }
+      const { id, name, email: userEmail, role, accessToken: at, refreshToken: rt, numberOfLogins, mustChangePassword } = res.data
+      const u: User = { id, name, email: userEmail, role, numberOfLogins, mustChangePassword }
       localStorage.setItem(ACCESS_TOKEN_KEY, at)
       localStorage.setItem(REFRESH_TOKEN_KEY, rt)
       localStorage.setItem(USER_KEY, JSON.stringify(u))
       setAccessToken(at)
       setUser(u)
-      if (role === "HR_ADMIN" && numberOfLogins === 0) {
+      if (mustChangePassword) {
+        router.push("/auth/change-password")
+      } else if (role === "HR_ADMIN" && numberOfLogins === 0) {
         router.push("/onboarding")
-
-      }else if(role === "HR_ADMIN" ){
-        router.push("/admin")
-      } 
-      
-      else{
-        router.push("/ess")
+      } else if (role === "HR_ADMIN") {
+        router.push("/dashboard/hr")
+      } else {
+        router.push("/dashboard/ess")
       }
-
     },
     [router],
   )
@@ -97,15 +96,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/auth/login")
   }, [accessToken, router])
 
-  const requestResetPassword = useCallback(async () => {
-    if (!accessToken) throw new Error("Not authenticated")
-    await authService.requestResetPassword(accessToken)
-  }, [accessToken])
+  const requestResetPassword = useCallback(async (email: string) => {
+    await authService.requestResetPassword(email)
+  }, [])
 
   const resetPassword = useCallback(
     async (email: string, otp: string, oldPassword: string, newPassword: string) => {
+      await authService.resetPassword(email, otp, oldPassword, newPassword)
+    },
+    [],
+  )
+
+  const changePassword = useCallback(
+    async (oldPassword: string, newPassword: string) => {
       if (!accessToken) throw new Error("Not authenticated")
-      await authService.resetPassword(accessToken, email, otp, oldPassword, newPassword)
+      await authService.changePassword(oldPassword, newPassword, accessToken)
+      setUser((prev) => {
+        if (!prev) return prev
+        const updated = { ...prev, mustChangePassword: false }
+        localStorage.setItem(USER_KEY, JSON.stringify(updated))
+        return updated
+      })
     },
     [accessToken],
   )
@@ -122,6 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         requestResetPassword,
         resetPassword,
+        changePassword,
       }}
     >
       {children}

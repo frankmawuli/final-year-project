@@ -3,6 +3,8 @@
 import { useState, useRef, useCallback } from "react"
 import { Upload, FileText, FileImage, File, X, CheckCircle2, AlertCircle, CloudUpload } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { uploadService } from "@/services/upload.service"
 
 // ── Types ────────────────────────────────────────────────────────
 type UploadCategory = "Medical Certificate" | "Expense Receipt" | "Personal ID" | "Training Certificate" | "Other"
@@ -22,8 +24,8 @@ const CATEGORIES: UploadCategory[] = [
   "Medical Certificate", "Expense Receipt", "Personal ID", "Training Certificate", "Other",
 ]
 
-const ACCEPTED = ["application/pdf", "image/png", "image/jpeg", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
-const MAX_MB   = 10
+const ACCEPTED = ["application/pdf", "image/png", "image/jpeg"]
+const MAX_MB   = 5
 
 function fileIcon(file: File) {
   if (file.type === "application/pdf")   return { Icon: FileText,  cls: "text-rose-500"  }
@@ -141,6 +143,7 @@ function FileRow({
 
 // ── Main Page ─────────────────────────────────────────────────────
 export default function UploadPage() {
+  const { accessToken } = useAuth()
   const [items,    setItems]    = useState<FileItem[]>([])
   const [dragging, setDragging] = useState(false)
   const [errors,   setErrors]   = useState<string[]>([])
@@ -181,25 +184,21 @@ export default function UploadPage() {
     setItems((prev) => prev.filter((i) => i.id !== id))
   }
 
-  function simulateUpload() {
+  async function handleUpload() {
     const queued = items.filter((i) => i.status === "queued")
     if (!queued.length) return
 
-    queued.forEach((item) => {
-      updateItem(item.id, { status: "uploading", progress: 0 })
-      let progress = 0
-      const interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 18) + 8
-        if (progress >= 100) {
-          clearInterval(interval)
-          // ~10% chance of simulated error
-          const fail = Math.random() < 0.1
-          updateItem(item.id, { status: fail ? "error" : "done", progress: 100 })
-        } else {
-          updateItem(item.id, { progress })
+    await Promise.all(
+      queued.map(async (item) => {
+        updateItem(item.id, { status: "uploading", progress: 50 })
+        try {
+          await uploadService.document(item.file, accessToken ?? "")
+          updateItem(item.id, { status: "done", progress: 100 })
+        } catch {
+          updateItem(item.id, { status: "error", progress: 0 })
         }
-      }, 200)
-    })
+      }),
+    )
   }
 
   const hasQueued   = items.some((i) => i.status === "queued")
@@ -254,7 +253,7 @@ export default function UploadPage() {
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
-              {["PDF", "PNG", "JPG", "DOCX"].map((t) => (
+              {["PDF", "PNG", "JPG"].map((t) => (
                 <span key={t} className="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
                   {t}
                 </span>
@@ -264,7 +263,7 @@ export default function UploadPage() {
               ref={inputRef}
               type="file"
               multiple
-              accept=".pdf,.png,.jpg,.jpeg,.docx"
+              accept=".pdf,.png,.jpg,.jpeg"
               className="hidden"
               onChange={(e) => addFiles(e.target.files)}
             />
@@ -325,7 +324,7 @@ export default function UploadPage() {
                 </button>
                 {hasQueued && (
                   <button
-                    onClick={simulateUpload}
+                    onClick={handleUpload}
                     className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-white hover:opacity-90"
                   >
                     <Upload className="size-4" />
@@ -342,7 +341,7 @@ export default function UploadPage() {
             <p className="mb-3 text-sm font-semibold text-foreground">Upload guidelines</p>
             <ul className="flex flex-col gap-2">
               {[
-                "Accepted formats: PDF, PNG, JPG, DOCX",
+                "Accepted formats: PDF, PNG, JPG",
                 `Maximum file size: ${MAX_MB} MB per file`,
                 "Medical certificates must be signed by a licensed physician",
                 "Documents are reviewed by HR within 1–2 business days",

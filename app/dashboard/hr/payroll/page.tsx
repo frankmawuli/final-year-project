@@ -1,29 +1,23 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
-import { DollarSign, BarChart2, Minus, CalendarDays, Clock, ChevronRight, Search } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { DollarSign, BarChart2, Minus, CalendarDays, Clock, ChevronRight, Search, Play, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
+import { useAuth } from "@/context/auth-context"
+import {
+  payrollService,
+  type ApiPayrollRun,
+  type ApiPayrollSummary,
+  type ApiPayslip,
+} from "@/services/payroll.service"
 
-// ── Assets ────────────────────────────────────────────────────
-const adminPhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
+// ── Constants ─────────────────────────────────────────────────
+const DEFAULT_PHOTO = "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png"
 
-const photos = {
-  a: "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
-  b: "/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png",
-  c: "/assets/cf9965b714128bf9b66e7daf6ad58bf5300b9eea.png",
-  d: "/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
-  e: "/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png",
-  f: "/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
-  g: "/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
-  h: "/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
-  i: "/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
-}
-
-// ── Employee payroll data ──────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────
 interface PayrollEmployee {
-  id:         number
+  id:         string
   name:       string
   email:      string
   photo:      string
@@ -31,74 +25,87 @@ interface PayrollEmployee {
   baseSalary: number
   bonus:      number
   deductions: number
-  status:     "Paid" | "Pending" | "Processing"
+  netPay:     number
+  status:     "Paid" | "Pending" | "Processing" | "Failed"
 }
 
-const payrollEmployees: PayrollEmployee[] = [
-  { id: 1, name: "Michael Chen",     email: "michael.chen@corecruiter.com",     photo: photos.a, department: "Design",       baseSalary: 9500,  bonus: 1200, deductions: 2150, status: "Paid"       },
-  { id: 2, name: "Sarah Williams",   email: "sarah.williams@corecruiter.com",   photo: photos.b, department: "Marketing",    baseSalary: 8750,  bonus: 1500, deductions: 2050, status: "Paid"       },
-  { id: 3, name: "David Rodriguez",  email: "david.rodriguez@corecruiter.com",  photo: photos.c, department: "Engineering",  baseSalary: 11200, bonus: 2100, deductions: 2800, status: "Paid"       },
-  { id: 4, name: "James Anderson",   email: "james.anderson@corecruiter.com",   photo: photos.d, department: "Sales",        baseSalary: 13500, bonus: 3000, deductions: 3200, status: "Paid"       },
-  { id: 5, name: "Jessica Martinez", email: "jessica.martinez@corecruiter.com", photo: photos.e, department: "Design",       baseSalary: 8200,  bonus: 900,  deductions: 1950, status: "Paid"       },
-  { id: 6, name: "Robert Taylor",    email: "robert.taylor@corecruiter.com",    photo: photos.f, department: "Engineering",  baseSalary: 12083, bonus: 2800, deductions: 3383, status: "Paid"       },
-  { id: 7, name: "Priya Patel",      email: "priya.patel@corecruiter.com",      photo: photos.g, department: "Analytics",    baseSalary: 9800,  bonus: 1100, deductions: 2300, status: "Paid"       },
-  { id: 8, name: "Lena Schmidt",     email: "lena.schmidt@corecruiter.com",     photo: photos.h, department: "HR",           baseSalary: 7600,  bonus: 800,  deductions: 1750, status: "Paid"       },
-  { id: 9, name: "Omar Hassan",      email: "omar.hassan@corecruiter.com",      photo: photos.i, department: "Engineering",  baseSalary: 11500, bonus: 2500, deductions: 2950, status: "Processing" },
-]
+interface RunRow {
+  id:        string
+  period:    string
+  employees: number
+  meta:      string
+  amount:    string
+  status:    string
+}
 
 const statusStyle: Record<PayrollEmployee["status"], string> = {
-  Paid:       "bg-emerald-50 text-emerald-600",
-  Pending:    "bg-amber-50 text-amber-600",
-  Processing: "bg-blue-50 text-[#2d68fe]",
+  Paid:       "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
+  Pending:    "bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
+  Processing: "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
+  Failed:     "bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400",
 }
 
-// ── Data ──────────────────────────────────────────────────────
-const stats = [
-  {
-    label:       "Total Payroll",
-    value:       "$117,449",
-    change:      "+3.2%",
-    changeLabel: "this month",
-    positive:    true,
-    Icon:        DollarSign,
-    iconBg:      "bg-[#2d68fe]",
-  },
-  {
-    label:       "Total Gross",
-    value:       "$157,723",
-    change:      "+2.8%",
-    changeLabel: "before deductions",
-    positive:    true,
-    Icon:        BarChart2,
-    iconBg:      "bg-[#2d68fe]",
-  },
-  {
-    label:       "Total Deductions",
-    value:       "$40,274",
-    change:      "+1.5%",
-    changeLabel: "taxes & benefits",
-    positive:    false,
-    Icon:        Minus,
-    iconBg:      "bg-[#eef0f6]",
-  },
-]
+// ── API → view mapping ─────────────────────────────────────────
+function formatPeriod(period: string): string {
+  const [y, m] = period.split("-").map(Number)
+  return new Date(y, m - 1).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+}
 
-const payrollRuns = [
-  { period: "March 2026",    employees: 14, meta: "Due Mar 31",  amount: "$117,449", status: "Scheduled" },
-  { period: "February 2026", employees: 14, meta: "Paid Feb 28", amount: "$113,827", status: "Completed" },
-  { period: "January 2026",  employees: 14, meta: "Paid Jan 31", amount: "$115,203", status: "Completed" },
-  { period: "December 2025", employees: 13, meta: "Paid Dec 31", amount: "$108,945", status: "Completed" },
-]
+function currentPeriodLabel(): string {
+  const now = new Date()
+  return now.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+}
 
-const payDistribution = [
-  { dept: "Engineering", amount: 52380 },
-  { dept: "Product",     amount: 28740 },
-  { dept: "Design",      amount: 17690 },
-  { dept: "Marketing",   amount: 11790 },
-  { dept: "Sales",       amount:  6849 },
-]
+function shortDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+}
 
-const maxPay = Math.max(...payDistribution.map((d) => d.amount))
+const runStatusLabel: Record<ApiPayrollRun["status"], string> = {
+  DRAFT:            "Draft",
+  CALCULATED:       "Processing",
+  PENDING_APPROVAL: "Awaiting approval",
+  APPROVED:         "Scheduled",
+  PAID:             "Completed",
+  // Legacy backend statuses
+  SCHEDULED:        "Scheduled",
+  PROCESSING:       "Processing",
+  COMPLETED:        "Completed",
+  CANCELLED:        "Cancelled",
+}
+
+function mapRun(run: ApiPayrollRun): RunRow {
+  const paid = run.status === "PAID" || run.status === "COMPLETED"
+  return {
+    id:        run.id,
+    period:    formatPeriod(run.period),
+    employees: run.employeeCount,
+    meta:      paid ? `Paid ${shortDate(run.paidAt ?? run.payDate)}` : `Due ${shortDate(run.payDate)}`,
+    amount:    `$${run.totals.net.toLocaleString()}`,
+    status:    runStatusLabel[run.status] ?? run.status,
+  }
+}
+
+const payslipStatusLabel: Record<ApiPayslip["paymentStatus"], PayrollEmployee["status"]> = {
+  PAID:       "Paid",
+  PROCESSING: "Processing",
+  PENDING:    "Pending",
+  FAILED:     "Failed",
+}
+
+function mapPayslip(slip: ApiPayslip): PayrollEmployee {
+  return {
+    id:         slip.id,
+    name:       slip.employee.user.name,
+    email:      slip.employee.user.email,
+    photo:      slip.employee.user.avatarUrl ?? DEFAULT_PHOTO,
+    department: slip.employee.department ?? "—",
+    baseSalary: slip.baseSalary,
+    bonus:      slip.bonus,
+    deductions: slip.totalDeductions,
+    netPay:     slip.netPay,
+    status:     payslipStatusLabel[slip.paymentStatus] ?? "Pending",
+  }
+}
 
 const sidebarNav = [
   { label: "Employees",   href: "/dashboard/hr/employees"   },
@@ -111,11 +118,64 @@ const sidebarNav = [
 const TABS = ["Overview", "Employees", "Payroll Runs"] as const
 type Tab = (typeof TABS)[number]
 
+// ── Run list rows (shared by Overview and Payroll Runs tab) ────
+function RunList({ runs }: { runs: RunRow[] }) {
+  if (runs.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-10 text-center">
+        <CalendarDays className="size-10 text-muted" />
+        <p className="text-sm text-muted-foreground">
+          No payroll runs yet — click “Run Payroll” to calculate your first one.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col divide-y divide-border">
+      {runs.map((run) => (
+        <div key={run.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+          <div className="flex items-center gap-4">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/30">
+              <CalendarDays className="size-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">{run.period}</p>
+              <p className="text-xs text-muted-foreground">
+                {run.employees} employee{run.employees !== 1 ? "s" : ""} • {run.meta}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-5">
+            <p className="text-sm font-bold text-foreground">{run.amount}</p>
+            <span
+              className={cn(
+                "min-w-[90px] rounded-md px-3 py-1 text-center text-xs font-semibold",
+                run.status === "Completed"
+                  ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+                  : "bg-blue-50 text-primary dark:bg-blue-900/30 dark:text-blue-400"
+              )}
+            >
+              {run.status}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── Employees tab content ──────────────────────────────────────
-function EmployeesPayrollTab() {
+function EmployeesPayrollTab({
+  employees,
+  periodLabel,
+}: {
+  employees:   PayrollEmployee[]
+  periodLabel: string
+}) {
   const [search, setSearch] = useState("")
 
-  const filtered = payrollEmployees.filter(
+  const filtered = employees.filter(
     (e) =>
       e.name.toLowerCase().includes(search.toLowerCase()) ||
       e.department.toLowerCase().includes(search.toLowerCase()) ||
@@ -125,17 +185,17 @@ function EmployeesPayrollTab() {
   const fmt = (n: number) => `$${n.toLocaleString()}`
 
   return (
-    <div className="rounded-2xl bg-white shadow-sm">
+    <div className="rounded-2xl bg-card shadow-sm">
       {/* Table toolbar */}
       <div className="flex items-center justify-between border-b border-border px-6 py-4">
-        <h2 className="text-base font-semibold text-[#1c1c1c]">Employee Payroll — March 2026</h2>
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-[#f8fafc] px-3 py-2">
-          <Search className="size-4 shrink-0 text-[#8181a5]" />
+        <h2 className="text-base font-semibold text-foreground">Employee Payroll — {periodLabel}</h2>
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-muted px-3 py-2">
+          <Search className="size-4 shrink-0 text-muted-foreground" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search employees…"
-            className="w-44 bg-transparent text-sm text-[#1c1c1c] outline-none placeholder:text-[#8181a5]"
+            className="w-44 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
           />
         </div>
       </div>
@@ -145,64 +205,63 @@ function EmployeesPayrollTab() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Employee</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Base Salary</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Department</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Bonus</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Deductions</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Net Pay</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-[#8181a5]">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Employee</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Base Salary</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Department</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Bonus</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Deductions</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Net Pay</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filtered.map((emp) => {
-              const netPay = emp.baseSalary + emp.bonus - emp.deductions
-              return (
-                <tr key={emp.id} className="hover:bg-[#f8fafc]">
-                  {/* Employee */}
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={emp.photo}
-                        alt={emp.name}
-                        className="size-9 shrink-0 rounded-full object-cover"
-                      />
-                      <div>
-                        <p className="font-medium text-[#1c1c1c]">{emp.name}</p>
-                        <p className="text-xs text-[#8181a5]">{emp.email}</p>
-                      </div>
+            {filtered.map((emp) => (
+              <tr key={emp.id} className="hover:bg-muted/50">
+                {/* Employee */}
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={emp.photo}
+                      alt={emp.name}
+                      className="size-9 shrink-0 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-medium text-foreground">{emp.name}</p>
+                      <p className="text-xs text-muted-foreground">{emp.email}</p>
                     </div>
-                  </td>
+                  </div>
+                </td>
 
-                  {/* Base Salary */}
-                  <td className="px-4 py-4 text-[#1c1c1c]">{fmt(emp.baseSalary)}</td>
+                {/* Base Salary */}
+                <td className="px-4 py-4 text-foreground">{fmt(emp.baseSalary)}</td>
 
-                  {/* Department */}
-                  <td className="px-4 py-4 text-[#8181a5]">{emp.department}</td>
+                {/* Department */}
+                <td className="px-4 py-4 text-muted-foreground">{emp.department}</td>
 
-                  {/* Bonus */}
-                  <td className="px-4 py-4 font-medium text-emerald-500">+{fmt(emp.bonus)}</td>
+                {/* Bonus */}
+                <td className="px-4 py-4 font-medium text-emerald-500">+{fmt(emp.bonus)}</td>
 
-                  {/* Deductions */}
-                  <td className="px-4 py-4 font-medium text-rose-500">-{fmt(emp.deductions)}</td>
+                {/* Deductions */}
+                <td className="px-4 py-4 font-medium text-rose-500">-{fmt(emp.deductions)}</td>
 
-                  {/* Net Pay */}
-                  <td className="px-4 py-4 font-semibold text-[#1c1c1c]">{fmt(netPay)}</td>
+                {/* Net Pay */}
+                <td className="px-4 py-4 font-semibold text-foreground">{fmt(emp.netPay)}</td>
 
-                  {/* Status */}
-                  <td className="px-4 py-4">
-                    <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", statusStyle[emp.status])}>
-                      {emp.status}
-                    </span>
-                  </td>
-                </tr>
-              )
-            })}
+                {/* Status */}
+                <td className="px-4 py-4">
+                  <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", statusStyle[emp.status])}>
+                    {emp.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-[#8181a5]">
-                  No employees match your search.
+                <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                  {employees.length === 0
+                    ? "No payslips yet — run payroll to generate them."
+                    : "No employees match your search."}
                 </td>
               </tr>
             )}
@@ -212,13 +271,13 @@ function EmployeesPayrollTab() {
 
       {/* Footer totals */}
       <div className="flex items-center justify-between border-t border-border px-6 py-4">
-        <p className="text-xs text-[#8181a5]">{filtered.length} of {payrollEmployees.length} employees</p>
+        <p className="text-xs text-muted-foreground">{filtered.length} of {employees.length} employees</p>
         <div className="flex items-center gap-8 text-sm">
-          <span className="text-[#8181a5]">
-            Total base: <span className="font-semibold text-[#1c1c1c]">{fmt(filtered.reduce((s, e) => s + e.baseSalary, 0))}</span>
+          <span className="text-muted-foreground">
+            Total base: <span className="font-semibold text-foreground">{fmt(filtered.reduce((s, e) => s + e.baseSalary, 0))}</span>
           </span>
-          <span className="text-[#8181a5]">
-            Total net: <span className="font-semibold text-[#1c1c1c]">{fmt(filtered.reduce((s, e) => s + e.baseSalary + e.bonus - e.deductions, 0))}</span>
+          <span className="text-muted-foreground">
+            Total net: <span className="font-semibold text-foreground">{fmt(filtered.reduce((s, e) => s + e.netPay, 0))}</span>
           </span>
         </div>
       </div>
@@ -228,11 +287,138 @@ function EmployeesPayrollTab() {
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function PayrollPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("Overview")
+  const [activeTab, setActiveTab]     = useState<Tab>("Overview")
+  const { accessToken }               = useAuth()
+  const [loading, setLoading]         = useState(true)
+  const [error, setError]             = useState<string | null>(null)
+  const [summary, setSummary]         = useState<ApiPayrollSummary | null>(null)
+  const [runs, setRuns]               = useState<RunRow[]>([])
+  const [employees, setEmployees]     = useState<PayrollEmployee[]>([])
+  const [periodLabel, setPeriodLabel] = useState(currentPeriodLabel())
+  const [running, setRunning]         = useState(false)
+  const [runMsg, setRunMsg]           = useState<{ text: string; error: boolean } | null>(null)
+
+  const loadData = useCallback(async () => {
+    if (!accessToken) return
+    setError(null)
+    try {
+      const [sumRes, runsRes] = await Promise.all([
+        payrollService.summary(accessToken),
+        payrollService.listRuns(accessToken, { limit: 12 }),
+      ])
+      setSummary(sumRes.data)
+      setRuns(runsRes.data.map(mapRun))
+      const latest = runsRes.data[0]
+      if (latest) {
+        setPeriodLabel(formatPeriod(latest.period))
+        const runRes = await payrollService.getRun(latest.id, accessToken)
+        setEmployees((runRes.data.payslips ?? []).map(mapPayslip))
+      } else {
+        setEmployees([])
+      }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to load payroll data")
+    } finally {
+      setLoading(false)
+    }
+  }, [accessToken])
+
+  useEffect(() => { loadData() }, [loadData])
+
+  async function runPayroll() {
+    if (!accessToken) return
+    setRunning(true)
+    setRunMsg(null)
+    try {
+      const res = await payrollService.createRun({}, accessToken)
+      const skipped = res.meta?.skippedCount ?? 0
+      setRunMsg({
+        text: `Payroll calculated for ${res.data.employeeCount} employee${res.data.employeeCount !== 1 ? "s" : ""}${
+          skipped ? ` — ${skipped} skipped (no salary set)` : ""
+        }`,
+        error: false,
+      })
+      await loadData()
+    } catch (e: unknown) {
+      setRunMsg({ text: e instanceof Error ? e.message : "Failed to run payroll", error: true })
+    } finally {
+      setRunning(false)
+    }
+  }
+
+  const fmtMoney = (n: number) => `$${Math.round(n).toLocaleString()}`
+  const fmtPct   = (n: number) => `${n >= 0 ? "+" : ""}${n}%`
+
+  const stats = [
+    {
+      label:       "Total Payroll",
+      value:       summary ? fmtMoney(summary.totalNet) : "—",
+      change:      summary ? fmtPct(summary.netChangePct) : "",
+      changeLabel: "vs previous run",
+      positive:    (summary?.netChangePct ?? 0) >= 0,
+      Icon:        DollarSign,
+      iconBg:      "bg-primary",
+    },
+    {
+      label:       "Total Gross",
+      value:       summary ? fmtMoney(summary.totalGross) : "—",
+      change:      summary ? fmtPct(summary.grossChangePct) : "",
+      changeLabel: "before deductions",
+      positive:    (summary?.grossChangePct ?? 0) >= 0,
+      Icon:        BarChart2,
+      iconBg:      "bg-primary",
+    },
+    {
+      label:       "Total Deductions",
+      value:       summary ? fmtMoney(summary.totalDeductions) : "—",
+      change:      summary ? fmtPct(summary.deductionsChangePct) : "",
+      changeLabel: "taxes & pension",
+      positive:    false,
+      Icon:        Minus,
+      iconBg:      "bg-muted",
+    },
+  ]
+
+  const distribution = summary?.distribution ?? []
+  const maxPay = Math.max(...distribution.map((d) => d.amount), 1)
+
+  const upcoming = summary?.upcoming
+    ? {
+        title: `${formatPeriod(summary.upcoming.period)} payroll due`,
+        sub:   `Pay date ${new Date(summary.upcoming.payDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`,
+      }
+    : null
+
+  if (loading) {
+    return (
+      <>
+        <HrNavigationPannel navItems={sidebarNav}/>
+        <main className="flex flex-1 items-center justify-center p-8">
+          <p className="text-sm text-muted-foreground">Loading payroll…</p>
+        </main>
+      </>
+    )
+  }
+
+  if (error) {
+    return (
+      <>
+        <HrNavigationPannel navItems={sidebarNav}/>
+        <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
+          <p className="text-sm text-rose-500">{error}</p>
+          <button
+            onClick={() => { setLoading(true); loadData() }}
+            className="flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            <RefreshCw className="size-4" /> Retry
+          </button>
+        </main>
+      </>
+    )
+  }
 
   return (
     <>
-
       {/* ── Text sidebar ── */}
       <HrNavigationPannel navItems={sidebarNav}/>
       {/* ── Main content ── */}
@@ -241,40 +427,60 @@ export default function PayrollPage() {
         {/* Stats row */}
         <div className="mb-8 grid grid-cols-3 gap-6">
           {stats.map(({ label, value, change, changeLabel, positive, Icon, iconBg }) => (
-            <div key={label} className="flex items-start justify-between rounded-2xl bg-white p-6 shadow-sm">
+            <div key={label} className="flex items-start justify-between rounded-2xl bg-card p-6 shadow-sm">
               <div>
-                <p className="mb-1 text-sm text-[#8181a5]">{label}</p>
-                <p className="mb-2 text-3xl font-bold tracking-tight text-[#1c1c1c]">{value}</p>
+                <p className="mb-1 text-sm text-muted-foreground">{label}</p>
+                <p className="mb-2 text-3xl font-bold tracking-tight text-foreground">{value}</p>
                 <div className="flex items-center gap-1.5">
-                  <span className={cn("text-sm font-semibold", positive ? "text-emerald-500" : "text-rose-500")}>
-                    ↑ {change}
-                  </span>
-                  <span className="text-sm text-[#8181a5]">{changeLabel}</span>
+                  {change && (
+                    <span className={cn("text-sm font-semibold", positive ? "text-emerald-500" : "text-rose-500")}>
+                      {change}
+                    </span>
+                  )}
+                  <span className="text-sm text-muted-foreground">{changeLabel}</span>
                 </div>
               </div>
               <div className={cn("flex size-11 shrink-0 items-center justify-center rounded-full", iconBg)}>
-                <Icon className={cn("size-5", positive ? "text-white" : "text-[#8181a5]")} />
+                <Icon className={cn("size-5", positive ? "text-primary-foreground" : "text-muted-foreground")} />
               </div>
             </div>
           ))}
         </div>
 
-        {/* Tabs */}
-        <div className="mb-6 flex w-fit items-center gap-1 rounded-xl border border-border bg-white p-1 shadow-sm">
-          {TABS.map((tab) => (
+        {/* Tabs + actions */}
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <div className="flex w-fit items-center gap-1 rounded-xl border border-border bg-card p-1 shadow-sm">
+            {TABS.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  "rounded-lg px-5 py-2 text-sm font-medium transition-colors",
+                  activeTab === tab
+                    ? "bg-background text-foreground shadow-sm ring-1 ring-border"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3">
+            {runMsg && (
+              <p className={cn("text-sm font-medium", runMsg.error ? "text-rose-500" : "text-emerald-600")}>
+                {runMsg.text}
+              </p>
+            )}
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={cn(
-                "rounded-lg px-5 py-2 text-sm font-medium transition-colors",
-                activeTab === tab
-                  ? "bg-white text-[#1c1c1c] shadow-sm ring-1 ring-border"
-                  : "text-[#8181a5] hover:text-[#1c1c1c]"
-              )}
+              onClick={runPayroll}
+              disabled={running}
+              className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
             >
-              {tab}
+              <Play className="size-4" />
+              {running ? "Calculating…" : "Run Payroll"}
             </button>
-          ))}
+          </div>
         </div>
 
         {/* ── Overview tab ── */}
@@ -282,84 +488,65 @@ export default function PayrollPage() {
           <div className="grid grid-cols-[1fr_360px] gap-6">
 
             {/* Recent Payroll Runs */}
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="rounded-2xl bg-card p-6 shadow-sm">
               <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[#1c1c1c]">Recent Payroll Runs</h2>
-                <button className="text-sm font-medium text-[#5e81f4] hover:underline">View all</button>
+                <h2 className="text-lg font-semibold text-foreground">Recent Payroll Runs</h2>
+                <button
+                  onClick={() => setActiveTab("Payroll Runs")}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  View all
+                </button>
               </div>
-
-              <div className="flex flex-col divide-y divide-border">
-                {payrollRuns.map((run) => (
-                  <div key={run.period} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                    <div className="flex items-center gap-4">
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50">
-                        <CalendarDays className="size-5 text-[#2d68fe]" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-[#1c1c1c]">{run.period}</p>
-                        <p className="text-xs text-[#8181a5]">
-                          {run.employees} employees • {run.meta}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-5">
-                      <p className="text-sm font-bold text-[#1c1c1c]">{run.amount}</p>
-                      <span
-                        className={cn(
-                          "min-w-[90px] rounded-md px-3 py-1 text-center text-xs font-semibold",
-                          run.status === "Scheduled"
-                            ? "bg-blue-50 text-[#2d68fe]"
-                            : "bg-emerald-50 text-emerald-600"
-                        )}
-                      >
-                        {run.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <RunList runs={runs.slice(0, 4)} />
             </div>
 
             {/* Right column */}
             <div className="flex flex-col gap-6">
 
               {/* Pay Distribution */}
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-5 text-lg font-semibold text-[#1c1c1c]">Pay Distribution</h2>
-                <div className="flex flex-col gap-4">
-                  {payDistribution.map(({ dept, amount }) => (
-                    <div key={dept}>
-                      <div className="mb-1.5 flex items-center justify-between">
-                        <span className="text-sm text-[#1c1c1c]">{dept}</span>
-                        <span className="text-sm font-semibold text-[#1c1c1c]">
-                          ${amount.toLocaleString()}
-                        </span>
+              <div className="rounded-2xl bg-card p-6 shadow-sm">
+                <h2 className="mb-5 text-lg font-semibold text-foreground">Pay Distribution</h2>
+                {distribution.length === 0 ? (
+                  <p className="py-4 text-sm text-muted-foreground">No payroll data yet.</p>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {distribution.map(({ department, amount }) => (
+                      <div key={department}>
+                        <div className="mb-1.5 flex items-center justify-between">
+                          <span className="text-sm text-foreground">{department}</span>
+                          <span className="text-sm font-semibold text-foreground">
+                            ${amount.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="h-2 overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-2 rounded-full bg-primary transition-all"
+                            style={{ width: `${(amount / maxPay) * 100}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-[#eef0f6]">
-                        <div
-                          className="h-2 rounded-full bg-[#2d68fe] transition-all"
-                          style={{ width: `${(amount / maxPay) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Upcoming */}
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-lg font-semibold text-[#1c1c1c]">Upcoming</h2>
-                <div className="flex items-center gap-3 rounded-xl bg-[#eef4ff] px-4 py-4">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#2d68fe]">
-                    <Clock className="size-4 text-white" />
+              {upcoming && (
+                <div className="rounded-2xl bg-card p-6 shadow-sm">
+                  <h2 className="mb-4 text-lg font-semibold text-foreground">Upcoming</h2>
+                  <div className="flex items-center gap-3 rounded-xl bg-primary/10 px-4 py-4">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary">
+                      <Clock className="size-4 text-primary-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-foreground">{upcoming.title}</p>
+                      <p className="text-xs text-muted-foreground">{upcoming.sub}</p>
+                    </div>
+                    <ChevronRight className="size-4 text-muted-foreground" />
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-[#1c1c1c]">March payroll due</p>
-                    <p className="text-xs text-[#8181a5]">Processing begins March 29, 2026</p>
-                  </div>
-                  <ChevronRight className="size-4 text-[#8181a5]" />
                 </div>
-              </div>
+              )}
 
             </div>
           </div>
@@ -367,14 +554,14 @@ export default function PayrollPage() {
 
         {/* ── Employees tab ── */}
         {activeTab === "Employees" && (
-          <EmployeesPayrollTab />
+          <EmployeesPayrollTab employees={employees} periodLabel={periodLabel} />
         )}
 
         {/* ── Payroll Runs tab ── */}
         {activeTab === "Payroll Runs" && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl bg-white p-12 text-center shadow-sm">
-            <CalendarDays className="size-12 text-[#eef0f6]" />
-            <p className="text-base font-medium text-[#8181a5]">Full payroll runs history coming soon</p>
+          <div className="rounded-2xl bg-card p-6 shadow-sm">
+            <h2 className="mb-5 text-lg font-semibold text-foreground">Payroll Runs</h2>
+            <RunList runs={runs} />
           </div>
         )}
 

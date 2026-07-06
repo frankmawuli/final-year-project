@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:5000/api-docs/ -o /dev/null -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:5000/api-docs/)",
+      "Bash(curl -s http://localhost:5000/api-docs/swagger-initializer.js)",
+      "Bash(find /d/core-recruiter-server1 -type f \\\\\\( -iname \"*.js\" -o -iname \"*.ts\" \\\\\\) | grep -v node_modules | grep -viE \"auth|otp|verif|reset|password|user|login|signup\" | head -50)",
+      "Read(//d/core-recruiter-server1/**)",
+      "Bash(find /d/core-recruiter-server1 -type f \\\\\\( -iname \"*auth*\" -o -iname \"*otp*\" -o -iname \"*verif*\" -o -iname \"*reset*\" -o -iname \"*login*\" -o -iname \"*signup*\" \\\\\\) | grep -v node_modules)",
+      "Read(//d/core-recruiter-server1/src/Modules/applicant/**)",
+      "Read(//d/core-recruiter-server1/src/Modules/authentication/**)",
+      "Bash(find /d/core-recruiter-server1/src -iname \"*router*\" -o -iname \"*route*\" | grep -v node_modules)",
+      "Read(//d/core-recruiter-server1/src/**)",
+      "Read(//d/core-recruiter-server1/src/routes/**)",
+      "Read(//d/core-recruiter-server1/node_modules/pdf-parse/dist/pdf-parse/esm/**)"
+    ],
+    "additionalDirectories": [
+      "D:\\core-recruiter-server1\\src\\Modules\\applicant",
+      "D:\\core-recruiter-server1\\src\\validator"
+    ]
+  }
+}

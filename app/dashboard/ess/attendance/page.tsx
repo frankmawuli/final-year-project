@@ -67,7 +67,7 @@ export default function AttendancePage() {
      
 
       {/* ── Mobile page title ── */}
-      <div className="border-b border-border bg-white px-4 py-3 lg:hidden">
+      <div className="border-b border-border bg-card px-4 py-3 lg:hidden">
         <h1 className="text-base font-semibold text-foreground">Clock In / Clock Out</h1>
         <p className="mt-0.5 text-xs text-muted-foreground">Time › Attendance</p>
       </div>
@@ -80,8 +80,7 @@ export default function AttendancePage() {
           <div className="flex flex-col gap-4 sm:flex-row lg:flex-col">
             {/* Greeting card */}
             <div
-              className="relative overflow-hidden rounded-2xl p-5 text-white sm:flex-1 lg:flex-none"
-              style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
+              className="gradient-primary relative overflow-hidden rounded-2xl p-5 text-white sm:flex-1 lg:flex-none"
             >
               <span className="absolute -right-6 -top-6 size-28 rounded-full bg-white/10" />
               <span className="absolute -bottom-8 right-10 size-20 rounded-full bg-white/10" />
@@ -101,13 +100,13 @@ export default function AttendancePage() {
                 </div>
               </div>
 
-              <button className="mt-4 w-full rounded-lg bg-white py-2 text-sm font-semibold text-primary transition-opacity hover:opacity-90">
+              <button className="mt-4 w-full rounded-lg bg-white/20 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90">
                 View Profile
               </button>
             </div>
 
             {/* Live clock card */}
-            <div className="rounded-2xl border border-border bg-white p-5 shadow-sm sm:flex-1 lg:flex-none">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:flex-1 lg:flex-none">
               <p className="mb-1 text-sm font-medium text-muted-foreground">Time</p>
               <p className="text-2xl font-bold tracking-tight text-primary md:text-3xl">
                 {time}
@@ -122,7 +121,7 @@ export default function AttendancePage() {
           {/* Right column */}
           <div className="flex flex-col gap-4">
             {/* Select Project */}
-            <div className="rounded-2xl border border-border bg-white p-5 shadow-sm md:p-6">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm md:p-6">
               <h2 className="mb-4 text-base font-semibold text-foreground">Select Project</h2>
               <div className="flex gap-3">
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
@@ -142,7 +141,7 @@ export default function AttendancePage() {
             </div>
 
             {/* Attendance clock in/out */}
-            <div className="rounded-2xl border border-border bg-white p-5 shadow-sm md:p-6">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm md:p-6">
               <h2 className="mb-4 text-base font-semibold text-foreground">Attendance</h2>
               <div className="mb-5 grid grid-cols-2 gap-3 md:gap-4">
                 <div className="rounded-xl border border-border bg-background px-4 py-3 text-center">
@@ -170,12 +169,10 @@ export default function AttendancePage() {
               </div>
               <Button
                 onClick={handleClock}
-                className="w-full"
-                style={
-                  clockedIn
-                    ? { background: "#ef4444" }
-                    : { background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }
-                }
+                className={cn(
+                  "w-full",
+                  clockedIn ? "bg-red-500 hover:bg-red-600" : "gradient-primary border-0 hover:opacity-90"
+                )}
               >
                 {clockedIn ? "Clock Out" : "Clock In"}
               </Button>
@@ -184,7 +181,7 @@ export default function AttendancePage() {
         </div>
 
         {/* ── Recent Attendance ─────────────────────────────── */}
-        <div className="rounded-2xl border border-border bg-white shadow-sm">
+        <div className="rounded-2xl border border-border bg-card shadow-sm">
           {/* Filters */}
           <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6">
             <h2 className="text-base font-semibold text-foreground">Recent Attendance</h2>

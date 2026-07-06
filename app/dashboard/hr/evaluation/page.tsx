@@ -1,32 +1,25 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import {
   Search, SlidersHorizontal, ChevronLeft, ChevronRight,
   ChevronDown, X, Download, MapPin, Mail, Phone,
-  Briefcase, GraduationCap, FileText, Star,
+  Briefcase, GraduationCap, FileText, Star, Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
-
-// ── Asset URLs ────────────────────────────────────────────────
-const photos = {
-  a: "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
-  b: "/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
-  c: "/assets/cf9965b714128bf9b66e7daf6ad58bf5300b9eea.png",
-  d: "/assets/2dba1db7966039308370470fce52b3b220f9a3fb.png",
-  e: "/assets/5f121b335ad17b18af3c3c797e7a5f1afc3ec39f.png",
-  f: "/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
-  g: "/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
-  h: "/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
-  i: "/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
-}
+import { useAuth } from "@/context/auth-context"
+import {
+  applicationsService,
+  type ApiApplicantDetail,
+} from "@/services/applications.service"
+import type { ApiApplicant, ApiApplicantStatus } from "@/services/jobs.service"
 
 // ── Types ─────────────────────────────────────────────────────
-type EvalStatus = "Pending Review" | "Interview" | "Accepted" | "Approved" | "Rejected"
+type EvalStatus = "Pending Review" | "Shortlisted" | "Interview" | "Accepted" | "Approved" | "Rejected"
 
 interface Candidate {
-  id:         number
+  id:         string
   name:       string
   email:      string
   phone:      string
@@ -41,170 +34,105 @@ interface Candidate {
   skills:     string[]
   experience: { role: string; company: string; duration: string }[]
   education:  { degree: string; school: string; year: string }[]
-  documents:  { name: string; type: string }[]
+  documents:  { name: string; type: string; url: string }[]
 }
 
 // ── Status config ─────────────────────────────────────────────
 const statusConfig: Record<EvalStatus, { bg: string; text: string }> = {
   "Pending Review": { bg: "#f0f0ff", text: "#8a8cd9" },
+  Shortlisted:      { bg: "#eef2ff", text: "#6366f1" },
   Interview:        { bg: "#eff6ff", text: "#3b82f6" },
   Accepted:         { bg: "#def8ee", text: "#4aa785" },
   Approved:         { bg: "#fffbd4", text: "#ffc555" },
   Rejected:         { bg: "#fef2f2", text: "#ef4444" },
 }
 
-const STATUS_OPTIONS: EvalStatus[] = ["Pending Review", "Interview", "Accepted", "Approved", "Rejected"]
+const STATUS_OPTIONS: EvalStatus[] = ["Pending Review", "Shortlisted", "Interview", "Accepted", "Approved", "Rejected"]
 
-// ── Candidate data ────────────────────────────────────────────
-const initial: Candidate[] = [
-  {
-    id: 1, photo: photos.a, name: "Tiger Nixon",     email: "error50@gmail.com",       phone: "+1 (555) 234-5678",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "Tokyo, Japan", aiScore: 94, status: "Approved",
-    about: "Seasoned backend engineer with 7+ years building scalable APIs and distributed systems. Passionate about clean architecture and developer tooling.",
-    skills: ["Node.js", "Python", "PostgreSQL", "Docker", "AWS", "Redis"],
-    experience: [
-      { role: "Senior Backend Engineer", company: "Stripe",  duration: "2021 – Present" },
-      { role: "Backend Engineer",        company: "Shopify", duration: "2018 – 2021"    },
-    ],
-    education: [{ degree: "B.Sc. Computer Science", school: "MIT", year: "2018" }],
-    documents: [
-      { name: "Tiger_Nixon_CV.pdf",           type: "Resume"       },
-      { name: "Tiger_Nixon_CoverLetter.pdf",  type: "Cover Letter" },
-      { name: "Tiger_Portfolio.zip",          type: "Portfolio"    },
-    ],
-  },
-  {
-    id: 2, photo: photos.b, name: "Colleen Hurst",   email: "colleen.h@gmail.com",      phone: "+1 (555) 876-1234",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "New York, USA", aiScore: 87, status: "Interview",
-    about: "Full-stack developer specialising in microservices. 5 years at high-growth startups, loves mentoring junior engineers.",
-    skills: ["Go", "Kubernetes", "gRPC", "PostgreSQL", "Terraform"],
-    experience: [
-      { role: "Software Engineer II", company: "Uber",    duration: "2020 – Present" },
-      { role: "Junior Developer",     company: "Twilio",  duration: "2018 – 2020"    },
-    ],
-    education: [{ degree: "M.Sc. Software Engineering", school: "Stanford", year: "2018" }],
-    documents: [
-      { name: "Colleen_CV.pdf",           type: "Resume"       },
-      { name: "Colleen_CoverLetter.pdf",  type: "Cover Letter" },
-    ],
-  },
-  {
-    id: 3, photo: photos.c, name: "Bradley Greer",   email: "bradley.g@gmail.com",     phone: "+44 7700 900123",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "Edinburgh, UK", aiScore: 91, status: "Approved",
-    about: "Platform engineer with deep expertise in observability, CI/CD pipelines, and cloud infrastructure across AWS and GCP.",
-    skills: ["Java", "Spring Boot", "Kafka", "AWS", "Prometheus"],
-    experience: [
-      { role: "Platform Engineer", company: "Cloudflare", duration: "2022 – Present" },
-      { role: "DevOps Engineer",   company: "Sky",        duration: "2019 – 2022"    },
-    ],
-    education: [{ degree: "B.Eng. Computer Engineering", school: "University of Edinburgh", year: "2019" }],
-    documents: [
-      { name: "Bradley_CV.pdf",   type: "Resume"       },
-      { name: "Bradley_Portfolio.pdf", type: "Portfolio" },
-    ],
-  },
-  {
-    id: 4, photo: photos.d, name: "Garrett Winters", email: "garrett.w@gmail.com",     phone: "+1 (555) 321-9876",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "San Francisco, USA", aiScore: 78, status: "Pending Review",
-    about: "Accountant turned software engineer. Strong analytical background combined with 3 years of backend development experience.",
-    skills: ["Python", "Django", "MySQL", "REST APIs", "Docker"],
-    experience: [
-      { role: "Backend Developer", company: "Intuit", duration: "2022 – Present" },
-    ],
-    education: [{ degree: "B.Sc. Accounting & Computer Science", school: "UC Berkeley", year: "2022" }],
-    documents: [{ name: "Garrett_CV.pdf", type: "Resume" }],
-  },
-  {
-    id: 5, photo: photos.e, name: "Ashton Cox",      email: "ashton.cox@gmail.com",    phone: "+44 7911 654321",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "Edinburgh, UK", aiScore: 82, status: "Interview",
-    about: "Technical author and developer hybrid. Exceptional at documenting complex systems while actively contributing to backend codebases.",
-    skills: ["TypeScript", "Node.js", "GraphQL", "MongoDB"],
-    experience: [
-      { role: "Technical Author & Developer", company: "Atlassian", duration: "2020 – Present" },
-    ],
-    education: [{ degree: "B.A. Computer Science & English", school: "University of Glasgow", year: "2020" }],
-    documents: [
-      { name: "Ashton_CV.pdf",          type: "Resume"       },
-      { name: "Ashton_CoverLetter.pdf", type: "Cover Letter" },
-    ],
-  },
-  {
-    id: 6, photo: photos.f, name: "Cedric Kelly",    email: "cedric.kelly@gmail.com",  phone: "+1 (555) 445-0099",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "New York, USA", aiScore: 65, status: "Rejected",
-    about: "Integration specialist with experience connecting third-party APIs and building ETL pipelines for enterprise clients.",
-    skills: ["PHP", "Laravel", "MySQL", "REST APIs"],
-    experience: [
-      { role: "Integration Engineer", company: "Salesforce", duration: "2019 – Present" },
-    ],
-    education: [{ degree: "B.Sc. Information Systems", school: "NYU", year: "2019" }],
-    documents: [{ name: "Cedric_CV.pdf", type: "Resume" }],
-  },
-  {
-    id: 7, photo: photos.g, name: "Airi Satou",      email: "airi.satou@gmail.com",    phone: "+81 90-1234-5678",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "Tokyo, Japan", aiScore: 89, status: "Approved",
-    about: "Experienced in building high-performance e-commerce backends serving millions of daily transactions across Asia-Pacific.",
-    skills: ["Ruby on Rails", "Redis", "Elasticsearch", "AWS Lambda"],
-    experience: [
-      { role: "Senior Engineer", company: "Rakuten",  duration: "2021 – Present" },
-      { role: "Rails Developer", company: "DeNA",     duration: "2018 – 2021"    },
-    ],
-    education: [{ degree: "B.Sc. Computer Science", school: "Keio University", year: "2018" }],
-    documents: [
-      { name: "Airi_CV.pdf",           type: "Resume"       },
-      { name: "Airi_CoverLetter.pdf",  type: "Cover Letter" },
-      { name: "Airi_Portfolio.pdf",    type: "Portfolio"    },
-    ],
-  },
-  {
-    id: 8, photo: photos.h, name: "Brielle Williamson", email: "brielle.w@gmail.com", phone: "+49 30 12345678",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "Berlin, Germany", aiScore: 73, status: "Pending Review",
-    about: "Berlin-based backend developer specialising in fintech solutions. Experience with regulated financial systems and GDPR compliance.",
-    skills: ["Scala", "Akka", "PostgreSQL", "Apache Spark"],
-    experience: [
-      { role: "Backend Engineer", company: "N26", duration: "2020 – Present" },
-    ],
-    education: [{ degree: "M.Sc. Financial Technology", school: "TU Berlin", year: "2020" }],
-    documents: [{ name: "Brielle_CV.pdf", type: "Resume" }],
-  },
-  {
-    id: 9, photo: photos.i, name: "Herrod Chandler",  email: "herrod.c@gmail.com",    phone: "+92 321 1234567",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "Islamabad, Pakistan", aiScore: 88, status: "Interview",
-    about: "Full-stack leaning backend developer with a knack for building real-time applications using WebSockets and event-driven architecture.",
-    skills: ["JavaScript", "Node.js", "Socket.io", "MongoDB", "Redis"],
-    experience: [
-      { role: "Software Engineer",  company: "Systems Limited", duration: "2021 – Present" },
-      { role: "Junior Developer",   company: "Netsol",          duration: "2019 – 2021"    },
-    ],
-    education: [{ degree: "B.Sc. Software Engineering", school: "FAST-NUCES", year: "2019" }],
-    documents: [
-      { name: "Herrod_CV.pdf",          type: "Resume"       },
-      { name: "Herrod_CoverLetter.pdf", type: "Cover Letter" },
-    ],
-  },
-  {
-    id: 10, photo: photos.a, name: "Rhona Davidson",  email: "rhona.d@gmail.com",     phone: "+91 98765 43210",
-    position: "Backend Developer", department: "Engineering", appliedAt: "January 1, 2025",
-    location: "Delhi, India", aiScore: 76, status: "Pending Review",
-    about: "Software engineer with strong foundations in algorithms and data structures. Contributed to open-source Rust projects.",
-    skills: ["Rust", "C++", "PostgreSQL", "gRPC", "Linux"],
-    experience: [
-      { role: "Systems Engineer", company: "Flipkart", duration: "2022 – Present" },
-    ],
-    education: [{ degree: "B.Tech Computer Science", school: "IIT Delhi", year: "2022" }],
-    documents: [{ name: "Rhona_CV.pdf", type: "Resume" }],
-  },
-]
+// ── API ↔ UI status maps ──────────────────────────────────────
+const STATUS_TO_EVAL: Record<ApiApplicantStatus, EvalStatus> = {
+  PENDING_REVIEW: "Pending Review",
+  SHORTLISTED:    "Shortlisted",
+  INTERVIEW:      "Interview",
+  ACCEPTED:       "Accepted",
+  APPROVED:       "Approved",
+  REJECTED:       "Rejected",
+}
 
-const ROWS_PER_PAGE = 8
+const EVAL_TO_STATUS: Record<EvalStatus, ApiApplicantStatus> = {
+  "Pending Review": "PENDING_REVIEW",
+  Shortlisted:      "SHORTLISTED",
+  Interview:        "INTERVIEW",
+  Accepted:         "ACCEPTED",
+  Approved:         "APPROVED",
+  Rejected:         "REJECTED",
+}
+
+// ── Formatters ────────────────────────────────────────────────
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  })
+}
+
+function formatDuration(start?: string, end?: string | null): string {
+  const s = start ? new Date(start).getFullYear() : "?"
+  const e = end   ? new Date(end).getFullYear()   : "Present"
+  return `${s} – ${e}`
+}
+
+// MISMATCH: ApiApplicant.job has no department name — job.type used as fallback.
+// Ask the backend to include department.name in the applicant job payload.
+const JOB_TYPE_LABEL: Record<string, string> = {
+  FULL_TIME:   "Full Time",
+  PART_TIME:   "Part Time",
+  CONTRACT:    "Contract",
+  INTERNSHIP:  "Internship",
+}
+
+// ── API → local mappers ────────────────────────────────────────
+function fromApplicant(a: ApiApplicant): Candidate {
+  return {
+    id:         a.id,
+    name:       a.candidate.name,
+    email:      a.candidate.email,
+    phone:      a.candidate.phone    ?? "",
+    photo:      a.candidate.avatarUrl ?? "",
+    position:   a.job.title,
+    department: JOB_TYPE_LABEL[a.job.type] ?? a.job.type,
+    appliedAt:  formatDate(a.appliedAt),
+    location:   a.candidate.location ?? "",
+    aiScore:    a.aiScore             ?? 0,
+    status:     STATUS_TO_EVAL[a.status],
+    about:      a.candidate.about    ?? "",
+    skills:     [],
+    experience: [],
+    education:  [],
+    documents:  a.documents.map(d => ({ name: d.name, type: d.type, url: d.url })),
+  }
+}
+
+function mergeDetail(base: Candidate, d: ApiApplicantDetail): Candidate {
+  return {
+    ...base,
+    about:  d.candidate.about ?? base.about,
+    skills: d.candidate.skills.map(s => s.name),
+    experience: [...d.candidate.experience]
+      .sort((a, b) => a.position - b.position)
+      .map(e => ({
+        role:     e.title    ?? "",   // MISMATCH: API field is "title", UI expects "role"
+        company:  e.company  ?? "",
+        duration: formatDuration(e.startDate, e.endDate),
+      })),
+    education: [...d.candidate.education]
+      .sort((a, b) => a.position - b.position)
+      .map(e => ({
+        degree: e.degree ?? "",
+        school: e.school ?? "",
+        year:   e.endDate ? String(new Date(e.endDate).getFullYear()) : "",
+      })),
+  }
+}
 
 // ── Sub-components ─────────────────────────────────────────────
 
@@ -216,7 +144,6 @@ function AiScoreBadge({ score }: { score: number }) {
       className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold"
       style={{ background: bg, color }}
     >
-      {/* checkmark for high scores */}
       {score >= 85 && (
         <svg viewBox="0 0 12 12" className="size-3 shrink-0" fill="none" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
@@ -239,7 +166,6 @@ function StatusBadge({ status }: { status: EvalStatus }) {
   )
 }
 
-// Status dropdown
 function StatusDropdown({
   value,
   onChange,
@@ -281,10 +207,7 @@ function StatusDropdown({
                 )}
                 style={{ color: text }}
               >
-                <span
-                  className="size-2 shrink-0 rounded-full"
-                  style={{ background: text }}
-                />
+                <span className="size-2 shrink-0 rounded-full" style={{ background: text }} />
                 {opt}
               </button>
             )
@@ -295,31 +218,23 @@ function StatusDropdown({
   )
 }
 
-// View profile side panel
 function ProfilePanel({
   candidate,
+  loading,
   onClose,
 }: {
   candidate: Candidate
-  onClose: () => void
+  loading:   boolean
+  onClose:   () => void
 }) {
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
 
-      {/* Drawer */}
       <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-white shadow-2xl">
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="text-base font-semibold text-[#1f2937]">Applicant Profile</h2>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted"
-          >
+          <button onClick={onClose} className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
@@ -327,11 +242,17 @@ function ProfilePanel({
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           {/* Identity */}
           <div className="flex items-start gap-4">
-            <img
-              src={candidate.photo}
-              alt={candidate.name}
-              className="size-16 shrink-0 rounded-full object-cover ring-2 ring-border"
-            />
+            {candidate.photo ? (
+              <img
+                src={candidate.photo}
+                alt={candidate.name}
+                className="size-16 shrink-0 rounded-full object-cover ring-2 ring-border"
+              />
+            ) : (
+              <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] ring-2 ring-border text-lg font-bold text-[#8a8cd9]">
+                {candidate.name.charAt(0)}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <p className="text-lg font-bold text-[#1f2937]">{candidate.name}</p>
               <p className="text-sm font-medium text-[#3d70fa]">{candidate.position}</p>
@@ -370,25 +291,35 @@ function ProfilePanel({
           </div>
 
           {/* About */}
-          <div>
-            <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
-              <Star className="size-3.5 text-[#ffc555]" />About
-            </p>
-            <p className="text-sm leading-relaxed text-[#667388]">{candidate.about}</p>
-          </div>
+          {candidate.about && (
+            <div>
+              <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
+                <Star className="size-3.5 text-[#ffc555]" />About
+              </p>
+              <p className="text-sm leading-relaxed text-[#667388]">{candidate.about}</p>
+            </div>
+          )}
 
           {/* Skills */}
           <div>
             <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
               <Briefcase className="size-3.5 text-[#5e81f4]" />Skills
             </p>
-            <div className="flex flex-wrap gap-2">
-              {candidate.skills.map((s) => (
-                <span key={s} className="rounded-full bg-[#f0f0ff] px-2.5 py-0.5 text-xs font-medium text-[#8a8cd9]">
-                  {s}
-                </span>
-              ))}
-            </div>
+            {loading ? (
+              <div className="flex items-center gap-2 text-xs text-[#8181a5]">
+                <Loader2 className="size-3.5 animate-spin" />Loading…
+              </div>
+            ) : candidate.skills.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {candidate.skills.map((s) => (
+                  <span key={s} className="rounded-full bg-[#f0f0ff] px-2.5 py-0.5 text-xs font-medium text-[#8a8cd9]">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-[#8181a5]">No skills listed.</p>
+            )}
           </div>
 
           {/* Experience */}
@@ -396,17 +327,25 @@ function ProfilePanel({
             <p className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
               <Briefcase className="size-3.5 text-[#3b82f6]" />Experience
             </p>
-            <div className="space-y-3">
-              {candidate.experience.map((exp, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="mt-1 size-2 shrink-0 rounded-full bg-[#5e81f4]" />
-                  <div>
-                    <p className="text-sm font-semibold text-[#1f2937]">{exp.role}</p>
-                    <p className="text-xs text-[#667388]">{exp.company} · {exp.duration}</p>
+            {loading ? (
+              <div className="flex items-center gap-2 text-xs text-[#8181a5]">
+                <Loader2 className="size-3.5 animate-spin" />Loading…
+              </div>
+            ) : candidate.experience.length > 0 ? (
+              <div className="space-y-3">
+                {candidate.experience.map((exp, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="mt-1 size-2 shrink-0 rounded-full bg-[#5e81f4]" />
+                    <div>
+                      <p className="text-sm font-semibold text-[#1f2937]">{exp.role}</p>
+                      <p className="text-xs text-[#667388]">{exp.company} · {exp.duration}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-[#8181a5]">No experience listed.</p>
+            )}
           </div>
 
           {/* Education */}
@@ -414,46 +353,62 @@ function ProfilePanel({
             <p className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
               <GraduationCap className="size-3.5 text-[#4aa785]" />Education
             </p>
-            <div className="space-y-3">
-              {candidate.education.map((edu, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="mt-1 size-2 shrink-0 rounded-full bg-[#4aa785]" />
-                  <div>
-                    <p className="text-sm font-semibold text-[#1f2937]">{edu.degree}</p>
-                    <p className="text-xs text-[#667388]">{edu.school} · {edu.year}</p>
+            {loading ? (
+              <div className="flex items-center gap-2 text-xs text-[#8181a5]">
+                <Loader2 className="size-3.5 animate-spin" />Loading…
+              </div>
+            ) : candidate.education.length > 0 ? (
+              <div className="space-y-3">
+                {candidate.education.map((edu, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="mt-1 size-2 shrink-0 rounded-full bg-[#4aa785]" />
+                    <div>
+                      <p className="text-sm font-semibold text-[#1f2937]">{edu.degree}</p>
+                      <p className="text-xs text-[#667388]">{edu.school} · {edu.year}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-[#8181a5]">No education listed.</p>
+            )}
           </div>
 
           {/* Documents */}
-          <div>
-            <p className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
-              <FileText className="size-3.5 text-[#ffc555]" />Submitted Documents
-            </p>
-            <div className="space-y-2">
-              {candidate.documents.map((doc, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between rounded-lg border border-border bg-[#f8fafc] px-3 py-2.5"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#eff6ff]">
-                      <FileText className="size-4 text-[#3b82f6]" />
+          {candidate.documents.length > 0 && (
+            <div>
+              <p className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
+                <FileText className="size-3.5 text-[#ffc555]" />Submitted Documents
+              </p>
+              <div className="space-y-2">
+                {candidate.documents.map((doc, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between rounded-lg border border-border bg-[#f8fafc] px-3 py-2.5"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#eff6ff]">
+                        <FileText className="size-4 text-[#3b82f6]" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-[#1f2937]">{doc.name}</p>
+                        <p className="text-[10px] text-[#8181a5]">{doc.type}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs font-medium text-[#1f2937]">{doc.name}</p>
-                      <p className="text-[10px] text-[#8181a5]">{doc.type}</p>
-                    </div>
+                    <a
+                      href={doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg p-1.5 text-[#5e81f4] hover:bg-[#f0f0ff]"
+                      title="Download"
+                    >
+                      <Download className="size-4" />
+                    </a>
                   </div>
-                  <button className="rounded-lg p-1.5 text-[#5e81f4] hover:bg-[#f0f0ff]" title="Download">
-                    <Download className="size-4" />
-                  </button>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </aside>
     </>
@@ -471,31 +426,77 @@ const sidebarNav = [
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function EvaluationPage() {
-  const [candidates, setCandidates] = useState<Candidate[]>(initial)
-  const [search, setSearch]         = useState("")
-  const [page, setPage]             = useState(1)
-  const [viewing, setViewing]       = useState<Candidate | null>(null)
+  const { accessToken } = useAuth()
 
-  const filtered = candidates.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.position.toLowerCase().includes(search.toLowerCase()) ||
-      c.status.toLowerCase().includes(search.toLowerCase())
-  )
+  const [rows, setRows]               = useState<Candidate[]>([])
+  const [listLoading, setListLoading] = useState(true)
+  const [listError, setListError]     = useState<string | null>(null)
+  const [search, setSearch]           = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [page, setPage]               = useState(1)
+  const [totalPages, setTotalPages]   = useState(1)
+  const [viewing, setViewing]         = useState<Candidate | null>(null)
+  const [panelLoading, setPanelLoading] = useState(false)
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
-  const paginated  = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE)
+  // Debounce search → reset to page 1 when it settles
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(t)
+  }, [search])
 
-  const updateStatus = (id: number, status: EvalStatus) =>
-    setCandidates((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)))
+  const fetchList = useCallback(async (p: number, q: string) => {
+    if (!accessToken) return
+    setListLoading(true)
+    setListError(null)
+    try {
+      const res = await applicationsService.list(
+        { search: q || undefined, page: p, limit: 8 },
+        accessToken,
+      )
+      setRows(res.data.map(fromApplicant))
+      setTotalPages(res.meta.totalPages)
+    } catch {
+      setListError("Failed to load candidates. Please try again.")
+    } finally {
+      setListLoading(false)
+    }
+  }, [accessToken])
+
+  useEffect(() => {
+    fetchList(page, debouncedSearch)
+  }, [fetchList, page, debouncedSearch])
+
+  const handleView = async (c: Candidate) => {
+    setViewing(c)
+    setPanelLoading(true)
+    try {
+      const res = await applicationsService.getById(c.id, accessToken!)
+      setViewing(prev => prev?.id === c.id ? mergeDetail(prev, res.data) : prev)
+    } catch {
+      // keep showing basic data from the list
+    } finally {
+      setPanelLoading(false)
+    }
+  }
+
+  const updateStatus = async (id: string, status: EvalStatus) => {
+    // optimistic update
+    setRows(prev => prev.map(c => c.id === id ? { ...c, status } : c))
+    setViewing(prev => prev?.id === id ? { ...prev, status } : prev)
+    try {
+      await applicationsService.updateStatus(id, EVAL_TO_STATUS[status], accessToken!)
+    } catch {
+      fetchList(page, debouncedSearch) // revert on failure
+    }
+  }
 
   return (
     <>
-
-      {/* ── Text sidebar ── */}
       <HrNavigationPannel navItems={sidebarNav} />
 
-      {/* ── Main content ── */}
       <main className="flex flex-1 flex-col overflow-hidden p-6">
         {/* Search */}
         <div className="mb-5 flex items-center gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
@@ -504,7 +505,7 @@ export default function EvaluationPage() {
             type="text"
             placeholder="Search ⌘K"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            onChange={(e) => setSearch(e.target.value)}
             className="flex-1 bg-transparent text-sm text-[#1f2937] outline-none placeholder:text-[rgba(34,48,62,0.4)]"
           />
           <button className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
@@ -512,9 +513,14 @@ export default function EvaluationPage() {
           </button>
         </div>
 
+        {listError && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {listError}
+          </div>
+        )}
+
         {/* Table card */}
         <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-          {/* Table header */}
           <div className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center border-b border-border px-6 py-3.5">
             {["Candidate Name", "Job Position", "Applied", "AI Score", "Status", "Actions"].map((h, i) => (
               <span
@@ -526,16 +532,25 @@ export default function EvaluationPage() {
             ))}
           </div>
 
-          {/* Rows */}
           <div className="flex-1 overflow-y-auto divide-y divide-border">
-            {paginated.length > 0 ? paginated.map((c) => (
+            {listLoading ? (
+              <div className="flex h-32 items-center justify-center">
+                <Loader2 className="size-5 animate-spin text-[#8181a5]" />
+              </div>
+            ) : rows.length > 0 ? rows.map((c) => (
               <div
                 key={c.id}
                 className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center gap-x-3 px-6 py-3 transition-colors hover:bg-[#f8fafc]"
               >
                 {/* Name */}
                 <div className="flex min-w-0 items-center gap-3">
-                  <img src={c.photo} alt={c.name} className="size-9 shrink-0 rounded-full object-cover" />
+                  {c.photo ? (
+                    <img src={c.photo} alt={c.name} className="size-9 shrink-0 rounded-full object-cover" />
+                  ) : (
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] text-sm font-bold text-[#8a8cd9]">
+                      {c.name.charAt(0)}
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-[#1f2937]">{c.name}</p>
                     <p className="truncate text-xs text-[#667388]">{c.email}</p>
@@ -568,7 +583,7 @@ export default function EvaluationPage() {
                     onChange={(v) => updateStatus(c.id, v)}
                   />
                   <button
-                    onClick={() => setViewing(c)}
+                    onClick={() => handleView(c)}
                     className="h-[28px] rounded border border-[#6e39cb] px-3 text-xs font-medium text-[#6e39cb] transition-colors hover:bg-[#6e39cb]/5"
                   >
                     View
@@ -614,9 +629,12 @@ export default function EvaluationPage() {
         </div>
       </main>
 
-      {/* Profile panel */}
       {viewing && (
-        <ProfilePanel candidate={viewing} onClose={() => setViewing(null)} />
+        <ProfilePanel
+          candidate={viewing}
+          loading={panelLoading}
+          onClose={() => setViewing(null)}
+        />
       )}
     </>
   )

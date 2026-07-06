@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/context/auth-context"
 import { ApiError } from "@/lib/api-client"
+import { Logo } from "@/components/logo"
 
 type Step = "request" | "reset" | "done"
 
 export default function ResetPasswordPage() {
-  const { user, requestResetPassword, resetPassword } = useAuth()
+  const { requestResetPassword, resetPassword } = useAuth()
   const [step, setStep] = useState<Step>("request")
+  const [email, setEmail] = useState("")
   const [otp, setOtp] = useState("")
   const [oldPassword, setOldPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
@@ -24,13 +26,11 @@ export default function ResetPasswordPage() {
     setError(null)
     setLoading(true)
     try {
-      await requestResetPassword()
+      await requestResetPassword(email)
       setStep("reset")
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message)
-      } else if (err instanceof Error && err.message === "Not authenticated") {
-        setError("You must be signed in to reset your password.")
       } else {
         setError("Something went wrong. Please try again.")
       }
@@ -46,13 +46,9 @@ export default function ResetPasswordPage() {
       setError("Passwords do not match.")
       return
     }
-    if (!user?.email) {
-      setError("Session expired. Please sign in again.")
-      return
-    }
     setLoading(true)
     try {
-      await resetPassword(user.email, otp, oldPassword, newPassword)
+      await resetPassword(email, otp, oldPassword, newPassword)
       setStep("done")
     } catch (err) {
       if (err instanceof ApiError) {
@@ -73,11 +69,7 @@ export default function ResetPasswordPage() {
         <div className="absolute -bottom-32 -left-32 h-112 w-md rounded-full bg-white/10" />
 
         <div className="relative flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
+          <Logo width={52} height={52} />
           <span className="text-lg font-semibold tracking-tight">CoreRecruiter</span>
         </div>
 
@@ -105,11 +97,7 @@ export default function ResetPasswordPage() {
         <div className="w-full max-w-sm space-y-8">
           {/* Mobile logo */}
           <div className="flex items-center gap-2 lg:hidden">
-            <div className="gradient-primary flex h-9 w-9 items-center justify-center rounded-xl">
-              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
+            <Logo width={52} height={52} />
             <span className="text-lg font-semibold">CoreRecruiter</span>
           </div>
 
@@ -117,10 +105,9 @@ export default function ResetPasswordPage() {
           {step === "request" && (
             <>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">Change password</h2>
+                <h2 className="text-2xl font-bold tracking-tight text-foreground">Reset password</h2>
                 <p className="text-sm text-muted-foreground">
-                  We&apos;ll send a verification code to{" "}
-                  <span className="font-medium text-foreground">{user?.email ?? "your email"}</span>
+                  Enter your registered email and we&apos;ll send a verification code.
                 </p>
               </div>
 
@@ -130,6 +117,22 @@ export default function ResetPasswordPage() {
                     {error}
                   </p>
                 )}
+
+                <div className="space-y-1.5">
+                  <label htmlFor="email" className="text-sm font-medium text-foreground">
+                    Email address
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                  />
+                </div>
+
                 <Button
                   type="submit"
                   size="lg"

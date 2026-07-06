@@ -19,7 +19,7 @@ export default function HrNavigationPannel({ navItems }: HrNavigationPannelProps
   const pathname = usePathname()
 
   return (
-    <aside className="flex w-[220px] shrink-0 flex-col justify-between bg-white py-5 pl-5 pr-3 shadow-sm">
+    <aside className="flex w-[220px] shrink-0 flex-col justify-between bg-sidebar py-5 pl-5 pr-3 shadow-sm">
       <nav className="flex flex-col gap-1">
         {navItems.map(({ label, href }) => {
           const isActive = pathname === href

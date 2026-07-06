@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import {
   Upload,
   X as XIcon,
@@ -21,8 +21,11 @@ import {
   Phone,
   Mail,
   Camera,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { uploadService } from "@/services/upload.service"
+import { jobsService } from "@/services/jobs.service"
 
 // ── Step definitions ────────────────────────────────────────────
 const STEPS = [
@@ -259,10 +262,30 @@ function AvatarUpload({
   onChange: (url: string | null) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
-  function handleFile(file: File) {
-    if (!file.type.startsWith("image/")) return
+  async function handleFile(file: File) {
+    if (!file.type.match(/^image\/(jpeg|png)$/)) {
+      setUploadError("Only JPG or PNG images are accepted.")
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Image exceeds the 5 MB limit.")
+      return
+    }
     onChange(URL.createObjectURL(file))
+    setUploadError(null)
+    setUploading(true)
+    try {
+      const token = localStorage.getItem("access_token") ?? ""
+      const result = await uploadService.image(file, token)
+      onChange(result.url)
+    } catch {
+      setUploadError("Upload failed. Please try again.")
+    } finally {
+      setUploading(false)
+    }
   }
 
   return (
@@ -274,18 +297,24 @@ function AvatarUpload({
           ) : (
             <User className="size-8 text-muted-foreground" strokeWidth={1.5} />
           )}
+          {uploading && (
+            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
+              <Loader2 className="size-5 animate-spin text-white" />
+            </div>
+          )}
         </div>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full border-2 border-card bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+          disabled={uploading}
+          className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full border-2 border-card bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
         >
           <Camera className="size-3.5" />
         </button>
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0]
@@ -295,12 +324,14 @@ function AvatarUpload({
       </div>
       <div>
         <p className="text-[13px] font-medium text-foreground">Profile Photo</p>
-        <p className="mt-0.5 text-[12px] text-muted-foreground">JPG, PNG or GIF · max 2 MB</p>
+        <p className="mt-0.5 text-[12px] text-muted-foreground">JPG or PNG · max 5 MB</p>
+        {uploadError && <p className="mt-0.5 text-[11px] text-rose-500">{uploadError}</p>}
         <div className="mt-2 flex gap-2">
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="rounded-lg border border-border bg-card px-3 py-1.5 text-[12px] font-medium text-foreground hover:bg-muted"
+            disabled={uploading}
+            className="rounded-lg border border-border bg-card px-3 py-1.5 text-[12px] font-medium text-foreground hover:bg-muted disabled:opacity-60"
           >
             Upload photo
           </button>
@@ -325,23 +356,48 @@ function ResumeUpload({
   error,
 }: {
   fileName: string | null
-  onChange: (name: string | null) => void
+  onChange: (name: string | null, url: string | null) => void
   error?: string
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [displayName, setDisplayName] = useState<string | null>(fileName)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
-  function handleFile(file: File) {
-    const allowed = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
-    if (!allowed.includes(file.type)) return
-    onChange(file.name)
+  async function handleFile(file: File) {
+    const allowed = ["application/pdf", "image/jpeg", "image/png"]
+    if (!allowed.includes(file.type)) {
+      setUploadError("Only PDF, JPG, and PNG files are accepted.")
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("File exceeds the 5 MB limit.")
+      return
+    }
+    setDisplayName(file.name)
+    setUploadError(null)
+    setUploading(true)
+    try {
+      const token = localStorage.getItem("access_token") ?? ""
+      const result = await uploadService.document(file, token)
+      onChange(result.name, result.url)
+    } catch {
+      setUploadError("Upload failed. Please try again.")
+      setDisplayName(null)
+      onChange(null, null)
+    } finally {
+      setUploading(false)
+    }
   }
+
+  const activeError = uploadError ?? error
 
   return (
     <div>
       <div
-        onClick={() => inputRef.current?.click()}
-        onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+        onClick={() => !uploading && inputRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); if (!uploading) setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={(e) => {
           e.preventDefault()
@@ -353,7 +409,7 @@ function ResumeUpload({
           "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed py-6 transition-colors",
           dragging
             ? "border-primary bg-primary/10"
-            : error
+            : activeError
             ? "border-rose-400 bg-muted"
             : "border-border bg-muted hover:border-primary hover:bg-primary/5"
         )}
@@ -361,25 +417,34 @@ function ResumeUpload({
         <input
           ref={inputRef}
           type="file"
-          accept=".pdf,.doc,.docx"
+          accept=".pdf,.jpg,.jpeg,.png"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0]
             if (f) handleFile(f)
           }}
         />
-        {fileName ? (
+        {uploading ? (
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="size-6 animate-spin text-primary" />
+            <p className="text-[13px] text-muted-foreground">Uploading {displayName}…</p>
+          </div>
+        ) : displayName ? (
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
               <FileText className="size-5 text-primary" />
             </div>
             <div>
-              <p className="text-[13px] font-medium text-foreground">{fileName}</p>
+              <p className="text-[13px] font-medium text-foreground">{displayName}</p>
               <p className="text-[11px] text-muted-foreground">Click to replace</p>
             </div>
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); onChange(null) }}
+              onClick={(e) => {
+                e.stopPropagation()
+                setDisplayName(null)
+                onChange(null, null)
+              }}
               className="ml-2 rounded-full p-1 hover:bg-muted"
             >
               <XIcon className="size-4 text-muted-foreground" />
@@ -393,11 +458,11 @@ function ResumeUpload({
             <p className="text-center text-[13px] text-muted-foreground">
               <span className="font-medium text-primary">Click to upload</span> or drag & drop
             </p>
-            <p className="text-[11px] text-muted-foreground">PDF, DOC or DOCX (max 5 MB)</p>
+            <p className="text-[11px] text-muted-foreground">PDF, JPG or PNG (max 5 MB)</p>
           </>
         )}
       </div>
-      {error && <p className="mt-1 text-[11px] text-rose-500">{error}</p>}
+      {activeError && <p className="mt-1 text-[11px] text-rose-500">{activeError}</p>}
     </div>
   )
 }
@@ -416,6 +481,7 @@ interface Step2Data {
   skills: string[]
   experience: string
   resumeFileName: string | null
+  resumeUrl: string | null
 }
 interface Step3Data {
   degree: string
@@ -468,7 +534,7 @@ function Step1({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <FieldLabel required>Email Address</FieldLabel>
           <TextInput
@@ -551,7 +617,7 @@ function Step2({
         <FieldLabel required>Resume / CV</FieldLabel>
         <ResumeUpload
           fileName={data.resumeFileName}
-          onChange={(name) => onChange({ resumeFileName: name })}
+          onChange={(name, url) => onChange({ resumeFileName: name, resumeUrl: url })}
           error={errors.resumeFileName}
         />
       </div>
@@ -592,7 +658,7 @@ function Step3({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <FieldLabel required>Year of Graduation</FieldLabel>
           <SelectInput
@@ -691,8 +757,8 @@ function Step4({
             Additional Links
           </p>
           {data.extraLinks.map((link, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <div className="w-[130px] shrink-0">
+            <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <div className="w-full sm:w-[130px] sm:shrink-0">
                 <input
                   value={link.label}
                   onChange={(e) => updateExtraLink(i, "label", e.target.value)}
@@ -700,21 +766,21 @@ function Step4({
                   className="h-[44px] w-full rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary"
                 />
               </div>
-              <div className="flex-1">
+              <div className="flex w-full sm:flex-1 gap-2">
                 <input
                   value={link.url}
                   onChange={(e) => updateExtraLink(i, "url", e.target.value)}
                   placeholder="https://…"
-                  className="h-[44px] w-full rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary"
+                  className="h-[44px] flex-1 rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary"
                 />
+                <button
+                  type="button"
+                  onClick={() => removeExtraLink(i)}
+                  className="flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-rose-50 hover:text-rose-500"
+                >
+                  <Trash2 className="size-4" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => removeExtraLink(i)}
-                className="flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-rose-50 hover:text-rose-500"
-              >
-                <Trash2 className="size-4" />
-              </button>
             </div>
           ))}
         </div>
@@ -835,7 +901,7 @@ function Step5({
 // ── Left sidebar ────────────────────────────────────────────────
 function SidebarStepList({ current }: { current: number }) {
   return (
-    <aside className="flex w-[260px] shrink-0 flex-col bg-primary/5 p-6">
+    <aside className="hidden sm:flex w-[260px] shrink-0 flex-col bg-primary/5 p-6">
       <div className="mb-8">
         <div
           className="flex size-9 items-center justify-center rounded-xl"
@@ -912,7 +978,7 @@ function SidebarStepList({ current }: { current: number }) {
 // ── Success screen ──────────────────────────────────────────────
 function SuccessScreen({ onBack }: { onBack: () => void }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
+    <div className="flex flex-1 flex-col items-center justify-center p-5 sm:p-8 text-center">
       <div
         className="mb-5 flex size-16 items-center justify-center rounded-full"
         style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
@@ -926,7 +992,7 @@ function SuccessScreen({ onBack }: { onBack: () => void }) {
       <p className="mb-8 text-[13px] text-muted-foreground">
         Our team will review your profile and reach out within 5–7 business days.
       </p>
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <button
           type="button"
           onClick={onBack}
@@ -949,14 +1015,18 @@ function SuccessScreen({ onBack }: { onBack: () => void }) {
 // ── Main page ───────────────────────────────────────────────────
 export default function JobApplicationPage() {
   const router = useRouter()
-  const [step, setStep] = useState(1)
-  const [submitted, setSubmitted] = useState(false)
+  const searchParams = useSearchParams()
+  const jobId = searchParams.get("jobId") ?? ""
+  const [step,        setStep]        = useState(1)
+  const [submitted,   setSubmitted]   = useState(false)
+  const [submitting,  setSubmitting]  = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [step1, setStep1] = useState<Step1Data>({ fullName: "", email: "", phone: "" })
   const [step2, setStep2] = useState<Step2Data>({
-    jobTitle: "", skills: [], experience: "", resumeFileName: null,
+    jobTitle: "", skills: [], experience: "", resumeFileName: null, resumeUrl: null,
   })
   const [step3, setStep3] = useState<Step3Data>({
     degree: "", school: "", gradYear: "", gpa: "",
@@ -1010,12 +1080,48 @@ export default function JobApplicationPage() {
     return Object.keys(errs).length === 0
   }
 
-  function handleNext() {
+  async function handleNext() {
     if (!validate()) return
     if (step < STEPS.length) {
       setStep((s) => s + 1)
-    } else {
+      return
+    }
+
+    // Final step — submit to backend
+    if (!jobId) {
+      setSubmitError("No job selected. Please return to the job listing and click Apply Now.")
+      return
+    }
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      const documents: { name: string; type: "Resume"; url: string }[] = []
+      if (step2.resumeUrl) {
+        documents.push({ name: step2.resumeFileName ?? "Resume", type: "Resume", url: step2.resumeUrl })
+      }
+
+      await jobsService.apply(jobId, {
+        name:     step1.fullName,
+        email:    step1.email,
+        phone:    step1.phone   || undefined,
+        about:    step5.coverLetter || undefined,
+        linkedin: step4.linkedin  || undefined,
+        twitter:  step4.twitter   || undefined,
+        skills:   step2.skills.map((s) => ({ name: s })),
+        education: step3.degree ? [{
+          position: 1,
+          school:   step3.school,
+          degree:   step3.degree,
+          year:     step3.gradYear || undefined,
+        }] : undefined,
+        documents,
+      })
+
       setSubmitted(true)
+    } catch {
+      setSubmitError("Submission failed. Please check your details and try again.")
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -1035,22 +1141,45 @@ export default function JobApplicationPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+    <div className="flex min-h-screen items-center justify-center bg-background p-3 sm:p-6">
       <div className="flex w-full max-w-[940px] overflow-hidden rounded-2xl bg-card shadow-xl">
 
-        {/* Sidebar */}
+        {/* Sidebar – hidden on mobile */}
         <SidebarStepList current={step} />
 
         {/* Form area */}
         {submitted ? (
           <SuccessScreen onBack={() => router.push("/apply")} />
         ) : (
-          <div className="flex flex-1 flex-col p-8">
+          <div className="flex flex-1 flex-col p-5 sm:p-8">
+            {/* Mobile-only progress indicator */}
+            <div className="sm:hidden mb-5">
+              <div className="mb-2 flex items-center justify-between text-[11px]">
+                <span className="font-semibold uppercase tracking-wider text-primary">
+                  Step {step} of {STEPS.length}
+                </span>
+                <span className="text-muted-foreground">
+                  {Math.round(((step - 1) / STEPS.length) * 100)}% complete
+                </span>
+              </div>
+              <div className="flex gap-1">
+                {STEPS.map((s) => (
+                  <div
+                    key={s.id}
+                    className={cn(
+                      "h-1.5 flex-1 rounded-full transition-colors duration-300",
+                      s.id < step ? "bg-primary" : s.id === step ? "bg-primary/40" : "bg-muted"
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+
             {/* Header */}
             <p className="mb-1 text-[12px] font-semibold uppercase tracking-widest text-primary">
               STEP {step} OF {STEPS.length}
             </p>
-            <h1 className="mb-1 text-[24px] font-bold leading-tight tracking-tight text-foreground">
+            <h1 className="mb-1 text-[20px] sm:text-[24px] font-bold leading-tight tracking-tight text-foreground">
               {stepLabels[step]}
             </h1>
             <p className="mb-6 text-[13px] text-muted-foreground">{stepSubtitles[step]}</p>
@@ -1108,33 +1237,46 @@ export default function JobApplicationPage() {
             </div>
 
             {/* Navigation */}
-            <div className="mt-6 flex items-center justify-between border-t border-border pt-5">
-              <button
-                type="button"
-                onClick={() => (step > 1 ? setStep((s) => s - 1) : router.back())}
-                className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground"
-              >
-                ← Back
-              </button>
-
-              <div className="flex items-center gap-3">
-                {step === 4 && (
-                  <button
-                    type="button"
-                    onClick={() => setStep((s) => s + 1)}
-                    className="text-[12px] font-medium text-muted-foreground underline hover:text-foreground"
-                  >
-                    Skip for now
-                  </button>
-                )}
+            <div className="mt-6 border-t border-border pt-5">
+              {submitError && (
+                <p className="mb-3 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-[12px] text-rose-600">
+                  {submitError}
+                </p>
+              )}
+              <div className="flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={handleNext}
-                  className="rounded-xl px-7 py-2.5 text-[13px] font-semibold text-primary-foreground shadow-lg transition-opacity hover:opacity-90"
-                  style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
+                  onClick={() => (step > 1 ? setStep((s) => s - 1) : router.back())}
+                  disabled={submitting}
+                  className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
                 >
-                  {step === STEPS.length ? "Submit Application →" : "Save and continue →"}
+                  ← Back
                 </button>
+
+                <div className="flex items-center gap-3">
+                  {step === 4 && (
+                    <button
+                      type="button"
+                      onClick={() => setStep((s) => s + 1)}
+                      className="text-[12px] font-medium text-muted-foreground underline hover:text-foreground"
+                    >
+                      Skip for now
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={submitting}
+                    className="flex items-center gap-2 rounded-xl px-7 py-2.5 text-[13px] font-semibold text-primary-foreground shadow-lg transition-opacity hover:opacity-90 disabled:opacity-70"
+                    style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
+                  >
+                    {submitting && <Loader2 className="size-3.5 animate-spin" />}
+                    {step === STEPS.length
+                      ? submitting ? "Submitting…" : "Submit Application →"
+                      : "Save and continue →"
+                    }
+                  </button>
+                </div>
               </div>
             </div>
           </div>

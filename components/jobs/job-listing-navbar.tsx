@@ -1,0 +1,108 @@
+"use client";
+
+import Link from "next/link";
+import { Bell, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { LogoJobs } from "@/components/logo";
+import { useApplicantAuth } from "@/context/applicant-auth-context";
+
+const PUBLIC_LINKS = [
+  { label: "Find Jobs", href: "/jobs/job-listing", active: true },
+];
+
+const AUTH_LINKS = [
+  { label: "Find Jobs", href: "/jobs/job-listing", active: true },
+  { label: "My profile", href: "/jobs/profile" },
+  { label: "Applications", href: "/jobs/application" },
+];
+
+export function JobListingNavbar() {
+  const { applicant, isAuthenticated, loading } = useApplicantAuth();
+
+  const navLinks = isAuthenticated ? AUTH_LINKS : PUBLIC_LINKS;
+
+  const initials = applicant?.name
+    ?.split(" ")
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  return (
+    <header className="bg-white border-b border-[#E5E7EB]">
+      <div className="max-w-[1340px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        {/* Logo + nav links */}
+        <div className="flex items-center gap-8">
+          <Link href="/jobs" className="flex items-center gap-2 shrink-0">
+            <LogoJobs width={46} height={46} />
+            <span className="font-bold text-[16px] text-foreground hidden sm:block">
+              CoreRecruiter
+            </span>
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-6">
+            {navLinks.map(({ label, href, active }) => (
+              <Link
+                key={label}
+                href={href}
+                className={cn(
+                  "text-[13.5px] font-medium transition-colors",
+                  active ? "text-foreground font-semibold" : "text-[#6B7280] hover:text-foreground"
+                )}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        {/* Actions */}
+        {!loading && (
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+            {isAuthenticated ? (
+              <>
+                {/* Notifications */}
+                <button
+                  aria-label="Notifications"
+                  className="relative flex items-center justify-center w-9 h-9 rounded-full text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
+                >
+                  <Bell className="w-[18px] h-[18px]" />
+                  <span className="absolute top-1.5 right-2 w-[7px] h-[7px] rounded-full bg-rose-500 ring-2 ring-white" />
+                </button>
+
+                {/* Settings */}
+                <button
+                  aria-label="Settings"
+                  className="relative hidden sm:flex items-center justify-center w-9 h-9 rounded-full text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
+                >
+                  <Settings className="w-[18px] h-[18px]" />
+                  <span className="absolute top-1.5 right-2 w-[7px] h-[7px] rounded-full bg-rose-500 ring-2 ring-white" />
+                </button>
+
+                {/* Profile */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary text-[13px] font-semibold shrink-0">
+                    {initials}
+                  </div>
+                  <span className="hidden md:block text-[13.5px] font-semibold text-foreground">
+                    {applicant?.name}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/jobs/login"
+                  className="text-[13.5px] font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  Login
+                </Link>
+                
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}

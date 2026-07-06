@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { Banknote, ChevronDown, Trash2, Plus } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Banknote, Landmark, ChevronDown, Trash2, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { payrollService, type ApiPayrollSettings } from "@/services/payroll.service"
 
 // ── Types ─────────────────────────────────────────────────────
 type Allowance = { id: number; name: string; amount: string }
@@ -20,14 +22,14 @@ function Card({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       <div className="mb-5 flex items-center gap-3">
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f3f4f6]">
-          <Icon className="size-4 text-[#6b7280]" />
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+          <Icon className="size-4 text-muted-foreground" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-[#111827]">{title}</p>
-          <p className="text-xs text-[#9ca3af]">{subtitle}</p>
+          <p className="text-sm font-semibold text-foreground">{title}</p>
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -43,12 +45,12 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       onClick={() => onChange(!checked)}
       className={cn(
         "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200",
-        checked ? "bg-[#5e81f4]" : "bg-[#e5e7eb]"
+        checked ? "bg-primary" : "bg-muted"
       )}
     >
       <span
         className={cn(
-          "pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm ring-0 transition-transform duration-200",
+          "pointer-events-none inline-block size-4 rounded-full bg-background shadow-sm ring-0 transition-transform duration-200",
           checked ? "translate-x-4" : "translate-x-0"
         )}
       />
@@ -57,7 +59,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 }
 
 function Divider() {
-  return <hr className="border-[#f3f4f6]" />
+  return <hr className="border-border" />
 }
 
 function Row({
@@ -72,22 +74,36 @@ function Row({
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
-        <p className="text-sm font-medium text-[#111827]">{label}</p>
-        {hint && <p className="text-xs text-[#9ca3af]">{hint}</p>}
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       </div>
       {children}
     </div>
   )
 }
 
-function SaveRow({ onSave }: { onSave: () => void }) {
+function SaveRow({
+  onSave,
+  saving,
+  message,
+}: {
+  onSave:   () => void
+  saving:   boolean
+  message:  { text: string; error: boolean } | null
+}) {
   return (
-    <div className="flex justify-end pt-2">
+    <div className="flex items-center justify-end gap-4 pt-2">
+      {message && (
+        <p className={cn("text-sm", message.error ? "text-rose-500" : "text-emerald-600")}>
+          {message.text}
+        </p>
+      )}
       <button
         onClick={onSave}
-        className="rounded-xl bg-[#5e81f4] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#4c6ef5]"
+        disabled={saving}
+        className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
       >
-        Save changes
+        {saving ? "Saving…" : "Save changes"}
       </button>
     </div>
   )
@@ -95,13 +111,15 @@ function SaveRow({ onSave }: { onSave: () => void }) {
 
 // ── Shared style strings ──────────────────────────────────────
 const inputCls =
-  "w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-3.5 py-2.5 text-sm text-[#111827] outline-none placeholder:text-[#d1d5db] focus:border-[#5e81f4] focus:bg-white focus:ring-2 focus:ring-[#5e81f4]/10"
+  "w-full rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 const selectCls =
-  "w-full appearance-none rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-3.5 py-2.5 pr-9 text-sm text-[#111827] outline-none focus:border-[#5e81f4] focus:bg-white focus:ring-2 focus:ring-[#5e81f4]/10"
+  "w-full appearance-none rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 pr-9 text-sm text-foreground outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 // ── Page ──────────────────────────────────────────────────────
 export default function Payroll() {
+  const { accessToken } = useAuth()
+
   const [payCycle,       setPayCycle]       = useState("Monthly")
   const [payDay,         setPayDay]         = useState("25")
   const [payMethod,      setPayMethod]      = useState("Bank Transfer")
@@ -114,41 +132,151 @@ export default function Payroll() {
   const [autoProcess,    setAutoProcess]    = useState(false)
   const [requireApproval,setRequireApproval]= useState(true)
 
-  function onSave() {
-    // TODO: persist settings
+  // Company funding account — printed on the bank advice file as the debit account
+  const [bankName,       setBankName]       = useState("")
+  const [bankBranch,     setBankBranch]     = useState("")
+  const [acctName,       setAcctName]       = useState("")
+  const [acctNumber,     setAcctNumber]     = useState("")
+
+  const [saving,  setSaving]  = useState(false)
+  const [message, setMessage] = useState<{ text: string; error: boolean } | null>(null)
+
+  useEffect(() => {
+    if (!accessToken) return
+    payrollService.getSettings(accessToken)
+      .then(({ data }) => {
+        setPayCycle(data.payCycle)
+        setPayDay(String(data.payDay))
+        setPayMethod(data.payMethod)
+        setTaxScheme(data.taxScheme)
+        setPensionPct(String(data.pensionPct))
+        setAutoProcess(data.autoProcess)
+        setRequireApproval(data.requireApproval)
+        setAllowances(data.allowances.map((a, i) => ({
+          id:     a.id ?? i + 1,
+          name:   a.name,
+          amount: String(a.amount),
+        })))
+        if (data.fundingAccount) {
+          setBankName(data.fundingAccount.bankName)
+          setBankBranch(data.fundingAccount.branch)
+          setAcctName(data.fundingAccount.accountName)
+          setAcctNumber(data.fundingAccount.accountNumber)
+        }
+      })
+      .catch(() => { /* endpoint not live yet — keep defaults */ })
+  }, [accessToken])
+
+  async function onSave() {
+    if (!accessToken) return
+    setSaving(true)
+    setMessage(null)
+
+    const body: Partial<ApiPayrollSettings> = {
+      payCycle:        payCycle as ApiPayrollSettings["payCycle"],
+      payDay:          Number(payDay),
+      payMethod:       payMethod as ApiPayrollSettings["payMethod"],
+      taxScheme,
+      pensionPct:      Number(pensionPct),
+      autoProcess,
+      requireApproval,
+      allowances:      allowances
+        .filter((a) => a.name.trim())
+        .map((a) => ({ name: a.name.trim(), amount: Number(a.amount) || 0 })),
+      fundingAccount:  bankName.trim() || acctNumber.trim()
+        ? { bankName: bankName.trim(), branch: bankBranch.trim(), accountName: acctName.trim(), accountNumber: acctNumber.trim() }
+        : null,
+    }
+
+    try {
+      await payrollService.updateSettings(body, accessToken)
+      setMessage({ text: "Settings saved", error: false })
+    } catch (e: unknown) {
+      setMessage({ text: e instanceof Error ? e.message : "Failed to save settings", error: true })
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
     <div className="flex flex-col gap-6">
+      <Card title="Company Funding Account" subtitle="Account salaries are paid from — shown on the bank advice file" icon={Landmark}>
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Bank Name</label>
+              <input
+                value={bankName}
+                onChange={e => setBankName(e.target.value)}
+                className={inputCls}
+                placeholder="e.g. GCB Bank"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Branch</label>
+              <input
+                value={bankBranch}
+                onChange={e => setBankBranch(e.target.value)}
+                className={inputCls}
+                placeholder="e.g. Ring Road Central"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Account Name</label>
+              <input
+                value={acctName}
+                onChange={e => setAcctName(e.target.value)}
+                className={inputCls}
+                placeholder="Company legal name"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Account Number</label>
+              <input
+                value={acctNumber}
+                onChange={e => setAcctNumber(e.target.value)}
+                className={inputCls}
+                placeholder="0123456789012"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Funds are never moved by this app — payroll runs generate a bank advice file that you upload to your corporate internet banking to execute payments.
+          </p>
+        </div>
+      </Card>
+
       <Card title="Pay Cycle" subtitle="Define how and when salaries are disbursed" icon={Banknote}>
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[#374151]">Pay Frequency</label>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Pay Frequency</label>
               <div className="relative">
                 <select value={payCycle} onChange={e => setPayCycle(e.target.value)} className={selectCls}>
                   {["Weekly", "Bi-weekly", "Monthly"].map(v => <option key={v}>{v}</option>)}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-[#9ca3af]" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[#374151]">Pay Day (day of month)</label>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Pay Day (day of month)</label>
               <div className="relative">
                 <select value={payDay} onChange={e => setPayDay(e.target.value)} className={selectCls}>
                   {Array.from({ length: 28 }, (_, i) => String(i + 1)).map(d => <option key={d}>{d}</option>)}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-[#9ca3af]" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
               </div>
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-[#374151]">Payment Method</label>
+            <label className="mb-1.5 block text-xs font-medium text-foreground">Payment Method</label>
             <div className="relative max-w-xs">
               <select value={payMethod} onChange={e => setPayMethod(e.target.value)} className={selectCls}>
                 {["Bank Transfer", "Mobile Money", "Cheque", "Cash"].map(v => <option key={v}>{v}</option>)}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-[#9ca3af]" />
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
             </div>
           </div>
         </div>
@@ -158,16 +286,16 @@ export default function Payroll() {
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[#374151]">Tax Scheme</label>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Tax Scheme</label>
               <div className="relative">
                 <select value={taxScheme} onChange={e => setTaxScheme(e.target.value)} className={selectCls}>
                   {["PAYE", "Flat Rate", "Graduated", "Exempt"].map(v => <option key={v}>{v}</option>)}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-[#9ca3af]" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[#374151]">Employee Pension (%)</label>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Employee Pension (%)</label>
               <input
                 type="number"
                 min="0"
@@ -184,8 +312,8 @@ export default function Payroll() {
       <Card title="Standard Allowances" subtitle="Included in every payslip by default" icon={Banknote}>
         <div className="flex flex-col gap-2.5">
           <div className="grid grid-cols-[1fr_120px_40px] gap-2 px-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]">Allowance</span>
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af]">Amount ($)</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Allowance</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Amount ($)</span>
             <span />
           </div>
           {allowances.map((a, i) => (
@@ -206,7 +334,7 @@ export default function Payroll() {
               />
               <button
                 onClick={() => setAllowances(p => p.filter((_, j) => j !== i))}
-                className="flex size-9 items-center justify-center rounded-xl border border-[#e5e7eb] text-[#9ca3af] hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500"
+                className="flex size-9 items-center justify-center rounded-xl border border-border text-muted-foreground hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-900/20 dark:hover:text-rose-400"
               >
                 <Trash2 className="size-3.5" />
               </button>
@@ -214,7 +342,7 @@ export default function Payroll() {
           ))}
           <button
             onClick={() => setAllowances(p => [...p, { id: Date.now(), name: "", amount: "" }])}
-            className="flex w-fit items-center gap-1.5 rounded-xl border border-dashed border-[#e5e7eb] px-3 py-2 text-xs font-medium text-[#6b7280] hover:border-[#5e81f4] hover:text-[#5e81f4]"
+            className="flex w-fit items-center gap-1.5 rounded-xl border border-dashed border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary hover:text-primary"
           >
             <Plus className="size-3.5" /> Add Allowance
           </button>
@@ -233,7 +361,7 @@ export default function Payroll() {
         </div>
       </Card>
 
-      <SaveRow onSave={onSave} />
+      <SaveRow onSave={onSave} saving={saving} message={message} />
     </div>
   )
 }

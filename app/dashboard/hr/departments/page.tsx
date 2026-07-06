@@ -1,39 +1,32 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import Link from "next/link"
 import {
   Search, SlidersHorizontal, Plus, X, MoreHorizontal,
-  Users, Code2, Palette, Megaphone, TrendingUp,
+  Code2, Palette, Megaphone, TrendingUp,
   BarChart2, HeartHandshake, Coins, Package,
   ChevronLeft, ChevronRight, UserPlus, Trash2,
   Building2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
+import { useAuth } from "@/context/auth-context"
+import { ApiError } from "@/lib/api-client"
+import { departmentService, type ApiDeptEmployee } from "@/services/departments.service"
+import { employeeService, type ApiEmployee } from "@/services/employee.service"
 
-// ── Assets ────────────────────────────────────────────────────
-const adminPhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
-
-const photos: Record<string, string> = {
-  "Michael Chen":     "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png",
-  "Sarah Williams":   "/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png",
-  "David Rodriguez":  "/assets/cf9965b714128bf9b66e7daf6ad58bf5300b9eea.png",
-  "James Anderson":   "/assets/9bc2b88fce6e56306262a2efd5513136569ca255.png",
-  "Jessica Martinez": "/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png",
-  "Robert Taylor":    "/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png",
-  "Priya Patel":      "/assets/635a3bf857069957b4442100197a1e910ea3121d.png",
-  "Lena Schmidt":     "/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png",
-  "Omar Hassan":      "/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png",
-}
+// ── Constants ─────────────────────────────────────────────────
+const DEFAULT_PHOTO = "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png"
+const CARDS_PER_PAGE = 6
 
 // ── Types ─────────────────────────────────────────────────────
 interface Member {
-  id:    number
-  name:  string
-  role:  string
-  email: string
-  photo: string
+  id:     string         // CUID from dept endpoint, or stringified number from employee endpoint
+  name:   string
+  role:   string
+  email:  string
+  photo:  string
+  deptId: number | null  // used to filter available vs already-assigned pool employees
 }
 
 interface Department {
@@ -42,78 +35,71 @@ interface Department {
   description: string
   colorKey:    string
   head:        string
-  members:     Member[]
+  memberCount: number
 }
 
 // ── Color palette ─────────────────────────────────────────────
-const colorMap: Record<string, { bg: string; text: string; light: string; icon: React.ElementType }> = {
-  purple:  { bg: "#8b5cf6", text: "#8b5cf6", light: "#f5f3ff", icon: Palette        },
-  blue:    { bg: "#3b82f6", text: "#3b82f6", light: "#eff6ff", icon: Code2          },
-  orange:  { bg: "#f97316", text: "#f97316", light: "#fff7ed", icon: Megaphone      },
-  green:   { bg: "#10b981", text: "#10b981", light: "#ecfdf5", icon: TrendingUp     },
-  indigo:  { bg: "#6366f1", text: "#6366f1", light: "#eef2ff", icon: BarChart2      },
-  pink:    { bg: "#ec4899", text: "#ec4899", light: "#fdf2f8", icon: HeartHandshake },
-  amber:   { bg: "#f59e0b", text: "#f59e0b", light: "#fffbeb", icon: Coins          },
-  teal:    { bg: "#14b8a6", text: "#14b8a6", light: "#f0fdfa", icon: Package        },
+const colorMap: Record<string, {
+  lightCls: string
+  iconCls:  string
+  icon:     React.ElementType
+}> = {
+  purple: { lightCls: "bg-purple-50 dark:bg-purple-900/30",   iconCls: "text-purple-500",   icon: Palette        },
+  blue:   { lightCls: "bg-blue-50 dark:bg-blue-900/30",       iconCls: "text-blue-500",     icon: Code2          },
+  orange: { lightCls: "bg-orange-50 dark:bg-orange-900/30",   iconCls: "text-orange-500",   icon: Megaphone      },
+  green:  { lightCls: "bg-emerald-50 dark:bg-emerald-900/30", iconCls: "text-emerald-500",  icon: TrendingUp     },
+  indigo: { lightCls: "bg-indigo-50 dark:bg-indigo-900/30",   iconCls: "text-indigo-500",   icon: BarChart2      },
+  pink:   { lightCls: "bg-pink-50 dark:bg-pink-900/30",       iconCls: "text-pink-500",     icon: HeartHandshake },
+  amber:  { lightCls: "bg-amber-50 dark:bg-amber-900/30",     iconCls: "text-amber-500",    icon: Coins          },
+  teal:   { lightCls: "bg-teal-50 dark:bg-teal-900/30",       iconCls: "text-teal-500",     icon: Package        },
 }
 
 const COLOR_KEYS = Object.keys(colorMap)
 
-// ── All employees pool (for adding to departments) ────────────
-const allEmployees: Member[] = [
-  { id: 1, name: "Michael Chen",     role: "Senior Product Designer",  email: "michael.chen@corecruiter.com",     photo: photos["Michael Chen"]     },
-  { id: 2, name: "Sarah Williams",   role: "Marketing Manager",         email: "sarah.williams@corecruiter.com",   photo: photos["Sarah Williams"]   },
-  { id: 3, name: "David Rodriguez",  role: "Full Stack Developer",      email: "david.rodriguez@corecruiter.com",  photo: photos["David Rodriguez"]  },
-  { id: 4, name: "James Anderson",   role: "Sales Director",            email: "james.anderson@corecruiter.com",   photo: photos["James Anderson"]   },
-  { id: 5, name: "Jessica Martinez", role: "UX Researcher",             email: "jessica.martinez@corecruiter.com", photo: photos["Jessica Martinez"] },
-  { id: 6, name: "Robert Taylor",    role: "DevOps Engineer",           email: "robert.taylor@corecruiter.com",    photo: photos["Robert Taylor"]    },
-  { id: 7, name: "Priya Patel",      role: "Data Analyst",              email: "priya.patel@corecruiter.com",      photo: photos["Priya Patel"]      },
-  { id: 8, name: "Lena Schmidt",     role: "HR Specialist",             email: "lena.schmidt@corecruiter.com",     photo: photos["Lena Schmidt"]     },
-  { id: 9, name: "Omar Hassan",      role: "Backend Engineer",          email: "omar.hassan@corecruiter.com",      photo: photos["Omar Hassan"]      },
-]
+// ── Helpers ────────────────────────────────────────────────────
+function getColorKey(id: number): string {
+  return COLOR_KEYS[id % COLOR_KEYS.length]
+}
 
-// ── Seed departments ──────────────────────────────────────────
-const seed: Department[] = [
-  {
-    id: 1, name: "Design",      colorKey: "purple", description: "Product design, UX research, and brand identity.",
-    head: "Michael Chen",
-    members: [
-      allEmployees.find((e) => e.name === "Michael Chen")!,
-      allEmployees.find((e) => e.name === "Jessica Martinez")!,
-    ],
-  },
-  {
-    id: 2, name: "Engineering", colorKey: "blue",   description: "Full-stack, backend, and DevOps engineering.",
-    head: "David Rodriguez",
-    members: [
-      allEmployees.find((e) => e.name === "David Rodriguez")!,
-      allEmployees.find((e) => e.name === "Robert Taylor")!,
-      allEmployees.find((e) => e.name === "Omar Hassan")!,
-    ],
-  },
-  {
-    id: 3, name: "Marketing",   colorKey: "orange", description: "Growth, content, campaigns, and brand awareness.",
-    head: "Sarah Williams",
-    members: [allEmployees.find((e) => e.name === "Sarah Williams")!],
-  },
-  {
-    id: 4, name: "Sales",       colorKey: "green",  description: "Enterprise sales, partnerships, and revenue growth.",
-    head: "James Anderson",
-    members: [allEmployees.find((e) => e.name === "James Anderson")!],
-  },
-  {
-    id: 5, name: "Analytics",   colorKey: "indigo", description: "Business intelligence, data pipelines, and reporting.",
-    head: "Priya Patel",
-    members: [allEmployees.find((e) => e.name === "Priya Patel")!],
-  },
-  {
-    id: 6, name: "HR",          colorKey: "pink",   description: "Talent acquisition, culture, and employee experience.",
-    head: "Lena Schmidt",
-    members: [allEmployees.find((e) => e.name === "Lena Schmidt")!],
-  },
-]
+function mapDept(a: {
+  id: number
+  name: string
+  description: string | null
+  _count?: { employees: number }
+}): Department {
+  return {
+    id:          a.id,
+    name:        a.name,
+    description: a.description ?? "",
+    colorKey:    getColorKey(a.id),
+    head:        "—",
+    memberCount: a._count?.employees ?? 0,
+  }
+}
 
-const CARDS_PER_PAGE = 6
+// Maps a dept-endpoint employee (string CUID id, no jobTitle) to Member
+function mapDeptEmployee(e: ApiDeptEmployee, deptId: number): Member {
+  return {
+    id:     e.id,
+    name:   e.user.name,
+    role:   "",
+    email:  e.user.email,
+    photo:  e.user.avatarUrl ?? DEFAULT_PHOTO,
+    deptId: deptId,
+  }
+}
+
+// Maps an employee-endpoint record (numeric id, has jobTitle) to Member
+function mapPoolEmployee(e: ApiEmployee): Member {
+  return {
+    id:     String(e.id),
+    name:   e.user.name,
+    role:   e.jobTitle ?? "",
+    email:  e.user.email,
+    photo:  e.user.avatarUrl ?? DEFAULT_PHOTO,
+    deptId: e.department?.id ?? null,
+  }
+}
 
 // ── Dot menu ──────────────────────────────────────────────────
 function DotMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => void }) {
@@ -128,13 +114,13 @@ function DotMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => voi
 
   return (
     <div ref={ref} className="relative">
-      <button onClick={() => setOpen((o) => !o)} className="rounded-md p-1 text-[#8181a5] hover:bg-muted">
+      <button onClick={() => setOpen((o) => !o)} className="rounded-md p-1 text-muted-foreground hover:bg-muted">
         <MoreHorizontal className="size-4" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-lg border border-border bg-white shadow-lg">
-          <button onClick={() => { onEdit(); setOpen(false) }} className="block w-full px-4 py-2 text-left text-sm text-[#374151] hover:bg-muted">Edit</button>
-          <button onClick={() => { onDelete(); setOpen(false) }} className="block w-full px-4 py-2 text-left text-sm text-rose-500 hover:bg-rose-50">Delete</button>
+        <div className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-lg border border-border bg-card shadow-lg">
+          <button onClick={() => { onEdit(); setOpen(false) }} className="block w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted">Edit</button>
+          <button onClick={() => { onDelete(); setOpen(false) }} className="block w-full px-4 py-2 text-left text-sm text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20">Delete</button>
         </div>
       )}
     </div>
@@ -143,72 +129,38 @@ function DotMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => voi
 
 // ── Department card ───────────────────────────────────────────
 function DepartmentCard({
-  dept,
-  onView,
-  onEdit,
-  onDelete,
+  dept, onView, onEdit, onDelete,
 }: {
-  dept:     Department
-  onView:   () => void
-  onEdit:   () => void
-  onDelete: () => void
+  dept: Department; onView: () => void; onEdit: () => void; onDelete: () => void
 }) {
-  const { bg, light, icon: Icon } = colorMap[dept.colorKey]
+  const { lightCls, iconCls, icon: Icon } = colorMap[dept.colorKey]
 
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-      {/* Top row */}
+    <div className="flex flex-col rounded-xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
       <div className="mb-4 flex items-start justify-between">
-        <div
-          className="flex size-12 items-center justify-center rounded-xl"
-          style={{ background: light }}
-        >
-          <Icon className="size-6" style={{ color: bg }} />
+        <div className={cn("flex size-12 items-center justify-center rounded-xl", lightCls)}>
+          <Icon className={cn("size-6", iconCls)} />
         </div>
         <DotMenu onEdit={onEdit} onDelete={onDelete} />
       </div>
 
-      {/* Name + description */}
-      <p className="mb-1 text-base font-bold text-[#1f2937]">{dept.name}</p>
-      <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-[#667388]">{dept.description}</p>
+      <p className="mb-1 text-base font-bold text-foreground">{dept.name}</p>
+      <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{dept.description}</p>
 
-      {/* Meta */}
       <div className="mb-4 space-y-2 text-sm">
         <div className="flex items-center justify-between">
-          <span className="text-[#8181a5]">Head</span>
-          <span className="font-semibold text-[#1f2937]">{dept.head}</span>
+          <span className="text-muted-foreground">Head</span>
+          <span className="font-semibold text-foreground">{dept.head}</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-[#8181a5]">Members</span>
-          <span className="font-semibold text-[#1f2937]">{dept.members.length}</span>
+          <span className="text-muted-foreground">Members</span>
+          <span className="font-semibold text-foreground">{dept.memberCount}</span>
         </div>
       </div>
 
-      {/* Stacked avatars */}
-      <div className="mb-4 flex items-center">
-        <div className="flex -space-x-2">
-          {dept.members.slice(0, 4).map((m) => (
-            <img
-              key={m.id}
-              src={m.photo}
-              alt={m.name}
-              title={m.name}
-              className="size-7 rounded-full object-cover ring-2 ring-white"
-            />
-          ))}
-          {dept.members.length > 4 && (
-            <div className="flex size-7 items-center justify-center rounded-full bg-[#f0f0ff] text-[10px] font-semibold text-[#8a8cd9] ring-2 ring-white">
-              +{dept.members.length - 4}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* View Members button */}
       <button
         onClick={onView}
-        className="mt-auto w-full rounded-lg py-2 text-sm font-semibold transition-colors"
-        style={{ background: light, color: bg }}
+        className={cn("mt-auto w-full rounded-lg py-2 text-sm font-semibold transition-colors", lightCls, iconCls)}
       >
         View Members
       </button>
@@ -218,17 +170,13 @@ function DepartmentCard({
 
 // ── Add Member dropdown ───────────────────────────────────────
 function AddMemberDropdown({
-  available,
-  onAdd,
-  colorKey,
+  available, onAdd, colorKey, disabled,
 }: {
-  available: Member[]
-  onAdd:     (m: Member) => void
-  colorKey:  string
+  available: Member[]; onAdd: (m: Member) => void; colorKey: string; disabled?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const { bg, light } = colorMap[colorKey]
+  const { lightCls, iconCls } = colorMap[colorKey]
 
   useEffect(() => {
     const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
@@ -237,22 +185,22 @@ function AddMemberDropdown({
   }, [])
 
   if (available.length === 0) return (
-    <span className="text-xs text-[#8181a5]">All employees are in this department</span>
+    <span className="text-xs text-muted-foreground">All employees assigned</span>
   )
 
   return (
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors"
-        style={{ background: light, color: bg }}
+        disabled={disabled}
+        className={cn("flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors disabled:opacity-50", lightCls, iconCls)}
       >
         <UserPlus className="size-4" /> Add Member
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-20 mt-1 w-64 overflow-hidden rounded-xl border border-border bg-white shadow-xl">
-          <p className="border-b border-border px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-[#8181a5]">
+        <div className="absolute left-0 top-full z-20 mt-1 w-64 overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+          <p className="border-b border-border px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Select employee
           </p>
           <div className="max-h-56 overflow-y-auto">
@@ -260,12 +208,12 @@ function AddMemberDropdown({
               <button
                 key={m.id}
                 onClick={() => { onAdd(m); setOpen(false) }}
-                className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-[#f8fafc]"
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-muted/50"
               >
                 <img src={m.photo} alt={m.name} className="size-8 shrink-0 rounded-full object-cover" />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-[#1f2937]">{m.name}</p>
-                  <p className="truncate text-xs text-[#8181a5]">{m.role}</p>
+                  <p className="truncate text-sm font-medium text-foreground">{m.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">{m.role}</p>
                 </div>
               </button>
             ))}
@@ -277,97 +225,158 @@ function AddMemberDropdown({
 }
 
 // ── Members side panel ────────────────────────────────────────
-function MembersPanel({
-  dept,
-  onClose,
-  onAddMember,
-  onRemoveMember,
-}: {
-  dept:           Department
-  onClose:        () => void
-  onAddMember:    (deptId: number, m: Member) => void
-  onRemoveMember: (deptId: number, memberId: number) => void
+function MembersPanel({ dept, onClose, onMemberCountChange }: {
+  dept:                 Department
+  onClose:              () => void
+  onMemberCountChange:  (deptId: number, newCount: number) => void
 }) {
-  const { bg, light, icon: Icon } = colorMap[dept.colorKey]
+  const { accessToken } = useAuth()
+  const { lightCls, iconCls, icon: Icon } = colorMap[dept.colorKey]
+
+  const [members,      setMembers]      = useState<Member[]>([])
+  const [pool,         setPool]         = useState<Member[]>([])
+  const [loading,      setLoading]      = useState(true)
+  const [panelError,   setPanelError]   = useState<string | null>(null)
+  const [savingId,     setSavingId]     = useState<string | null>(null)
   const [memberSearch, setMemberSearch] = useState("")
 
-  const memberIds  = new Set(dept.members.map((m) => m.id))
-  const available  = allEmployees.filter((e) => !memberIds.has(e.id))
-  const displayed  = dept.members.filter(
+  useEffect(() => {
+    if (!accessToken) return
+    setLoading(true)
+    Promise.all([
+      departmentService.members(dept.id, { status: "active", limit: 100 }, accessToken),
+      employeeService.list({ limit: 100 }, accessToken),
+    ])
+      .then(([membersRes, empRes]) => {
+        setMembers(membersRes.data.map((e) => mapDeptEmployee(e, dept.id)))
+        setPool(empRes.data.map(mapPoolEmployee))
+      })
+      .catch((e: unknown) => setPanelError(e instanceof Error ? e.message : "Failed to load members"))
+      .finally(() => setLoading(false))
+  }, [accessToken, dept.id])
+
+  // Filter pool by deptId — avoids broken cross-list ID comparison (pool has numeric string ids,
+  // dept members have CUID string ids)
+  const available = pool.filter((p) => p.deptId !== dept.id)
+
+  const displayed = members.filter(
     (m) =>
       m.name.toLowerCase().includes(memberSearch.toLowerCase()) ||
-      m.role.toLowerCase().includes(memberSearch.toLowerCase())
+      m.role.toLowerCase().includes(memberSearch.toLowerCase()),
   )
+
+  async function handleAdd(m: Member) {
+    if (!accessToken) return
+    setSavingId(m.id)
+    setPanelError(null)
+    try {
+      await employeeService.update(m.id, { departmentId: dept.id }, accessToken)
+      setMembers((prev) => [...prev, { ...m, deptId: dept.id }])
+      setPool((prev) => prev.map((p) => p.id === m.id ? { ...p, deptId: dept.id } : p))
+      onMemberCountChange(dept.id, members.length + 1)
+    } catch (e: unknown) {
+      setPanelError(e instanceof Error ? e.message : "Failed to add member")
+    } finally {
+      setSavingId(null)
+    }
+  }
+
+  async function handleRemove(empId: string) {
+    if (!accessToken) return
+    setSavingId(empId)
+    setPanelError(null)
+    try {
+      await employeeService.update(empId, { departmentId: null }, accessToken)
+      const removed = members.find((m) => m.id === empId)
+      setMembers((prev) => prev.filter((m) => m.id !== empId))
+      // Sync pool by email — the only common key between dept-member CUIDs and pool numeric ids
+      if (removed) {
+        setPool((prev) => prev.map((p) => p.email === removed.email ? { ...p, deptId: null } : p))
+      }
+      onMemberCountChange(dept.id, members.length - 1)
+    } catch (e: unknown) {
+      setPanelError(e instanceof Error ? e.message : "Failed to remove member")
+    } finally {
+      setSavingId(null)
+    }
+  }
 
   return (
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
-      <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-white shadow-2xl">
+      <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-card shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg" style={{ background: light }}>
-              <Icon className="size-5" style={{ color: bg }} />
+            <div className={cn("flex size-9 items-center justify-center rounded-lg", lightCls)}>
+              <Icon className={cn("size-5", iconCls)} />
             </div>
             <div>
-              <p className="text-base font-bold text-[#1f2937]">{dept.name}</p>
-              <p className="text-xs text-[#8181a5]">{dept.members.length} member{dept.members.length !== 1 ? "s" : ""}</p>
+              <p className="text-base font-bold text-foreground">{dept.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {loading ? "Loading…" : `${members.length} member${members.length !== 1 ? "s" : ""}`}
+              </p>
             </div>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
+          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
         {/* Toolbar */}
         <div className="flex items-center justify-between border-b border-border px-6 py-3">
-          <div className="flex flex-1 items-center gap-2 rounded-lg border border-border bg-[#f8fafc] px-3 py-1.5 mr-3">
-            <Search className="size-3.5 text-[#8181a5]" />
+          <div className="mr-3 flex flex-1 items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-1.5">
+            <Search className="size-3.5 text-muted-foreground" />
             <input
               value={memberSearch}
               onChange={(e) => setMemberSearch(e.target.value)}
               placeholder="Search members…"
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-[#8181a5]"
+              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
           <AddMemberDropdown
             available={available}
-            onAdd={(m) => onAddMember(dept.id, m)}
+            onAdd={handleAdd}
             colorKey={dept.colorKey}
+            disabled={loading || !!savingId}
           />
         </div>
 
+        {/* Error */}
+        {panelError && (
+          <div className="mx-4 mt-3 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+            {panelError}
+          </div>
+        )}
+
         {/* Member list */}
-        <div className="flex-1 overflow-y-auto divide-y divide-border">
-          {displayed.length === 0 ? (
-            <div className="flex h-32 items-center justify-center text-sm text-[#8181a5]">
-              {dept.members.length === 0 ? "No members yet. Add someone!" : "No matches found."}
+        <div className="flex-1 divide-y divide-border overflow-y-auto">
+          {loading ? (
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">Loading…</div>
+          ) : displayed.length === 0 ? (
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+              {members.length === 0 ? "No members yet. Add someone!" : "No matches found."}
             </div>
           ) : (
             displayed.map((m) => (
-              <div key={m.id} className="flex items-center gap-3 px-6 py-3.5 hover:bg-[#f8fafc]">
+              <div key={m.id} className="flex items-center gap-3 px-6 py-3.5 hover:bg-muted/50">
                 <img src={m.photo} alt={m.name} className="size-10 shrink-0 rounded-full object-cover" />
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-semibold text-[#1f2937]">{m.name}</p>
-                  <p className="truncate text-xs text-[#667388]">{m.role}</p>
-                  {m.name === dept.head && (
-                    <span
-                      className="mt-0.5 inline-block rounded-full px-2 py-px text-[10px] font-bold"
-                      style={{ background: light, color: bg }}
-                    >
-                      Head
-                    </span>
-                  )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-foreground">{m.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">{m.role || m.email}</p>
                 </div>
-                {m.name !== dept.head && (
-                  <button
-                    onClick={() => onRemoveMember(dept.id, m.id)}
-                    title="Remove from department"
-                    className="rounded-lg p-1.5 text-[#8181a5] transition-colors hover:bg-rose-50 hover:text-rose-500"
-                  >
+                <button
+                  onClick={() => handleRemove(m.id)}
+                  disabled={savingId === m.id}
+                  title="Remove from department"
+                  className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-rose-50 hover:text-rose-500 disabled:opacity-40 dark:hover:bg-rose-900/20 dark:hover:text-rose-400"
+                >
+                  {savingId === m.id ? (
+                    <span className="text-xs">…</span>
+                  ) : (
                     <Trash2 className="size-4" />
-                  </button>
-                )}
+                  )}
+                </button>
               </div>
             ))
           )}
@@ -379,99 +388,86 @@ function MembersPanel({
 
 // ── Add / Edit Department Modal ───────────────────────────────
 function DeptFormModal({
-  initial,
-  onClose,
-  onSave,
+  initial, onClose, onSave,
 }: {
   initial?: Department | null
-  onClose:  () => void
-  onSave:   (d: Department) => void
+  onClose: () => void
+  onSave:  (payload: { name: string; description: string }) => Promise<void>
 }) {
   const isEdit = Boolean(initial)
   const [name,        setName]        = useState(initial?.name        ?? "")
   const [description, setDescription] = useState(initial?.description ?? "")
-  const [head,        setHead]        = useState(initial?.head        ?? allEmployees[0].name)
-  const [colorKey,    setColorKey]    = useState(initial?.colorKey    ?? "blue")
+  const [saving,      setSaving]      = useState(false)
+  const [saveErr,     setSaveErr]     = useState<string | null>(null)
 
-  const inputCls = "w-full rounded-lg border border-[#e0e6ed] bg-white px-3 py-2.5 text-sm text-[#1f2937] outline-none focus:border-[#5e81f4] focus:ring-2 focus:ring-[#5e81f4]/20"
+  const inputCls = "w-full rounded-lg border border-border bg-muted/50 px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-transparent"
 
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onSave({
-      id:      initial?.id      ?? Date.now(),
-      members: initial?.members ?? [],
-      name, description, head, colorKey,
-    })
-    onClose()
+    setSaving(true)
+    setSaveErr(null)
+    try {
+      await onSave({ name, description })
+      onClose()
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.status === 409) {
+        setSaveErr("A department with this name already exists.")
+      } else {
+        setSaveErr(err instanceof Error ? err.message : "Failed to save")
+      }
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-[#1f2937]">{isEdit ? "Edit Department" : "New Department"}</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted"><X className="size-5" /></button>
+          <h2 className="text-base font-semibold text-foreground">{isEdit ? "Edit Department" : "New Department"}</h2>
+          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+            <X className="size-5" />
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-[#374151]">Department Name *</label>
-            <input className={inputCls} placeholder="e.g. Product" value={name} onChange={(e) => setName(e.target.value)} required />
+            <label className="mb-1 block text-xs font-medium text-foreground">Department Name *</label>
+            <input
+              className={inputCls}
+              placeholder="e.g. Product"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
           </div>
 
-          {/* Description */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-[#374151]">Description</label>
+            <label className="mb-1 block text-xs font-medium text-foreground">Description</label>
             <textarea
-              className={`${inputCls} h-20 resize-none`}
+              className={cn(inputCls, "h-20 resize-none")}
               placeholder="What does this department do?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
 
-          {/* Department Head */}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-[#374151]">Department Head</label>
-            <select className={inputCls} value={head} onChange={(e) => setHead(e.target.value)}>
-              {allEmployees.map((e) => (
-                <option key={e.id} value={e.name}>{e.name} — {e.role}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Color */}
-          <div>
-            <label className="mb-2 block text-xs font-medium text-[#374151]">Color</label>
-            <div className="flex flex-wrap gap-2">
-              {COLOR_KEYS.map((key) => {
-                const { bg, icon: Icon } = colorMap[key]
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setColorKey(key)}
-                    title={key}
-                    className={cn(
-                      "flex size-9 items-center justify-center rounded-lg transition-all",
-                      colorKey === key ? "ring-2 ring-offset-1 ring-[#5e81f4]" : "opacity-60 hover:opacity-100"
-                    )}
-                    style={{ background: colorMap[key].light }}
-                  >
-                    <Icon className="size-5" style={{ color: bg }} />
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+          {saveErr && (
+            <p className="rounded-lg bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+              {saveErr}
+            </p>
+          )}
 
           <div className="flex justify-end gap-2 pt-1">
-            <button type="button" onClick={onClose} className="rounded-lg border border-[#e0e6ed] px-4 py-2 text-sm font-medium text-[#374151] hover:bg-muted">
+            <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">
               Cancel
             </button>
-            <button type="submit" className="rounded-lg bg-[#5e81f4] px-5 py-2 text-sm font-semibold text-white hover:bg-[#4a6ee0]">
-              {isEdit ? "Save Changes" : "Create Department"}
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+            >
+              {saving ? "Saving…" : isEdit ? "Save Changes" : "Create Department"}
             </button>
           </div>
         </form>
@@ -482,107 +478,127 @@ function DeptFormModal({
 
 // ── Sidebar nav ───────────────────────────────────────────────
 const sidebarNav = [
-  { label: "Employees",   href: "/dashboard/hr/employees",   active: false },
-  { label: "Departments", href: "/dashboard/hr/departments", active: true  },
-  { label: "Leave",       href: "/dashboard/hr/leave",         active: false },
-  { label: "Payroll",     href: "/dashboard/hr/payroll",      active: false },
-  { label: "History",     href: "#",                          active: false },
+  { label: "Employees",   href: "/dashboard/hr/employees"   },
+  { label: "Departments", href: "/dashboard/hr/departments" },
+  { label: "Leave",       href: "/dashboard/hr/leave"       },
+  { label: "Payroll",     href: "/dashboard/hr/payroll"     },
+  { label: "History",     href: "#"                         },
 ]
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function DepartmentsPage() {
-  const [departments, setDepartments] = useState<Department[]>(seed)
-  const [search,      setSearch]      = useState("")
-  const [page,        setPage]        = useState(1)
-  const [viewing,     setViewing]     = useState<Department | null>(null)
-  const [editing,     setEditing]     = useState<Department | null | undefined>(undefined)
+  const { accessToken } = useAuth()
 
-  const filtered    = departments.filter((d) =>
-    d.name.toLowerCase().includes(search.toLowerCase()) ||
-    d.head.toLowerCase().includes(search.toLowerCase())
-  )
-  const totalPages  = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE))
-  const paginated   = filtered.slice((page - 1) * CARDS_PER_PAGE, page * CARDS_PER_PAGE)
+  const [departments,  setDepartments]  = useState<Department[]>([])
+  const [loading,      setLoading]      = useState(true)
+  const [error,        setError]        = useState<string | null>(null)
+  const [deleteError,  setDeleteError]  = useState<string | null>(null)
+  const [search,       setSearch]       = useState("")
+  const [page,         setPage]         = useState(1)
+  const [viewing,      setViewing]      = useState<Department | null>(null)
+  const [editing,      setEditing]      = useState<Department | null | undefined>(undefined)
 
-  const saveDept = (d: Department) => {
-    setDepartments((prev) => {
-      const exists = prev.find((x) => x.id === d.id)
-      return exists ? prev.map((x) => (x.id === d.id ? d : x)) : [d, ...prev]
-    })
-    // keep viewing panel in sync
-    setViewing((v) => (v?.id === d.id ? d : v))
-    setPage(1)
-  }
+  useEffect(() => {
+    if (!accessToken) return
+    setLoading(true)
+    setError(null)
+    departmentService
+      .list(accessToken)
+      .then((res) => setDepartments(res.data.map(mapDept)))
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : "Failed to load departments"))
+      .finally(() => setLoading(false))
+  }, [accessToken])
 
-  const deleteDept = (id: number) => {
-    setDepartments((prev) => prev.filter((d) => d.id !== id))
-    if (viewing?.id === id) setViewing(null)
-  }
+  const filtered   = departments.filter((d) => d.name.toLowerCase().includes(search.toLowerCase()))
+  const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE))
+  const paginated  = filtered.slice((page - 1) * CARDS_PER_PAGE, page * CARDS_PER_PAGE)
 
-  const addMember = (deptId: number, member: Member) => {
-    setDepartments((prev) =>
-      prev.map((d) =>
-        d.id === deptId ? { ...d, members: [...d.members, member] } : d
+  async function saveDept(payload: { name: string; description: string }, existing: Department | null) {
+    if (!accessToken) throw new Error("Not authenticated")
+    if (existing) {
+      const res = await departmentService.update(existing.id, payload, accessToken)
+      const updated = mapDept({ ...res.data, _count: { employees: existing.memberCount } })
+      setDepartments((prev) => prev.map((d) => (d.id === existing.id ? updated : d)))
+    } else {
+      const res = await departmentService.create(
+        { name: payload.name, description: payload.description || undefined },
+        accessToken,
       )
-    )
-    setViewing((v) =>
-      v?.id === deptId ? { ...v, members: [...v.members, member] } : v
-    )
+      setDepartments((prev) => [...prev, mapDept(res.data)])
+    }
   }
 
-  const removeMember = (deptId: number, memberId: number) => {
-    setDepartments((prev) =>
-      prev.map((d) =>
-        d.id === deptId ? { ...d, members: d.members.filter((m) => m.id !== memberId) } : d
-      )
-    )
-    setViewing((v) =>
-      v?.id === deptId ? { ...v, members: v.members.filter((m) => m.id !== memberId) } : v
-    )
+  async function deleteDept(id: number) {
+    if (!accessToken) return
+    setDeleteError(null)
+    try {
+      await departmentService.remove(id, accessToken)
+      setDepartments((prev) => prev.filter((d) => d.id !== id))
+      if (viewing?.id === id) setViewing(null)
+    } catch (e: unknown) {
+      if (e instanceof ApiError && e.status === 400) {
+        setDeleteError(e.message)
+      } else {
+        setDeleteError(e instanceof Error ? e.message : "Failed to delete department")
+      }
+    }
   }
 
-  // Stats row
-  const totalMembers = departments.reduce((acc, d) => acc + d.members.length, 0)
+  function handleMemberCountChange(deptId: number, newCount: number) {
+    setDepartments((prev) => prev.map((d) => (d.id === deptId ? { ...d, memberCount: newCount } : d)))
+  }
 
   return (
     <>
+      <HrNavigationPannel navItems={sidebarNav} />
 
-      {/* ── Text sidebar ── */}
-    <HrNavigationPannel navItems={sidebarNav}/>
-      {/* ── Main content ── */}
       <main className="flex flex-1 flex-col overflow-hidden p-6">
         {/* Search */}
-        <div className="mb-4 flex items-center gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
-          <Search className="size-5 shrink-0 text-[#8181a5]" />
+        <div className="mb-4 flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 shadow-sm">
+          <Search className="size-5 shrink-0 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search ⌘K"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-            className="flex-1 bg-transparent text-sm text-[#1f2937] outline-none placeholder:text-[rgba(34,48,62,0.4)]"
+            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/50"
           />
-          <button className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
+          <button className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
             <SlidersHorizontal className="size-5" />
           </button>
         </div>
 
-        {/* Header + stats */}
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-           
-            {/* Quick stat pills */}
-          
+        {/* Delete error banner */}
+        {deleteError && (
+          <div className="mb-4 flex items-center justify-between rounded-lg bg-rose-50 px-4 py-2.5 text-sm text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+            <span>{deleteError}</span>
+            <button onClick={() => setDeleteError(null)} className="ml-4 shrink-0 rounded p-0.5 hover:bg-rose-100 dark:hover:bg-rose-900/30">
+              <X className="size-4" />
+            </button>
           </div>
+        )}
+
+        {/* Header */}
+        <div className="mb-5 flex items-center justify-between">
+          <div />
           <button
             onClick={() => setEditing(null)}
-            className="flex items-center gap-2 rounded-xl bg-[#5e81f4] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#4a6ee0]"
+            className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
           >
             <Plus className="size-4" /> Add Department
           </button>
         </div>
 
-        {/* Department cards */}
-        {paginated.length > 0 ? (
+        {/* Content */}
+        {loading ? (
+          <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+            Loading departments…
+          </div>
+        ) : error ? (
+          <div className="flex flex-1 items-center justify-center text-sm text-rose-500">
+            {error}
+          </div>
+        ) : paginated.length > 0 ? (
           <div className="grid flex-1 auto-rows-min grid-cols-3 gap-4">
             {paginated.map((dept) => (
               <DepartmentCard
@@ -597,22 +613,22 @@ export default function DepartmentsPage() {
         ) : (
           <div className="flex flex-1 items-center justify-center">
             <div className="flex flex-col items-center gap-3 text-center">
-              <div className="flex size-14 items-center justify-center rounded-full bg-[#f0f0ff]">
-                <Building2 className="size-7 text-[#8a8cd9]" />
+              <div className="flex size-14 items-center justify-center rounded-full bg-primary/10">
+                <Building2 className="size-7 text-primary" />
               </div>
-              <p className="text-sm font-medium text-[#1f2937]">No departments found</p>
-              <p className="text-xs text-[#8181a5]">Try a different search or create a new department.</p>
+              <p className="text-sm font-medium text-foreground">No departments found</p>
+              <p className="text-xs text-muted-foreground">Try a different search or create a new department.</p>
             </div>
           </div>
         )}
 
         {/* Pagination */}
-        {totalPages > 1 && (
+        {!loading && !error && totalPages > 1 && (
           <div className="mt-5 flex items-center justify-end gap-1">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="flex size-8 items-center justify-center rounded-full text-[#4b5563] hover:bg-muted disabled:opacity-40"
+              className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
             >
               <ChevronLeft className="size-4" />
             </button>
@@ -622,7 +638,7 @@ export default function DepartmentsPage() {
                 onClick={() => setPage(p)}
                 className={cn(
                   "flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
-                  p === page ? "bg-[#3b6feb] text-white" : "text-[#4b5563] hover:bg-muted"
+                  p === page ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted",
                 )}
               >
                 {p}
@@ -631,7 +647,7 @@ export default function DepartmentsPage() {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="flex size-8 items-center justify-center rounded-full text-[#4b5563] hover:bg-muted disabled:opacity-40"
+              className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
             >
               <ChevronRight className="size-4" />
             </button>
@@ -639,22 +655,19 @@ export default function DepartmentsPage() {
         )}
       </main>
 
-      {/* Members panel */}
       {viewing && (
         <MembersPanel
           dept={viewing}
           onClose={() => setViewing(null)}
-          onAddMember={addMember}
-          onRemoveMember={removeMember}
+          onMemberCountChange={handleMemberCountChange}
         />
       )}
 
-      {/* Add / Edit modal */}
       {editing !== undefined && (
         <DeptFormModal
           initial={editing}
           onClose={() => setEditing(undefined)}
-          onSave={saveDept}
+          onSave={(payload) => saveDept(payload, editing ?? null)}
         />
       )}
     </>
