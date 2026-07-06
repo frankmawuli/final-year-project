@@ -12,6 +12,7 @@ import { jobsService, type ApiApplicant, type ApiApplicantStatus } from "@/servi
 const STATUS_OPTIONS: { value: ApiApplicantStatus | ""; label: string }[] = [
   { value: "",               label: "All"           },
   { value: "PENDING_REVIEW", label: "Pending Review"},
+  { value: "SHORTLISTED",    label: "Shortlisted"   },
   { value: "INTERVIEW",      label: "Interview"     },
   { value: "ACCEPTED",       label: "Accepted"      },
   { value: "APPROVED",       label: "Approved"      },
@@ -20,6 +21,7 @@ const STATUS_OPTIONS: { value: ApiApplicantStatus | ""; label: string }[] = [
 
 const STATUS_STYLE: Record<ApiApplicantStatus, string> = {
   PENDING_REVIEW: "bg-amber-100 text-amber-700",
+  SHORTLISTED:    "bg-indigo-100 text-indigo-700",
   INTERVIEW:      "bg-cyan-100 text-cyan-700",
   ACCEPTED:       "bg-emerald-100 text-emerald-700",
   APPROVED:       "bg-green-100 text-green-700",
@@ -28,6 +30,7 @@ const STATUS_STYLE: Record<ApiApplicantStatus, string> = {
 
 const STATUS_LABEL: Record<ApiApplicantStatus, string> = {
   PENDING_REVIEW: "Pending Review",
+  SHORTLISTED:    "Shortlisted",
   INTERVIEW:      "Interview",
   ACCEPTED:       "Accepted",
   APPROVED:       "Approved",

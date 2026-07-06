@@ -16,7 +16,7 @@ import {
 import type { ApiApplicant, ApiApplicantStatus } from "@/services/jobs.service"
 
 // ── Types ─────────────────────────────────────────────────────
-type EvalStatus = "Pending Review" | "Interview" | "Accepted" | "Approved" | "Rejected"
+type EvalStatus = "Pending Review" | "Shortlisted" | "Interview" | "Accepted" | "Approved" | "Rejected"
 
 interface Candidate {
   id:         string
@@ -40,17 +40,19 @@ interface Candidate {
 // ── Status config ─────────────────────────────────────────────
 const statusConfig: Record<EvalStatus, { bg: string; text: string }> = {
   "Pending Review": { bg: "#f0f0ff", text: "#8a8cd9" },
+  Shortlisted:      { bg: "#eef2ff", text: "#6366f1" },
   Interview:        { bg: "#eff6ff", text: "#3b82f6" },
   Accepted:         { bg: "#def8ee", text: "#4aa785" },
   Approved:         { bg: "#fffbd4", text: "#ffc555" },
   Rejected:         { bg: "#fef2f2", text: "#ef4444" },
 }
 
-const STATUS_OPTIONS: EvalStatus[] = ["Pending Review", "Interview", "Accepted", "Approved", "Rejected"]
+const STATUS_OPTIONS: EvalStatus[] = ["Pending Review", "Shortlisted", "Interview", "Accepted", "Approved", "Rejected"]
 
 // ── API ↔ UI status maps ──────────────────────────────────────
 const STATUS_TO_EVAL: Record<ApiApplicantStatus, EvalStatus> = {
   PENDING_REVIEW: "Pending Review",
+  SHORTLISTED:    "Shortlisted",
   INTERVIEW:      "Interview",
   ACCEPTED:       "Accepted",
   APPROVED:       "Approved",
@@ -59,6 +61,7 @@ const STATUS_TO_EVAL: Record<ApiApplicantStatus, EvalStatus> = {
 
 const EVAL_TO_STATUS: Record<EvalStatus, ApiApplicantStatus> = {
   "Pending Review": "PENDING_REVIEW",
+  Shortlisted:      "SHORTLISTED",
   Interview:        "INTERVIEW",
   Accepted:         "ACCEPTED",
   Approved:         "APPROVED",

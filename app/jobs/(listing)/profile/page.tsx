@@ -10,48 +10,76 @@ import { ExperienceEducationTab } from "@/components/jobs/profile/experience-edu
 import { CertificatesAwardsTab } from "@/components/jobs/profile/certificates-awards-tab";
 import { LanguagesSkillsTab } from "@/components/jobs/profile/languages-skills-tab";
 import { CvPortfolioCoverTab } from "@/components/jobs/profile/cv-portfolio-cover-tab";
+import { useApplicantAuth } from "@/context/applicant-auth-context";
+import type { ApplicantProfile } from "@/services/applicant-auth.service";
 
-const PROFILE_DATA: ProfileSidebarData = {
-  name: "Mawuli Frank",
-  title: "Full Stack Developer",
-  experience: "1 year",
-  availability: "Immediately",
-  location: "Nigeria",
-  completionPercent: 25,
-};
-
-const TAB_CONTENT: Partial<Record<ProfileTab, ReactNode>> = {
-  Overview: <OverviewTab />,
-  "About Me": (
-    <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
-      <AboutMeSection />
-    </div>
-  ),
-  "Employment & Availability": (
-    <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
-      <EmploymentSection />
-    </div>
-  ),
-  "Experience & Education": <ExperienceEducationTab />,
-  "Certificates & Awards": <CertificatesAwardsTab />,
-  "Languages & Skills": <LanguagesSkillsTab />,
-  "CV / Portfolio / Cover Letter": <CvPortfolioCoverTab />,
-};
+function completionPercent(profile: ApplicantProfile): number {
+  const checks = [
+    !!profile.name,
+    !!profile.about,
+    !!profile.phone,
+    !!profile.location,
+    !!profile.avatarUrl,
+    !!profile.headline,
+    !!profile.availability,
+    profile.skills.length > 0,
+    profile.experience.length > 0,
+    profile.education.length > 0,
+    !!profile.cvUrl,
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
 
 export default function JobProfile() {
   const [activeTab, setActiveTab] = useState<ProfileTab>("Overview");
+  const { profile, applicant, updateProfile } = useApplicantAuth();
+
+  const sidebarData: ProfileSidebarData = {
+    name: profile?.name ?? applicant?.name ?? "—",
+    title: profile?.headline ?? profile?.experience[0]?.role ?? "Job Seeker",
+    experience:
+      profile?.experienceYears ??
+      (profile?.experience.length
+        ? `${profile.experience.length} role${profile.experience.length > 1 ? "s" : ""}`
+        : "—"),
+    availability: profile?.availability ?? "—",
+    location: profile?.location ?? "—",
+    completionPercent: profile ? completionPercent(profile) : 0,
+    avatarUrl: profile?.avatarUrl ?? undefined,
+  };
+
+  const tabContent: Partial<Record<ProfileTab, ReactNode>> = {
+    Overview: <OverviewTab />,
+    "About Me": (
+      <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
+        <AboutMeSection
+          value={profile?.about ?? ""}
+          onSave={(about) => updateProfile({ about })}
+        />
+      </div>
+    ),
+    "Employment & Availability": (
+      <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
+        <EmploymentSection />
+      </div>
+    ),
+    "Experience & Education": <ExperienceEducationTab />,
+    "Certificates & Awards": <CertificatesAwardsTab />,
+    "Languages & Skills": <LanguagesSkillsTab />,
+    "CV / Portfolio / Cover Letter": <CvPortfolioCoverTab />,
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F6F8]">
       <div className="max-w-[1340px] mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row gap-6">
         <ProfileSidebar
-          data={PROFILE_DATA}
+          data={sidebarData}
           onUploadCv={() => setActiveTab("CV / Portfolio / Cover Letter")}
         />
 
         <main className="w-full md:w-[calc(100%-21.25rem)]">
           <ProfileTabs active={activeTab} onChange={setActiveTab} />
-          {TAB_CONTENT[activeTab] ?? (
+          {tabContent[activeTab] ?? (
             <div className="bg-white rounded-b-xl border border-[#E5E7EB] px-6 py-16 text-center text-[13.5px] text-muted-foreground">
               {activeTab} content coming soon.
             </div>

@@ -34,6 +34,13 @@ interface OfficeLocation {
   createdAt: string
 }
 
+interface InviteLinkResult {
+  inviteUrl: string
+  token: string
+  expiresAt: string | null
+  role: string
+}
+
 interface BulkInviteResult {
   total: number
   invitedCount: number
@@ -81,6 +88,16 @@ export const onboardingService = {
     api.post<{ success: boolean; data: OfficeLocation }>(
       "/onboarding/office-location",
       { companyId, name },
+      { Authorization: `Bearer ${accessToken}` }
+    ),
+
+  generateInviteLink: (
+    accessToken: string,
+    opts?: { role?: "HR_ADMIN" | "HR_MANAGER" | "SUPER_ADMIN" | "EMPLOYEE"; maxUses?: number; expiresInDays?: number }
+  ) =>
+    api.post<{ success: boolean; data: InviteLinkResult }>(
+      "/onboarding/invite-link",
+      opts ?? {},
       { Authorization: `Bearer ${accessToken}` }
     ),
 

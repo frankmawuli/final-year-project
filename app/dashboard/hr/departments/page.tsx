@@ -61,15 +61,6 @@ function getColorKey(id: number): string {
   return COLOR_KEYS[id % COLOR_KEYS.length]
 }
 
-function getCompanyIdFromToken(token: string): string | null {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]))
-    return payload.companyId ?? payload.company_id ?? payload.organizationId ?? null
-  } catch {
-    return null
-  }
-}
-
 function mapDept(a: {
   id: number
   name: string
@@ -529,10 +520,8 @@ export default function DepartmentsPage() {
       const updated = mapDept({ ...res.data, _count: { employees: existing.memberCount } })
       setDepartments((prev) => prev.map((d) => (d.id === existing.id ? updated : d)))
     } else {
-      const companyId = getCompanyIdFromToken(accessToken)
-      if (!companyId) throw new Error("Company ID not found in session. Please log out and back in.")
       const res = await departmentService.create(
-        { companyId, name: payload.name, description: payload.description || undefined },
+        { name: payload.name, description: payload.description || undefined },
         accessToken,
       )
       setDepartments((prev) => [...prev, mapDept(res.data)])

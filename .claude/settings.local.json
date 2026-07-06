@@ -36,7 +36,12 @@
       "Bash(dir D:\\\\core-recruiter\\\\lib *)",
       "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
       "Bash(grep -E \"\\\\.\\(ts|tsx|js|jsx\\)$\")",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(rm -f /d/core-recruiter-server1/_smoke-activity.mjs /d/core-recruiter-server1/_smoke-cleanup.mjs)",
+      "Bash(rm -f \"/c/Users/Lenovo/AppData/Local/Temp/claude/d--core-recruiter/94d4463c-d05c-4634-9e39-0525c34179a0/scratchpad/smoke-activity.mjs\")"
+    ],
+    "additionalDirectories": [
+      "d:\\core-recruiter-server1\\src\\Modules\\hr-admin"
     ]
   }
 }

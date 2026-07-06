@@ -11,7 +11,8 @@
       "Read(//d/core-recruiter-server1/src/Modules/authentication/**)",
       "Bash(find /d/core-recruiter-server1/src -iname \"*router*\" -o -iname \"*route*\" | grep -v node_modules)",
       "Read(//d/core-recruiter-server1/src/**)",
-      "Read(//d/core-recruiter-server1/src/routes/**)"
+      "Read(//d/core-recruiter-server1/src/routes/**)",
+      "Read(//d/core-recruiter-server1/node_modules/pdf-parse/dist/pdf-parse/esm/**)"
     ],
     "additionalDirectories": [
       "D:\\core-recruiter-server1\\src\\Modules\\applicant",

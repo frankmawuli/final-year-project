@@ -4,12 +4,13 @@ import { useState, useRef, useEffect } from "react"
 import {
   Search, SlidersHorizontal, Plus, X, MoreHorizontal,
   Phone, MessageSquare, User, Mail, MapPin, Building2,
-  Calendar, IdCard, ChevronLeft, ChevronRight,
+  Calendar, IdCard, ChevronLeft, ChevronRight, Banknote,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { useAuth } from "@/context/auth-context"
 import { employeeService, type ApiEmployee, type EmploymentType } from "@/services/employee.service"
+import { payrollService, type ApiCompensation } from "@/services/payroll.service"
 
 // ── Constants ─────────────────────────────────────────────────
 const DEFAULT_PHOTO = "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png"
@@ -268,6 +269,168 @@ function EmailModal({ emp, onClose }: { emp: Employee; onClose: () => void }) {
   )
 }
 
+// ── Compensation section (HR/payroll admins only) ─────────────
+// Saves independently of the employee form — compensation lives on its own
+// effective-dated record, so a salary change never rewrites employee data.
+function CompensationSection({ employeeId, onBack }: { employeeId: number; onBack?: () => void }) {
+  const { accessToken } = useAuth()
+
+  const [baseSalary,    setBaseSalary]    = useState("")
+  const [currency,      setCurrency]      = useState("GHS")
+  const [effectiveFrom, setEffectiveFrom] = useState(new Date().toISOString().slice(0, 10))
+  const [method,        setMethod]        = useState<"BANK" | "MOMO">("BANK")
+  const [bankName,      setBankName]      = useState("")
+  const [acctNumber,    setAcctNumber]    = useState("")
+  const [acctName,      setAcctName]      = useState("")
+  const [momoProvider,  setMomoProvider]  = useState("MTN")
+  const [momoNumber,    setMomoNumber]    = useState("")
+  const [saving,        setSaving]        = useState(false)
+  const [msg,           setMsg]           = useState<{ text: string; error: boolean } | null>(null)
+
+  useEffect(() => {
+    if (!accessToken) return
+    payrollService.getCompensation(String(employeeId), accessToken)
+      .then(({ data }) => {
+        setBaseSalary(String(data.baseSalary))
+        setCurrency(data.currency)
+        if (data.effectiveFrom) setEffectiveFrom(data.effectiveFrom.slice(0, 10))
+        setMethod(data.paymentMethod)
+        if (data.bank) {
+          setBankName(data.bank.bankName)
+          setAcctNumber(data.bank.accountNumber)
+          setAcctName(data.bank.accountName)
+        }
+        if (data.momo) {
+          setMomoProvider(data.momo.provider)
+          setMomoNumber(data.momo.number)
+        }
+      })
+      .catch(() => { /* no compensation record yet — start empty */ })
+  }, [accessToken, employeeId])
+
+  async function save() {
+    if (!accessToken) return
+    setSaving(true)
+    setMsg(null)
+    try {
+      await payrollService.updateCompensation(
+        String(employeeId),
+        {
+          baseSalary:    Number(baseSalary) || 0,
+          currency,
+          effectiveFrom,
+          paymentMethod: method,
+          ...(method === "BANK"
+            ? { bank: { bankName, accountNumber: acctNumber, accountName: acctName } }
+            : { momo: { provider: momoProvider, number: momoNumber } }),
+        },
+        accessToken,
+      )
+      setMsg({ text: "Compensation saved", error: false })
+    } catch (e: unknown) {
+      setMsg({ text: e instanceof Error ? e.message : "Failed to save compensation", error: true })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+  const labelCls = "mb-1 block text-xs font-medium text-foreground"
+
+  return (
+    <div>
+      <div className="mb-4 flex items-center gap-2">
+        <div className="flex size-8 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
+          <Banknote className="size-4 text-emerald-600 dark:text-emerald-400" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">Compensation</h3>
+          <p className="text-xs text-muted-foreground">Salary and payout details — visible to HR admins only</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className={labelCls}>Base Salary (monthly)</label>
+          <input className={inputCls} type="number" min="0" placeholder="0.00" value={baseSalary} onChange={(e) => setBaseSalary(e.target.value)} />
+        </div>
+        <div>
+          <label className={labelCls}>Currency</label>
+          <select className={inputCls} value={currency} onChange={(e) => setCurrency(e.target.value)}>
+            {["GHS", "USD", "EUR", "GBP", "NGN"].map((c) => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Effective From</label>
+          <input className={inputCls} type="date" value={effectiveFrom} onChange={(e) => setEffectiveFrom(e.target.value)} />
+        </div>
+        <div>
+          <label className={labelCls}>Payment Method</label>
+          <select className={inputCls} value={method} onChange={(e) => setMethod(e.target.value as "BANK" | "MOMO")}>
+            <option value="BANK">Bank Transfer</option>
+            <option value="MOMO">Mobile Money</option>
+          </select>
+        </div>
+
+        {method === "BANK" ? (
+          <>
+            <div>
+              <label className={labelCls}>Bank</label>
+              <input className={inputCls} placeholder="e.g. GCB Bank" value={bankName} onChange={(e) => setBankName(e.target.value)} />
+            </div>
+            <div>
+              <label className={labelCls}>Account Number</label>
+              <input className={inputCls} placeholder="0000000000000" value={acctNumber} onChange={(e) => setAcctNumber(e.target.value)} />
+            </div>
+            <div className="col-span-2">
+              <label className={labelCls}>Account Name</label>
+              <input className={inputCls} placeholder="As it appears at the bank" value={acctName} onChange={(e) => setAcctName(e.target.value)} />
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <label className={labelCls}>Provider</label>
+              <select className={inputCls} value={momoProvider} onChange={(e) => setMomoProvider(e.target.value)}>
+                {["MTN", "Telecel Cash", "AT Money"].map((p) => <option key={p}>{p}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>MoMo Number</label>
+              <input className={inputCls} placeholder="024 000 0000" value={momoNumber} onChange={(e) => setMomoNumber(e.target.value)} />
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className={cn("mt-5 flex items-center gap-3", onBack ? "justify-between" : "justify-end")}>
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            <ChevronLeft className="size-4" /> Back
+          </button>
+        )}
+        <div className="flex items-center gap-3">
+          {msg && (
+            <p className={cn("text-xs font-medium", msg.error ? "text-rose-500" : "text-emerald-600")}>{msg.text}</p>
+          )}
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving || !baseSalary}
+            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+          >
+            {saving ? "Saving…" : "Save Compensation"}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Add / Edit Employee Modal ─────────────────────────────────
 function EmployeeFormModal({
   initial,
@@ -279,6 +442,8 @@ function EmployeeFormModal({
   onSave:   (payload: FormPayload) => Promise<void>
 }) {
   const isEdit = Boolean(initial)
+  // Edit is a 2-step flow: 1/2 employee details, 2/2 compensation
+  const [step, setStep] = useState<1 | 2>(1)
   const [form, setForm] = useState<FormPayload>({
     name:           initial?.name           ?? "",
     email:          initial?.email          ?? "",
@@ -292,17 +457,26 @@ function EmployeeFormModal({
   const [saving,  setSaving]  = useState(false)
   const [saveErr, setSaveErr] = useState<string | null>(null)
 
+  const initialForm = useRef(form).current
+  const dirty = JSON.stringify(form) !== JSON.stringify(initialForm)
+
   const set = (k: keyof FormPayload) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setForm((f) => ({ ...f, [k]: e.target.value }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Untouched edit form — just advance, nothing to save
+    if (isEdit && !dirty) {
+      setStep(2)
+      return
+    }
     setSaving(true)
     setSaveErr(null)
     try {
       await onSave(form)
-      onClose()
+      if (isEdit) setStep(2)
+      else onClose()
     } catch (err: unknown) {
       setSaveErr(err instanceof Error ? err.message : "Failed to save")
     } finally {
@@ -316,14 +490,24 @@ function EmployeeFormModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl bg-card p-6 shadow-2xl">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-card p-6 shadow-2xl">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">{isEdit ? "Edit Employee" : "Add New Employee"}</h2>
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-base font-semibold text-foreground">
+              {step === 1 ? (isEdit ? "Edit Employee" : "Add New Employee") : "Compensation"}
+            </h2>
+            {isEdit && (
+              <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+                {step}/2
+              </span>
+            )}
+          </div>
           <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
+        {step === 1 && (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             {/* Full Name — read-only on edit (name is on user record, not patchable) */}
@@ -404,11 +588,54 @@ function EmployeeFormModal({
               disabled={saving}
               className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
             >
-              {saving ? "Saving…" : isEdit ? "Save Changes" : "Add Employee"}
+              {saving ? "Saving…" : isEdit ? (dirty ? "Save & Continue" : "Next") : "Add Employee"}
             </button>
           </div>
         </form>
+        )}
+
+        {step === 2 && initial && (
+          <CompensationSection employeeId={initial.id} onBack={() => setStep(1)} />
+        )}
       </div>
+    </div>
+  )
+}
+
+// ── Compensation summary (read-only, profile panel) ───────────
+function CompensationSummary({ employeeId }: { employeeId: number }) {
+  const { accessToken } = useAuth()
+  const [comp, setComp] = useState<ApiCompensation | null>(null)
+
+  useEffect(() => {
+    if (!accessToken) return
+    payrollService.getCompensation(String(employeeId), accessToken)
+      .then(({ data }) => setComp(data))
+      .catch(() => setComp(null))
+  }, [accessToken, employeeId])
+
+  if (!comp) return null
+
+  const payout =
+    comp.paymentMethod === "MOMO" && comp.momo
+      ? `${comp.momo.provider} MoMo ••${comp.momo.number.slice(-4)}`
+      : comp.bank
+        ? `${comp.bank.bankName} ••${comp.bank.accountNumber.slice(-4)}`
+        : "Bank transfer"
+
+  return (
+    <div className="rounded-xl border border-border bg-muted/50 p-4">
+      <div className="mb-2 flex items-center gap-2">
+        <Banknote className="size-4 text-emerald-600 dark:text-emerald-400" />
+        <p className="text-sm font-semibold text-foreground">Compensation</p>
+      </div>
+      <p className="text-lg font-bold text-foreground">
+        {comp.currency} {comp.baseSalary.toLocaleString()}
+        <span className="text-xs font-normal text-muted-foreground"> /month</span>
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Paid via {payout} · effective {formatJoinDate(comp.effectiveFrom)}
+      </p>
     </div>
   )
 }
@@ -460,6 +687,8 @@ function ProfilePanel({ emp, onClose, onMessage }: { emp: Employee; onClose: () 
                 </div>
               ))}
           </div>
+
+          <CompensationSummary employeeId={emp.id} />
 
           {emp.bio && (
             <div>

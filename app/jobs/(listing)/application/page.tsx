@@ -1,21 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-type ApplicationStatus = "Under Review" | "Shortlisted" | "Interview" | "Hired" | "Rejected";
-
-interface Application {
-  id: string;
-  jobTitle: string;
-  company: string;
-  companyInitials: string;
-  jobType: "Full-time" | "Part-time" | "Contract" | "Internship";
-  location: string;
-  dateApplied: string;
-  status: ApplicationStatus;
-}
+import { useApplicantAuth } from "@/context/applicant-auth-context";
+import { applicantAuthService, type MyApplication, type MyApplicationStatus } from "@/services/applicant-auth.service";
 
 const LOGO_COLORS = [
   "#1B5E20", "#E65100", "#1565C0", "#0D47A1",
@@ -28,76 +18,49 @@ function logoColor(initials: string): string {
   return LOGO_COLORS[Math.abs(hash) % LOGO_COLORS.length];
 }
 
-const STATUS_STYLES: Record<ApplicationStatus, string> = {
-  "Under Review": "bg-amber-100 text-amber-700",
-  Shortlisted: "bg-blue-100 text-blue-700",
-  Interview: "bg-violet-100 text-violet-700",
-  Hired: "bg-emerald-100 text-emerald-700",
-  Rejected: "bg-rose-100 text-rose-600",
+function companyInitials(name: string): string {
+  const words = name.trim().split(/\s+/);
+  return (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 2)).toUpperCase();
+}
+
+const STATUS_LABELS: Record<MyApplicationStatus, string> = {
+  PENDING_REVIEW: "Under Review",
+  SHORTLISTED: "Shortlisted",
+  INTERVIEW: "Interview",
+  ACCEPTED: "Hired",
+  APPROVED: "Hired",
+  REJECTED: "Rejected",
 };
 
-const APPLICATIONS: Application[] = [
-  {
-    id: "1",
-    jobTitle: "Frontend Developer",
-    company: "Flutterwave",
-    companyInitials: "FW",
-    jobType: "Full-time",
-    location: "Lagos, Nigeria",
-    dateApplied: "18 Jun 2026",
-    status: "Interview",
-  },
-  {
-    id: "2",
-    jobTitle: "UI/UX Designer",
-    company: "Paystack",
-    companyInitials: "PS",
-    jobType: "Full-time",
-    location: "Remote",
-    dateApplied: "15 Jun 2026",
-    status: "Shortlisted",
-  },
-  {
-    id: "3",
-    jobTitle: "Backend Engineer (Node.js)",
-    company: "Andela",
-    companyInitials: "AN",
-    jobType: "Contract",
-    location: "Accra, Ghana",
-    dateApplied: "10 Jun 2026",
-    status: "Under Review",
-  },
-  {
-    id: "4",
-    jobTitle: "Product Designer",
-    company: "Piggyvest",
-    companyInitials: "PV",
-    jobType: "Full-time",
-    location: "Lagos, Nigeria",
-    dateApplied: "05 Jun 2026",
-    status: "Rejected",
-  },
-  {
-    id: "5",
-    jobTitle: "Full Stack Developer",
-    company: "Moniepoint",
-    companyInitials: "MP",
-    jobType: "Full-time",
-    location: "Remote",
-    dateApplied: "29 May 2026",
-    status: "Hired",
-  },
-  {
-    id: "6",
-    jobTitle: "Mobile Developer (Flutter)",
-    company: "Bolt",
-    companyInitials: "BT",
-    jobType: "Internship",
-    location: "Nairobi, Kenya",
-    dateApplied: "22 May 2026",
-    status: "Under Review",
-  },
-];
+const STATUS_STYLES: Record<MyApplicationStatus, string> = {
+  PENDING_REVIEW: "bg-amber-100 text-amber-700",
+  SHORTLISTED: "bg-blue-100 text-blue-700",
+  INTERVIEW: "bg-violet-100 text-violet-700",
+  ACCEPTED: "bg-emerald-100 text-emerald-700",
+  APPROVED: "bg-emerald-100 text-emerald-700",
+  REJECTED: "bg-rose-100 text-rose-600",
+};
+
+const JOB_TYPE_LABELS: Record<MyApplication["job"]["type"], string> = {
+  FULL_TIME: "Full-time",
+  PART_TIME: "Part-time",
+  CONTRACT: "Contract",
+  INTERNSHIP: "Internship",
+};
+
+const WORK_LOCATION_LABELS: Record<MyApplication["job"]["workLocation"], string> = {
+  REMOTE: "Remote",
+  ON_SITE: "On-site",
+  HYBRID: "Hybrid",
+};
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 function CompanyLogo({ initials }: { initials: string }) {
   return (
@@ -111,10 +74,35 @@ function CompanyLogo({ initials }: { initials: string }) {
 }
 
 export default function ApplicationPage() {
+  const { accessToken } = useApplicantAuth();
   const [search, setSearch] = useState("");
+  const [applications, setApplications] = useState<MyApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filtered = APPLICATIONS.filter((app) =>
-    `${app.jobTitle} ${app.company}`.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    if (!accessToken) return;
+    let cancelled = false;
+    applicantAuthService
+      .getMyApplications(accessToken)
+      .then((res) => {
+        if (!cancelled) setApplications(res.data);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load applications.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken]);
+
+  const filtered = applications.filter((app) =>
+    `${app.job.title} ${app.job.company.name}`.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -124,7 +112,9 @@ export default function ApplicationPage() {
           <div>
             <h1 className="text-[22px] font-bold text-foreground leading-tight">My Applications</h1>
             <p className="text-[13px] text-muted-foreground mt-0.5">
-              {filtered.length} {filtered.length === 1 ? "application" : "applications"}
+              {loading
+                ? "Loading…"
+                : `${filtered.length} ${filtered.length === 1 ? "application" : "applications"}`}
             </p>
           </div>
           <div className="relative w-full max-w-[260px]">
@@ -139,65 +129,107 @@ export default function ApplicationPage() {
         </div>
 
         <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] text-left">
-              <thead>
-                <tr className="border-b border-[#E5E7EB]">
-                  <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Job
-                  </th>
-                  <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Company
-                  </th>
-                  <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Job Type
-                  </th>
-                  <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Location
-                  </th>
-                  <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Date Applied
-                  </th>
-                  <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#F3F4F6]">
-                {filtered.map((app) => (
-                  <tr key={app.id} className="hover:bg-[#F9FAFB] transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <CompanyLogo initials={app.companyInitials} />
-                        <span className="text-[13.5px] font-medium text-foreground">{app.jobTitle}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-[13px] text-muted-foreground">{app.company}</td>
-                    <td className="px-6 py-4 text-[13px] text-muted-foreground">{app.jobType}</td>
-                    <td className="px-6 py-4 text-[13px] text-muted-foreground">{app.location}</td>
-                    <td className="px-6 py-4 text-[13px] text-muted-foreground">{app.dateApplied}</td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={cn(
-                          "inline-flex rounded-full px-2.5 py-1 text-[11.5px] font-semibold",
-                          STATUS_STYLES[app.status]
-                        )}
-                      >
-                        {app.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {filtered.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Search className="w-8 h-8 text-[#D1D5DB] mb-3" />
-              <p className="text-[14px] font-semibold text-foreground mb-1">No applications found</p>
-              <p className="text-[13px] text-muted-foreground">Try a different search term.</p>
+          {loading ? (
+            <div className="flex items-center justify-center gap-2 py-16 text-[13px] text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" /> Loading your applications…
             </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <p className="text-[14px] font-semibold text-foreground mb-1">
+                Could not load applications
+              </p>
+              <p className="text-[13px] text-muted-foreground">{error}</p>
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[760px] text-left">
+                  <thead>
+                    <tr className="border-b border-[#E5E7EB]">
+                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Job
+                      </th>
+                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Company
+                      </th>
+                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Job Type
+                      </th>
+                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Location
+                      </th>
+                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Date Applied
+                      </th>
+                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#F3F4F6]">
+                    {filtered.map((app) => {
+                      const initials = companyInitials(app.job.company.name);
+                      return (
+                        <tr key={app.id} className="hover:bg-[#F9FAFB] transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <CompanyLogo initials={initials} />
+                              <span className="text-[13.5px] font-medium text-foreground">
+                                {app.job.title}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-[13px] text-muted-foreground">
+                            {app.job.company.name}
+                          </td>
+                          <td className="px-6 py-4 text-[13px] text-muted-foreground">
+                            {JOB_TYPE_LABELS[app.job.type]}
+                          </td>
+                          <td className="px-6 py-4 text-[13px] text-muted-foreground">
+                            {WORK_LOCATION_LABELS[app.job.workLocation]}
+                          </td>
+                          <td className="px-6 py-4 text-[13px] text-muted-foreground">
+                            {formatDate(app.appliedAt)}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={cn(
+                                "inline-flex rounded-full px-2.5 py-1 text-[11.5px] font-semibold",
+                                STATUS_STYLES[app.status]
+                              )}
+                            >
+                              {STATUS_LABELS[app.status]}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {filtered.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <Search className="w-8 h-8 text-[#D1D5DB] mb-3" />
+                  <p className="text-[14px] font-semibold text-foreground mb-1">
+                    {applications.length === 0 ? "No applications yet" : "No applications found"}
+                  </p>
+                  <p className="text-[13px] text-muted-foreground">
+                    {applications.length === 0 ? (
+                      <>
+                        Browse the{" "}
+                        <Link href="/jobs/job-listing" className="font-medium text-primary underline">
+                          job listing
+                        </Link>{" "}
+                        and apply to get started.
+                      </>
+                    ) : (
+                      "Try a different search term."
+                    )}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -63,7 +63,7 @@ export const departmentService = {
   },
 
   create: (
-    body: { companyId: string; name: string; description?: string },
+    body: { name: string; description?: string },
     token: string,
   ) =>
     api.post<{ success: boolean; data: ApiDepartment }>("/departments", body, {

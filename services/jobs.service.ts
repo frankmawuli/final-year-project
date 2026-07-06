@@ -125,7 +125,7 @@ export interface ApiApplication {
   documents: { id: string; url: string; type: string }[]
 }
 
-export type ApiApplicantStatus = "PENDING_REVIEW" | "INTERVIEW" | "ACCEPTED" | "APPROVED" | "REJECTED"
+export type ApiApplicantStatus = "PENDING_REVIEW" | "SHORTLISTED" | "INTERVIEW" | "ACCEPTED" | "APPROVED" | "REJECTED"
 
 export interface ApiApplicant {
   id:             string

@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { Banknote, ChevronDown, Trash2, Plus } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Banknote, Landmark, ChevronDown, Trash2, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { payrollService, type ApiPayrollSettings } from "@/services/payroll.service"
 
 // ── Types ─────────────────────────────────────────────────────
 type Allowance = { id: number; name: string; amount: string }
@@ -80,14 +82,28 @@ function Row({
   )
 }
 
-function SaveRow({ onSave }: { onSave: () => void }) {
+function SaveRow({
+  onSave,
+  saving,
+  message,
+}: {
+  onSave:   () => void
+  saving:   boolean
+  message:  { text: string; error: boolean } | null
+}) {
   return (
-    <div className="flex justify-end pt-2">
+    <div className="flex items-center justify-end gap-4 pt-2">
+      {message && (
+        <p className={cn("text-sm", message.error ? "text-rose-500" : "text-emerald-600")}>
+          {message.text}
+        </p>
+      )}
       <button
         onClick={onSave}
-        className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+        disabled={saving}
+        className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
       >
-        Save changes
+        {saving ? "Saving…" : "Save changes"}
       </button>
     </div>
   )
@@ -102,6 +118,8 @@ const selectCls =
 
 // ── Page ──────────────────────────────────────────────────────
 export default function Payroll() {
+  const { accessToken } = useAuth()
+
   const [payCycle,       setPayCycle]       = useState("Monthly")
   const [payDay,         setPayDay]         = useState("25")
   const [payMethod,      setPayMethod]      = useState("Bank Transfer")
@@ -114,12 +132,122 @@ export default function Payroll() {
   const [autoProcess,    setAutoProcess]    = useState(false)
   const [requireApproval,setRequireApproval]= useState(true)
 
-  function onSave() {
-    // TODO: persist settings
+  // Company funding account — printed on the bank advice file as the debit account
+  const [bankName,       setBankName]       = useState("")
+  const [bankBranch,     setBankBranch]     = useState("")
+  const [acctName,       setAcctName]       = useState("")
+  const [acctNumber,     setAcctNumber]     = useState("")
+
+  const [saving,  setSaving]  = useState(false)
+  const [message, setMessage] = useState<{ text: string; error: boolean } | null>(null)
+
+  useEffect(() => {
+    if (!accessToken) return
+    payrollService.getSettings(accessToken)
+      .then(({ data }) => {
+        setPayCycle(data.payCycle)
+        setPayDay(String(data.payDay))
+        setPayMethod(data.payMethod)
+        setTaxScheme(data.taxScheme)
+        setPensionPct(String(data.pensionPct))
+        setAutoProcess(data.autoProcess)
+        setRequireApproval(data.requireApproval)
+        setAllowances(data.allowances.map((a, i) => ({
+          id:     a.id ?? i + 1,
+          name:   a.name,
+          amount: String(a.amount),
+        })))
+        if (data.fundingAccount) {
+          setBankName(data.fundingAccount.bankName)
+          setBankBranch(data.fundingAccount.branch)
+          setAcctName(data.fundingAccount.accountName)
+          setAcctNumber(data.fundingAccount.accountNumber)
+        }
+      })
+      .catch(() => { /* endpoint not live yet — keep defaults */ })
+  }, [accessToken])
+
+  async function onSave() {
+    if (!accessToken) return
+    setSaving(true)
+    setMessage(null)
+
+    const body: Partial<ApiPayrollSettings> = {
+      payCycle:        payCycle as ApiPayrollSettings["payCycle"],
+      payDay:          Number(payDay),
+      payMethod:       payMethod as ApiPayrollSettings["payMethod"],
+      taxScheme,
+      pensionPct:      Number(pensionPct),
+      autoProcess,
+      requireApproval,
+      allowances:      allowances
+        .filter((a) => a.name.trim())
+        .map((a) => ({ name: a.name.trim(), amount: Number(a.amount) || 0 })),
+      fundingAccount:  bankName.trim() || acctNumber.trim()
+        ? { bankName: bankName.trim(), branch: bankBranch.trim(), accountName: acctName.trim(), accountNumber: acctNumber.trim() }
+        : null,
+    }
+
+    try {
+      await payrollService.updateSettings(body, accessToken)
+      setMessage({ text: "Settings saved", error: false })
+    } catch (e: unknown) {
+      setMessage({ text: e instanceof Error ? e.message : "Failed to save settings", error: true })
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
     <div className="flex flex-col gap-6">
+      <Card title="Company Funding Account" subtitle="Account salaries are paid from — shown on the bank advice file" icon={Landmark}>
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Bank Name</label>
+              <input
+                value={bankName}
+                onChange={e => setBankName(e.target.value)}
+                className={inputCls}
+                placeholder="e.g. GCB Bank"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Branch</label>
+              <input
+                value={bankBranch}
+                onChange={e => setBankBranch(e.target.value)}
+                className={inputCls}
+                placeholder="e.g. Ring Road Central"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Account Name</label>
+              <input
+                value={acctName}
+                onChange={e => setAcctName(e.target.value)}
+                className={inputCls}
+                placeholder="Company legal name"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Account Number</label>
+              <input
+                value={acctNumber}
+                onChange={e => setAcctNumber(e.target.value)}
+                className={inputCls}
+                placeholder="0123456789012"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Funds are never moved by this app — payroll runs generate a bank advice file that you upload to your corporate internet banking to execute payments.
+          </p>
+        </div>
+      </Card>
+
       <Card title="Pay Cycle" subtitle="Define how and when salaries are disbursed" icon={Banknote}>
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">
@@ -233,7 +361,7 @@ export default function Payroll() {
         </div>
       </Card>
 
-      <SaveRow onSave={onSave} />
+      <SaveRow onSave={onSave} saving={saving} message={message} />
     </div>
   )
 }

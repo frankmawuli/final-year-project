@@ -16,8 +16,17 @@ import {
   Trash2,
   Link as LinkIcon,
   Users,
+  Copy,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useAuth } from "@/context/auth-context"
 import { onboardingService } from "@/services/onboarding.service"
 import { ApiError } from "@/lib/api-client"
@@ -446,11 +455,11 @@ function Step3({ data, onChange }: { data: Step3Data; onChange: (next: Step3Data
   )
 }
 
-function Step4({ data, onChange, departments, csvFile, onCsvFileChange }: {
+function Step4({ data, onChange, departments, csvFile, onCsvFileChange, inviteMethod, onInviteMethodChange }: {
   data: Step4Data; onChange: (next: Step4Data) => void; departments: string[]
   csvFile: File | null; onCsvFileChange: (file: File | null) => void
+  inviteMethod: "csv" | "link"; onInviteMethodChange: (method: "csv" | "link") => void
 }) {
-  const [inviteMethod, setInviteMethod] = useState<"csv" | "link">("csv")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   return (
@@ -463,7 +472,7 @@ function Step4({ data, onChange, departments, csvFile, onCsvFileChange }: {
             { id: "csv",  label: "Bulk Upload (CSV)", icon: Users },
             { id: "link", label: "Generate Link",     icon: LinkIcon },
           ] as const).map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" onClick={() => setInviteMethod(id)}
+            <button key={id} type="button" onClick={() => onInviteMethodChange(id)}
               className={cn(
                 "flex flex-1 items-center justify-center gap-2 rounded-lg border py-2.5 text-[12px] font-medium transition-colors",
                 inviteMethod === id
@@ -531,17 +540,13 @@ function Step4({ data, onChange, departments, csvFile, onCsvFileChange }: {
       {inviteMethod === "link" && (
         <div className="rounded-lg border border-border bg-muted p-4">
           <p className="mb-3 text-[13px] text-foreground">
-            Share this link with your team. Anyone with the link can create their account and join your workspace.
+            Share a link with your team. Anyone with the link can create their account and join your workspace.
           </p>
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5">
+          <div className="flex items-center gap-2 rounded-lg border border-dashed border-border bg-card px-3 py-2.5">
             <LinkIcon className="size-4 shrink-0 text-muted-foreground" />
             <span className="flex-1 truncate text-[12px] text-muted-foreground">
-              https://app.corerecruiter.com/join/invite-link-placeholder
+              Your invite link will be generated when you complete setup.
             </span>
-            <button type="button"
-              className="shrink-0 rounded-md bg-primary px-3 py-1 text-[11px] font-medium text-primary-foreground hover:bg-primary/90">
-              Copy
-            </button>
           </div>
         </div>
       )}
@@ -650,6 +655,9 @@ export default function CompanyOnboardingPage() {
     inviteRows: [{ name: "", email: "", department: "", role: "", startDate: "" }],
   })
   const [csvFile, setCsvFile] = useState<File | null>(null)
+  const [inviteMethod, setInviteMethod] = useState<"csv" | "link">("csv")
+  const [inviteLink, setInviteLink] = useState<string | null>(null)
+  const [linkCopied, setLinkCopied] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -712,8 +720,18 @@ export default function CompanyOnboardingPage() {
         ),
       ])
 
-      if (csvFile) {
+      if (inviteMethod === "csv" && csvFile) {
         await onboardingService.bulkInvite(accessToken, csvFile)
+      }
+
+      if (inviteMethod === "link") {
+        try {
+          const linkRes = await onboardingService.generateInviteLink(accessToken)
+          setInviteLink(linkRes.data.inviteUrl)
+          return // success dialog shows the link; navigation happens on close
+        } catch {
+          // company is already set up — send them on; a link can be generated later
+        }
       }
 
       router.push("/dashboard/hr")
@@ -782,6 +800,8 @@ export default function CompanyOnboardingPage() {
                 departments={step3.departments}
                 csvFile={csvFile}
                 onCsvFileChange={setCsvFile}
+                inviteMethod={inviteMethod}
+                onInviteMethodChange={setInviteMethod}
               />
             )}
           </div>
@@ -820,6 +840,47 @@ export default function CompanyOnboardingPage() {
         </div>
 
       </div>
+
+      {/* Invite link dialog — shown once setup completes with the "Generate Link" method */}
+      <Dialog
+        open={!!inviteLink}
+        onOpenChange={(open) => { if (!open) router.push("/dashboard/hr") }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Your workspace is ready 🎉</DialogTitle>
+            <DialogDescription>
+              Share this link with your team. Anyone with the link can create their account and join your workspace.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted px-3 py-2.5">
+            <LinkIcon className="size-4 shrink-0 text-muted-foreground" />
+            <span className="flex-1 truncate text-[12px] text-foreground">{inviteLink}</span>
+            <button
+              type="button"
+              onClick={() => {
+                if (!inviteLink) return
+                navigator.clipboard.writeText(inviteLink)
+                setLinkCopied(true)
+                setTimeout(() => setLinkCopied(false), 2000)
+              }}
+              className="flex shrink-0 items-center gap-1 rounded-md bg-primary px-3 py-1 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              {linkCopied ? <Check className="size-3" /> : <Copy className="size-3" />}
+              {linkCopied ? "Copied" : "Copy"}
+            </button>
+          </div>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => router.push("/dashboard/hr")}
+              className="rounded-xl bg-primary px-5 py-2 text-[13px] font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              Go to Dashboard →
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

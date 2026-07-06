@@ -1,8 +1,7 @@
 "use client"
 
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import {
   MapPin, Briefcase, Clock, DollarSign, CalendarDays,
   CheckCircle2, Star, Building2, Globe, XCircle, Share2,
@@ -10,6 +9,8 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { jobsService, type PublicJobDetail } from "@/services/jobs.service"
+import { ApplyModal } from "@/components/jobs/apply-modal"
+import { useApplicantAuth } from "@/context/applicant-auth-context"
 import {
   PUBLIC_TYPE_LABEL,
   PUBLIC_LEVEL_LABEL,
@@ -67,15 +68,27 @@ function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label:
 
 export default function JobDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const id = String(params.id ?? "")
+  const { isAuthenticated } = useApplicantAuth()
 
-  const [job,     setJob]     = useState<PublicJobDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState<string | null>(null)
+  const [job,       setJob]       = useState<PublicJobDetail | null>(null)
+  const [loading,   setLoading]   = useState(true)
+  const [error,     setError]     = useState<string | null>(null)
+  const [applyOpen, setApplyOpen] = useState(false)
+
+  // Logged-in applicants pick between quick apply and the form; everyone else
+  // goes straight to the form as before.
+  function handleApply() {
+    if (isAuthenticated) {
+      setApplyOpen(true)
+    } else {
+      router.push(`/apply/apply?jobId=${id}`)
+    }
+  }
 
   useEffect(() => {
     if (!id) return
-    setLoading(true)
     jobsService.getPublicById(id)
       .then((res) => setJob(res.data))
       .catch((e: unknown) => setError(e instanceof Error ? e.message : "Failed to load job"))
@@ -104,15 +117,17 @@ export default function JobDetailPage() {
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
       {/* Sticky apply bar – mobile only */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card p-3 shadow-lg lg:hidden">
-        <Link
-          href={`/apply/apply?jobId=${id}`}
+        <button
+          onClick={handleApply}
           className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
         >
           <ClipboardList className="size-4" />
           Apply Now
-        </Link>
+        </button>
       </div>
+
+      <ApplyModal jobId={id} jobTitle={job.title} open={applyOpen} onOpenChange={setApplyOpen} />
 
       <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
         <div className="mx-auto max-w-7xl p-4 sm:p-6">
@@ -234,14 +249,14 @@ export default function JobDetailPage() {
 
               {/* Action buttons */}
               <div className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-4 shadow-sm">
-                <Link
-                  href={`/apply/apply?jobId=${id}`}
+                <button
+                  onClick={handleApply}
                   className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
                 >
                   <ClipboardList className="size-4" />
                   Apply Now
-                </Link>
+                </button>
                 <button
                   onClick={() => navigator.clipboard.writeText(window.location.href)}
                   className="flex items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
