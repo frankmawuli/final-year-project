@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { Suspense, useState, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
   Upload,
@@ -1014,6 +1014,14 @@ function SuccessScreen({ onBack }: { onBack: () => void }) {
 
 // ── Main page ───────────────────────────────────────────────────
 export default function JobApplicationPage() {
+  return (
+    <Suspense fallback={null}>
+      <JobApplicationForm />
+    </Suspense>
+  )
+}
+
+function JobApplicationForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const jobId = searchParams.get("jobId") ?? ""
