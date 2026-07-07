@@ -243,85 +243,85 @@ function PreviewModal({ doc, onClose }: { doc: Document; onClose: () => void }) 
   const catBg   = categoryBg[doc.category]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 backdrop-blur-sm">
       <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-border px-6 py-5">
-          <div className="flex items-start gap-4">
+        <div className="flex items-start justify-between border-b border-border px-5 py-4">
+          <div className="flex items-start gap-3">
             <div className={cn("flex size-11 shrink-0 items-center justify-center rounded-xl", catBg)}>
               <Icon className="size-5" style={{ color: catClr }} />
             </div>
             <div>
               <p className="font-semibold text-foreground">{doc.name}</p>
-              <div className="mt-1 flex flex-wrap items-center gap-2">
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
                 <span
-                  className="rounded-full px-2 py-0.5 text-[11px] font-semibold text-white"
+                  className="rounded-full px-1.5 py-0.5 text-[11px] font-semibold text-white"
                   style={{ backgroundColor: catClr }}
                 >
                   {doc.category}
                 </span>
-                <span className={cn("flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold", statusBadge[doc.status])}>
+                <span className={cn("flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-semibold", statusBadge[doc.status])}>
                   {statusIcon[doc.status]} {doc.status}
                 </span>
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
         {/* Preview area */}
-        <div className="mx-6 mt-5 overflow-hidden rounded-xl border border-border bg-muted/30">
+        <div className="mx-5 mt-4 overflow-hidden rounded-xl border border-border bg-muted/30">
           {/* Fake document viewer toolbar */}
-          <div className="flex items-center justify-between border-b border-border bg-white px-4 py-2.5">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between border-b border-border bg-white px-3 py-2">
+            <div className="flex items-center gap-1.5">
               <FIcon className={cn("size-4", fileTypeColor[doc.fileType])} />
               <span className="text-xs font-medium text-foreground">{doc.name}.{doc.fileType}</span>
             </div>
             <span className="text-xs text-muted-foreground">{doc.size}</span>
           </div>
           {/* Simulated document body */}
-          <div className="flex min-h-[180px] flex-col items-center justify-center gap-4 p-6">
+          <div className="flex min-h-[180px] flex-col items-center justify-center gap-3 p-5">
             <div className="flex size-14 items-center justify-center rounded-2xl" style={{ backgroundColor: catBg.replace("bg-[", "").replace("]", "") }}>
               <Icon className="size-7" style={{ color: catClr }} />
             </div>
             <div className="max-w-xs text-center">
-              <p className="text-sm font-medium text-foreground">{doc.name}</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{doc.preview}</p>
+              <p className="text-xs font-medium text-foreground">{doc.name}</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{doc.preview}</p>
             </div>
-            <span className="mt-1 rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
+            <span className="mt-1 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
               {doc.fileType.toUpperCase()} · {doc.size}
             </span>
           </div>
         </div>
 
         {/* Meta */}
-        <div className="mx-6 mt-4 grid grid-cols-2 gap-3">
+        <div className="mx-5 mt-3 grid grid-cols-2 gap-2.5">
           {[
             { label: "Issued by",   value: doc.issuedBy  },
             { label: "Issued on",   value: doc.issuedOn  },
             ...(doc.expiresOn ? [{ label: "Expires on", value: doc.expiresOn }] : []),
             { label: "File type",   value: doc.fileType.toUpperCase() },
           ].map((m) => (
-            <div key={m.label} className="rounded-lg bg-muted/40 px-3 py-2.5">
+            <div key={m.label} className="rounded-lg bg-muted/40 px-2.5 py-2">
               <p className="text-[11px] text-muted-foreground">{m.label}</p>
-              <p className="mt-0.5 text-sm font-medium text-foreground">{m.value}</p>
+              <p className="mt-0.5 text-xs font-medium text-foreground">{m.value}</p>
             </div>
           ))}
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 px-6 py-5">
+        <div className="flex gap-2.5 px-5 py-4">
           <button
             onClick={onClose}
-            className="flex-1 rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+            className="flex-1 rounded-lg border border-border py-2 text-xs font-medium text-foreground hover:bg-muted"
           >
             Close
           </button>
           <button
             onClick={() => downloadDoc(doc)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-white hover:opacity-90"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-semibold text-white hover:opacity-90"
           >
             <Download className="size-4" />
             Download
@@ -340,25 +340,25 @@ function DocCard({ doc, onPreview }: { doc: Document; onPreview: () => void }) {
   const bg    = categoryBg[doc.category]
 
   return (
-    <div className="group flex flex-col rounded-2xl border border-border bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+    <div className="group flex flex-col rounded-2xl border border-border bg-white p-3 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
       {/* Top row */}
-      <div className="mb-3 flex items-start justify-between gap-2">
+      <div className="mb-2.5 flex items-start justify-between gap-1.5">
         <div className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", bg)}>
           <Icon className="size-5" style={{ color: clr }} />
         </div>
-        <span className={cn("flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", statusBadge[doc.status])}>
+        <span className={cn("flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold", statusBadge[doc.status])}>
           {statusIcon[doc.status]}{doc.status}
         </span>
       </div>
 
       {/* Name */}
-      <p className="mb-0.5 text-sm font-semibold leading-snug text-foreground line-clamp-2">
+      <p className="mb-0.5 text-xs font-semibold leading-snug text-foreground line-clamp-2">
         {doc.name}
       </p>
       <p className="text-xs text-muted-foreground">{doc.issuedBy}</p>
 
       {/* Meta row */}
-      <div className="mt-2 flex items-center gap-2">
+      <div className="mt-1.5 flex items-center gap-1.5">
         <FIcon className={cn("size-3.5 shrink-0", fileTypeColor[doc.fileType])} />
         <span className="text-[11px] text-muted-foreground">{doc.fileType.toUpperCase()} · {doc.size}</span>
       </div>
@@ -373,17 +373,17 @@ function DocCard({ doc, onPreview }: { doc: Document; onPreview: () => void }) {
       )}
 
       {/* Actions */}
-      <div className="mt-auto flex gap-2 pt-3">
+      <div className="mt-auto flex gap-1.5 pt-2.5">
         <button
           onClick={onPreview}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-xs font-medium text-foreground hover:bg-muted"
+          className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border py-1.5 text-xs font-medium text-foreground hover:bg-muted"
         >
           <Eye className="size-3.5" />
           Preview
         </button>
         <button
           onClick={() => downloadDoc(doc)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-semibold text-white hover:opacity-90"
+          className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary py-1.5 text-xs font-semibold text-white hover:opacity-90"
         >
           <Download className="size-3.5" />
           Download
@@ -415,18 +415,18 @@ export default function DocumentsPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Mobile title */}
-      <div className="border-b border-border bg-white px-4 py-3 lg:hidden">
-        <h1 className="text-base font-semibold text-foreground">My Documents</h1>
+      <div className="border-b border-border bg-white px-3 py-2.5 lg:hidden">
+        <h1 className="text-sm font-semibold text-foreground">My Documents</h1>
         <p className="mt-0.5 text-xs text-muted-foreground">Documents › All</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+      <div className="flex-1 overflow-y-auto p-3 md:p-5 lg:p-6">
 
         {/* ── Stats row ── */}
      
         {/* ── Category tabs + search ── */}
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-1.5">
+        <div className="mb-3 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap gap-1">
             {TABS.map((tab) => {
               const count = tab === "All" ? docs.length : docs.filter((d) => d.category === tab).length
               return (
@@ -434,7 +434,7 @@ export default function DocumentsPage() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors",
+                    "flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-colors",
                     activeTab === tab
                       ? "bg-primary text-white"
                       : "border border-border bg-white text-muted-foreground hover:bg-muted"
@@ -442,7 +442,7 @@ export default function DocumentsPage() {
                 >
                   {tab}
                   <span className={cn(
-                    "rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+                    "rounded-full px-1 py-0.5 text-[10px] font-bold",
                     activeTab === tab ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
                   )}>
                     {count}
@@ -452,14 +452,14 @@ export default function DocumentsPage() {
             })}
           </div>
 
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 shadow-sm">
+          <div className="flex items-center gap-1.5 rounded-lg border border-border bg-white px-2.5 py-1.5 shadow-sm">
             <Search className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search documents…"
-              className="w-40 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              className="w-40 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
             />
             {search && (
               <button onClick={() => setSearch("")} className="text-muted-foreground hover:text-foreground">
@@ -471,15 +471,15 @@ export default function DocumentsPage() {
 
         {/* ── Document grid ── */}
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((doc) => (
               <DocCard key={doc.id} doc={doc} onPreview={() => setPreview(doc)} />
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-white py-20">
-            <FileText className="mb-3 size-10 text-muted-foreground/40" />
-            <p className="text-sm font-medium text-muted-foreground">No documents found</p>
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-white py-16">
+            <FileText className="mb-2.5 size-10 text-muted-foreground/40" />
+            <p className="text-xs font-medium text-muted-foreground">No documents found</p>
             <p className="mt-1 text-xs text-muted-foreground">Try a different category or search term</p>
           </div>
         )}

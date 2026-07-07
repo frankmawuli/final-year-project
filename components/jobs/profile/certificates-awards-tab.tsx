@@ -43,19 +43,19 @@ export function CertificatesAwardsTab() {
 
   return (
     <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Certificates & Awards</h3>
-        <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
           Add certifications, licenses, or awards you&apos;ve earned, along with a copy of the
           certificate (PDF or image).
         </p>
 
         {certificates.length > 0 && (
-          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
             {certificates.map((cert) => (
               <div
                 key={cert.id}
-                className="flex items-start gap-3 rounded-xl border border-[#E5E7EB] p-4"
+                className="flex items-start gap-2.5 rounded-xl border border-[#E5E7EB] p-3"
               >
                 {cert.file.type.startsWith("image/") ? (
                   <img
@@ -90,8 +90,8 @@ export function CertificatesAwardsTab() {
           </div>
         )}
 
-        <div className="mt-6 flex justify-center">
-          <Button size="sm" className="rounded-full px-4" onClick={() => setAdding(true)}>
+        <div className="mt-5 flex justify-center">
+          <Button size="sm" className="rounded-full px-3" onClick={() => setAdding(true)}>
             <Plus className="size-3.5" />
             Add
           </Button>

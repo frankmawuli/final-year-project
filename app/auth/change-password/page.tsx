@@ -64,34 +64,34 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="flex items-center gap-2">
+    <div className="flex min-h-screen items-center justify-center bg-background px-5 py-10">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="flex items-center gap-1.5">
           <Logo width={52} height={52} />
-          <span className="text-lg font-semibold">CoreRecruiter</span>
+          <span className="text-base font-semibold">CoreRecruiter</span>
         </div>
 
-        <div className="space-y-2">
-          <div className="mb-3 flex size-11 items-center justify-center rounded-xl bg-primary/10">
+        <div className="space-y-1.5">
+          <div className="mb-2.5 flex size-11 items-center justify-center rounded-xl bg-primary/10">
             <LockKeyhole className="size-5 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">Set a new password</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Set a new password</h2>
+          <p className="text-xs text-muted-foreground">
             {user?.mustChangePassword
               ? "You're using a temporary password. Choose a new one to continue."
               : "Enter your current password, then choose a new one."}
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-3" onSubmit={handleSubmit}>
           {error && (
-            <p className="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+            <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
               {error}
             </p>
           )}
 
-          <div className="space-y-1.5">
-            <label htmlFor="old-password" className="text-sm font-medium text-foreground">
+          <div className="space-y-1">
+            <label htmlFor="old-password" className="text-xs font-medium text-foreground">
               Current password
             </label>
             <div className="relative">
@@ -102,7 +102,7 @@ export default function ChangePasswordPage() {
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
                 placeholder="Temporary password from your email"
-                className="h-11 rounded-xl border-border bg-card px-4 pr-10 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                className="h-11 rounded-xl border-border bg-card px-3 pr-8 text-xs placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
               />
               <button
                 type="button"
@@ -114,8 +114,8 @@ export default function ChangePasswordPage() {
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="new-password" className="text-sm font-medium text-foreground">
+          <div className="space-y-1">
+            <label htmlFor="new-password" className="text-xs font-medium text-foreground">
               New password
             </label>
             <div className="relative">
@@ -126,7 +126,7 @@ export default function ChangePasswordPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
-                className="h-11 rounded-xl border-border bg-card px-4 pr-10 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                className="h-11 rounded-xl border-border bg-card px-3 pr-8 text-xs placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
               />
               <button
                 type="button"
@@ -141,8 +141,8 @@ export default function ChangePasswordPage() {
             </p>
           </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="confirm-password" className="text-sm font-medium text-foreground">
+          <div className="space-y-1">
+            <label htmlFor="confirm-password" className="text-xs font-medium text-foreground">
               Confirm new password
             </label>
             <Input
@@ -152,7 +152,7 @@ export default function ChangePasswordPage() {
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               placeholder="••••••••"
-              className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+              className="h-11 rounded-xl border-border bg-card px-3 text-xs placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
             />
           </div>
 
@@ -160,7 +160,7 @@ export default function ChangePasswordPage() {
             type="submit"
             size="lg"
             disabled={loading}
-            className="gradient-primary h-11 w-full rounded-xl border-0 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
+            className="gradient-primary h-11 w-full rounded-xl border-0 text-xs font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
           >
             {loading ? "Saving…" : "Change password"}
           </Button>

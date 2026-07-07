@@ -98,15 +98,15 @@ export function CertificateUploadForm({
 
   return (
     <div>
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Add Certificate</h3>
       </div>
 
-      <div className="border-t border-[#F3F4F6] px-6 py-6">
+      <div className="border-t border-[#F3F4F6] px-5 py-5">
         <FormLabel required>Certificate File</FormLabel>
         {file ? (
-          <div className="flex items-center justify-between rounded-xl border border-[#E5E7EB] px-4 py-3">
-            <div className="flex min-w-0 items-center gap-3">
+          <div className="flex items-center justify-between rounded-xl border border-[#E5E7EB] px-3 py-2.5">
+            <div className="flex min-w-0 items-center gap-2.5">
               {file.type.startsWith("image/") && preview ? (
                 <img src={preview} alt={file.name} className="h-10 w-10 shrink-0 rounded-lg object-cover" />
               ) : (
@@ -136,7 +136,7 @@ export function CertificateUploadForm({
               e.preventDefault();
               handleFile(e.dataTransfer.files?.[0]);
             }}
-            className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center hover:border-primary"
+            className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#D1D5DB] px-3 py-6 text-center hover:border-primary"
           >
             <UploadCloud className="size-6 text-muted-foreground" />
             <span className="text-[13px] font-medium text-foreground">Click to upload or drag and drop</span>
@@ -150,10 +150,10 @@ export function CertificateUploadForm({
             />
           </div>
         )}
-        {fileError && <p className="mt-2 text-[12.5px] text-destructive">{fileError}</p>}
+        {fileError && <p className="mt-1.5 text-[12.5px] text-destructive">{fileError}</p>}
       </div>
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 border-t border-[#F3F4F6] px-6 py-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-[#F3F4F6] px-5 py-5 sm:grid-cols-2">
         <div>
           <FormLabel required>Certificate / Award Title</FormLabel>
           <FormInput
@@ -172,10 +172,10 @@ export function CertificateUploadForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 border-t border-[#F3F4F6] px-6 py-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-[#F3F4F6] px-5 py-5 sm:grid-cols-2">
         <div>
           <FormLabel required>Issue date</FormLabel>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             <FormSelect value={issueMonth} onChange={(e) => setIssueMonth(e.target.value)}>
               <option value="" disabled>
                 Month
@@ -200,7 +200,7 @@ export function CertificateUploadForm({
         </div>
         <div>
           <FormLabel>Expiration date</FormLabel>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             <FormSelect
               value={expirationMonth}
               disabled={doesNotExpire}
@@ -230,7 +230,7 @@ export function CertificateUploadForm({
               ))}
             </FormSelect>
           </div>
-          <label className="mt-3 flex w-fit cursor-pointer items-center gap-2.5 text-[13.5px] text-foreground">
+          <label className="mt-2.5 flex w-fit cursor-pointer items-center gap-2 text-[13.5px] text-foreground">
             <input
               type="checkbox"
               checked={doesNotExpire}
@@ -242,7 +242,7 @@ export function CertificateUploadForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 border-t border-[#F3F4F6] px-6 py-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-[#F3F4F6] px-5 py-5 sm:grid-cols-2">
         <div>
           <FormLabel>Credential ID</FormLabel>
           <FormInput placeholder="Optional" value={credentialId} onChange={(e) => setCredentialId(e.target.value)} />
@@ -257,7 +257,7 @@ export function CertificateUploadForm({
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 border-t border-[#F3F4F6] px-6 py-4">
+      <div className="flex justify-end gap-2.5 border-t border-[#F3F4F6] px-5 py-3">
         <Button
           variant="outline"
           className="border-primary text-primary hover:bg-primary/5"

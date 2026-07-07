@@ -191,21 +191,21 @@ export default function ApplicantsPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-hidden p-6">
+      <main className="flex flex-1 flex-col overflow-hidden p-5">
         {/* Search bar */}
-        <div className="mb-3 flex items-center gap-3 rounded-lg bg-card px-4 py-3 shadow-sm">
+        <div className="mb-2.5 flex items-center gap-2.5 rounded-lg bg-card px-3 py-2.5 shadow-sm">
           <Search className="size-5 shrink-0 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by name or email…"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
           />
           <button
             onClick={() => setShowFilter((f) => !f)}
             className={cn(
-              "rounded-lg p-1.5 transition-colors",
+              "rounded-lg p-1 transition-colors",
               showFilter ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted",
             )}
           >
@@ -215,13 +215,13 @@ export default function ApplicantsPage() {
 
         {/* Status filter pills */}
         {showFilter && (
-          <div className="mb-4 flex flex-wrap gap-2">
+          <div className="mb-3 flex flex-wrap gap-1.5">
             {STATUS_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => handleStatus(opt.value as ApiApplicantStatus | "")}
                 className={cn(
-                  "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                  "rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
                   status === opt.value
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground",
@@ -236,9 +236,9 @@ export default function ApplicantsPage() {
         {/* Table card */}
         <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
           {/* Header */}
-          <div className={cn("grid items-center gap-x-4 border-b border-border px-6 py-3", TABLE_COLUMNS)}>
+          <div className={cn("grid items-center gap-x-3 border-b border-border px-5 py-2.5", TABLE_COLUMNS)}>
             {["Candidate", "Email", "Social", "Location", "Salary", "Status", ""].map((col) => (
-              <span key={col} className="text-sm font-medium text-foreground">{col}</span>
+              <span key={col} className="text-xs font-medium text-foreground">{col}</span>
             ))}
           </div>
 
@@ -249,9 +249,9 @@ export default function ApplicantsPage() {
                 <Loader2 className="size-6 animate-spin text-primary" />
               </div>
             ) : error ? (
-              <div className="flex h-32 items-center justify-center text-sm text-rose-600">{error}</div>
+              <div className="flex h-32 items-center justify-center text-xs text-rose-600">{error}</div>
             ) : applicants.length === 0 ? (
-              <div className="flex h-32 items-center justify-center text-sm text-muted-foreground/40">
+              <div className="flex h-32 items-center justify-center text-xs text-muted-foreground/40">
                 No applicants found.
               </div>
             ) : (
@@ -259,21 +259,21 @@ export default function ApplicantsPage() {
                 <div
                   key={app.id}
                   className={cn(
-                    "grid items-center gap-x-4 px-6 py-3.5 transition-colors hover:bg-muted/50",
+                    "grid items-center gap-x-3 px-5 py-3 transition-colors hover:bg-muted/50",
                     TABLE_COLUMNS,
                   )}
                 >
                   {/* Candidate */}
-                  <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-2.5">
                     <CandidateAvatar name={app.candidate.name} avatarUrl={app.candidate.avatarUrl} />
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">{app.candidate.name}</p>
+                      <p className="truncate text-xs font-medium text-foreground">{app.candidate.name}</p>
                       <p className="truncate text-[11px] text-muted-foreground">{app.job.title}</p>
                     </div>
                   </div>
 
                   {/* Email */}
-                  <span className="truncate text-sm text-muted-foreground">{app.candidate.email}</span>
+                  <span className="truncate text-xs text-muted-foreground">{app.candidate.email}</span>
 
                   {/* Social */}
                   <SocialLinks
@@ -283,18 +283,18 @@ export default function ApplicantsPage() {
                   />
 
                   {/* Location */}
-                  <span className="truncate text-sm text-muted-foreground">
+                  <span className="truncate text-xs text-muted-foreground">
                     {app.candidate.location ?? "—"}
                   </span>
 
                   {/* Salary */}
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {fmtSalary(app.expectedSalary)}
                   </span>
 
                   {/* Status */}
                   <span className={cn(
-                    "w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                    "w-fit rounded-full px-2 py-0.5 text-xs font-semibold",
                     STATUS_STYLE[app.status] ?? "bg-muted text-muted-foreground",
                   )}>
                     {STATUS_LABEL[app.status] ?? app.status}
@@ -326,7 +326,7 @@ export default function ApplicantsPage() {
 
         {/* Pagination */}
         {total > 0 && (
-          <div className="mt-4 flex items-center justify-between">
+          <div className="mt-3 flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
               {total} applicant{total !== 1 ? "s" : ""}
             </p>
@@ -343,7 +343,7 @@ export default function ApplicantsPage() {
                   key={p}
                   onClick={() => handlePage(p)}
                   className={cn(
-                    "flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
+                    "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
                     p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
                   )}
                 >

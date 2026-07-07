@@ -19,7 +19,7 @@ export default function HrNavigationPannel({ navItems }: HrNavigationPannelProps
   const pathname = usePathname()
 
   return (
-    <aside className="flex w-[220px] shrink-0 flex-col justify-between bg-sidebar py-5 pl-5 pr-3 shadow-sm">
+    <aside className="flex w-[220px] shrink-0 flex-col justify-between bg-sidebar py-4 pl-4 pr-2.5 shadow-sm">
       <nav className="flex flex-col gap-1">
         {navItems.map(({ label, href }) => {
           const isActive = pathname === href
@@ -28,7 +28,7 @@ export default function HrNavigationPannel({ navItems }: HrNavigationPannelProps
               key={label}
               href={href}
               className={cn(
-                "block w-full rounded px-3 py-2.5 text-left text-sm font-medium transition-colors",
+                "block w-full rounded px-2.5 py-2 text-left text-xs font-medium transition-colors",
                 isActive
                   ? "bg-primary/5 text-primary"
                   : "text-muted-foreground hover:bg-muted"
@@ -40,14 +40,14 @@ export default function HrNavigationPannel({ navItems }: HrNavigationPannelProps
         })}
       </nav>
 
-      <div className="flex items-center gap-2 rounded-lg px-3 py-2">
+      <div className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5">
         <img
           src={adminPhoto}
           alt="Michael Smith"
           className="size-9 shrink-0 rounded-full object-cover"
         />
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-foreground">Michael Smith</p>
+          <p className="truncate text-xs font-medium text-foreground">Michael Smith</p>
           <p className="truncate text-xs text-muted-foreground">HR Administrator</p>
         </div>
       </div>

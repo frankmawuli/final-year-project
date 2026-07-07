@@ -64,8 +64,8 @@ function DocumentDropzone({
 
   if (file) {
     return (
-      <div className="flex items-center justify-between rounded-xl border border-[#E5E7EB] px-4 py-3">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="flex items-center justify-between rounded-xl border border-[#E5E7EB] px-3 py-2.5">
+        <div className="flex min-w-0 items-center gap-2.5">
           {preview ? (
             <img src={preview} alt={file.name} className="h-10 w-10 shrink-0 rounded-lg object-cover" />
           ) : (
@@ -99,7 +99,7 @@ function DocumentDropzone({
           e.preventDefault();
           handleFile(e.dataTransfer.files?.[0]);
         }}
-        className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center hover:border-primary"
+        className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#D1D5DB] px-3 py-6 text-center hover:border-primary"
       >
         <UploadCloud className="size-6 text-muted-foreground" />
         <span className="text-[13px] font-medium text-foreground">Click to upload or drag and drop</span>
@@ -114,7 +114,7 @@ function DocumentDropzone({
           onChange={(e) => handleFile(e.target.files?.[0])}
         />
       </div>
-      {error && <p className="mt-2 text-[12.5px] text-destructive">{error}</p>}
+      {error && <p className="mt-1.5 text-[12.5px] text-destructive">{error}</p>}
     </div>
   );
 }
@@ -131,8 +131,8 @@ function AutofillReview({
   applying: boolean;
 }) {
   return (
-    <div className="mt-4 rounded-xl border border-primary/30 bg-primary/5 p-4">
-      <div className="flex items-center gap-2">
+    <div className="mt-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
+      <div className="flex items-center gap-1.5">
         <Sparkles className="size-4 text-primary" />
         <h4 className="text-[13.5px] font-semibold text-foreground">Suggested profile from your CV</h4>
       </div>
@@ -141,17 +141,17 @@ function AutofillReview({
       </p>
 
       {suggestion.about && (
-        <p className="mt-3 rounded-lg bg-white px-3 py-2 text-[12.5px] leading-relaxed text-foreground">
+        <p className="mt-2.5 rounded-lg bg-white px-2.5 py-1.5 text-[12.5px] leading-relaxed text-foreground">
           {suggestion.about}
         </p>
       )}
 
       {suggestion.skills.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-2.5 flex flex-wrap gap-1">
           {suggestion.skills.map((skill) => (
             <span
               key={skill}
-              className="rounded-full bg-primary/10 px-2.5 py-1 text-[12px] font-medium text-primary"
+              className="rounded-full bg-primary/10 px-2 py-1 text-[12px] font-medium text-primary"
             >
               {skill}
             </span>
@@ -160,9 +160,9 @@ function AutofillReview({
       )}
 
       {suggestion.experience.length > 0 && (
-        <ul className="mt-3 space-y-1.5">
+        <ul className="mt-2.5 space-y-1">
           {suggestion.experience.map((e, i) => (
-            <li key={i} className="rounded-lg bg-white px-3 py-2 text-[12.5px]">
+            <li key={i} className="rounded-lg bg-white px-2.5 py-1.5 text-[12.5px]">
               <span className="font-semibold text-foreground">{e.role}</span>
               <span className="text-muted-foreground">
                 {" "}
@@ -175,9 +175,9 @@ function AutofillReview({
       )}
 
       {suggestion.education.length > 0 && (
-        <ul className="mt-2 space-y-1.5">
+        <ul className="mt-1.5 space-y-1">
           {suggestion.education.map((e, i) => (
-            <li key={i} className="rounded-lg bg-white px-3 py-2 text-[12.5px]">
+            <li key={i} className="rounded-lg bg-white px-2.5 py-1.5 text-[12.5px]">
               <span className="font-semibold text-foreground">{e.degree}</span>
               <span className="text-muted-foreground">
                 {" "}
@@ -189,7 +189,7 @@ function AutofillReview({
         </ul>
       )}
 
-      <div className="mt-4 flex justify-end gap-2">
+      <div className="mt-3 flex justify-end gap-1.5">
         <Button
           variant="outline"
           size="sm"
@@ -290,23 +290,23 @@ export function CvPortfolioCoverTab() {
 
   return (
     <div className="bg-white rounded-b-xl border border-[#E5E7EB] divide-y divide-[#F3F4F6]">
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">CV / Portfolio / Cover Letter</h3>
-        <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
           Upload the documents employers will see when reviewing your application.
         </p>
       </div>
 
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <FormLabel required>CV / Resume</FormLabel>
-        <p className="mt-1 mb-3 text-[12.5px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 mb-2.5 text-[12.5px] text-muted-foreground leading-relaxed">
           Upload your most recent resume as a PDF — it&apos;s attached automatically when you apply
           with your profile, and we can use it to fill in your profile for you.
         </p>
 
         {profile?.cvUrl && !cvFile && (
-          <div className="mb-3 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-            <div className="flex min-w-0 items-center gap-3">
+          <div className="mb-2.5 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+            <div className="flex min-w-0 items-center gap-2.5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-emerald-600">
                 <FileText className="size-5" />
               </div>
@@ -339,7 +339,7 @@ export function CvPortfolioCoverTab() {
         />
 
         {cvFile && (
-          <div className="mt-3 flex justify-end">
+          <div className="mt-2.5 flex justify-end">
             <Button size="sm" onClick={handleUploadCv} disabled={uploading}>
               {uploading ? (
                 <>
@@ -354,11 +354,11 @@ export function CvPortfolioCoverTab() {
           </div>
         )}
 
-        {cvError && <p className="mt-2 text-[12.5px] text-destructive">{cvError}</p>}
+        {cvError && <p className="mt-1.5 text-[12.5px] text-destructive">{cvError}</p>}
 
         {profile?.cvUrl && !suggestion && hasCvText !== false && (
-          <div className="mt-4 flex items-center justify-between rounded-xl border border-border px-4 py-3">
-            <div className="flex items-center gap-2 text-[13px] text-foreground">
+          <div className="mt-3 flex items-center justify-between rounded-xl border border-border px-3 py-2.5">
+            <div className="flex items-center gap-1.5 text-[13px] text-foreground">
               <Sparkles className="size-4 text-primary" />
               Fill in your profile from this CV
             </div>
@@ -384,18 +384,18 @@ export function CvPortfolioCoverTab() {
         )}
       </div>
 
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <FormLabel>Portfolio</FormLabel>
-        <p className="mt-1 mb-3 text-[12.5px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 mb-2.5 text-[12.5px] text-muted-foreground leading-relaxed">
           Share a link to your portfolio website, or upload a portfolio document.
         </p>
-        <div className="relative mb-4">
+        <div className="relative mb-3">
           <LinkIcon className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <FormInput
             placeholder="https://your-portfolio.com"
             value={portfolioLink}
             onChange={(e) => setPortfolioLink(e.target.value)}
-            className="pl-10"
+            className="pl-8"
           />
         </div>
         <DocumentDropzone
@@ -407,9 +407,9 @@ export function CvPortfolioCoverTab() {
         />
       </div>
 
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <FormLabel>Cover Letter</FormLabel>
-        <p className="mt-1 mb-3 text-[12.5px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 mb-2.5 text-[12.5px] text-muted-foreground leading-relaxed">
           Add a cover letter to introduce yourself to potential employers.
         </p>
         <DocumentDropzone

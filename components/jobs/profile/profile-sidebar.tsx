@@ -24,12 +24,12 @@ export function ProfileSidebar({
   return (
     <aside className="w-full shrink-0 md:w-[21.25rem]">
       <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
-        <div className="p-6 text-center">
+        <div className="p-5 text-center">
           <ProfileAvatar alt={data.name} src={data.avatarUrl} />
-          <h2 className="mt-4 text-lg font-semibold text-foreground">{data.name}</h2>
+          <h2 className="mt-3 text-base font-semibold text-foreground">{data.name}</h2>
           <p className="text-[13px] text-muted-foreground">{data.title}</p>
 
-          <div className="mt-4 space-y-1.5">
+          <div className="mt-3 space-y-1">
             <div className="text-[13px] text-muted-foreground">
               Experience : <span className="font-semibold text-foreground">{data.experience}</span>
             </div>
@@ -43,11 +43,11 @@ export function ProfileSidebar({
           </div>
         </div>
 
-        <div className="px-6">
+        <div className="px-5">
           <ProfileCompletionCard percent={data.completionPercent} />
         </div>
 
-        <div className="space-y-2.5 p-6">
+        <div className="space-y-2 p-5">
           <Button className="w-full" size="lg" onClick={onUploadCv}>
             Upload CV & Cover Letter
           </Button>

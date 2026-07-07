@@ -29,13 +29,13 @@ function Card({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-      <div className="mb-5 flex items-center gap-3">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div className="mb-4 flex items-center gap-2.5">
         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
           <Icon className="size-4 text-muted-foreground" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground">{title}</p>
+          <p className="text-xs font-semibold text-foreground">{title}</p>
           <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
@@ -45,15 +45,15 @@ function Card({
 }
 
 function Divider() {
-  return <hr className="my-4 border-border" />
+  return <hr className="my-3 border-border" />
 }
 
 function SaveRow({ onSave }: { onSave: () => void }) {
   return (
-    <div className="flex justify-end pt-2">
+    <div className="flex justify-end pt-1.5">
       <button
         onClick={onSave}
-        className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+        className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
       >
         Save changes
       </button>
@@ -63,10 +63,10 @@ function SaveRow({ onSave }: { onSave: () => void }) {
 
 // ── Shared style strings ──────────────────────────────────────
 const inputCls =
-  "w-full rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
+  "w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 const selectCls =
-  "w-full appearance-none rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 pr-9 text-sm text-foreground outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
+  "w-full appearance-none rounded-xl border border-border bg-muted/50 px-3 py-2 pr-7 text-xs text-foreground outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 // ── Page ──────────────────────────────────────────────────────
 export default function CompanySettings() {
@@ -127,10 +127,10 @@ export default function CompanySettings() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <Card title="Company Profile" subtitle="Public-facing identity of your organisation" icon={Building2}>
         {/* Logo */}
-        <div className="mb-5 flex items-center gap-5">
+        <div className="mb-4 flex items-center gap-4">
           <div className="relative">
             <div className={cn(
               "flex size-18 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-border bg-muted/50",
@@ -151,18 +151,18 @@ export default function CompanySettings() {
             )}
           </div>
           <div>
-            <p className="mb-1 text-sm font-medium text-foreground">Company Logo</p>
-            <p className="mb-2.5 text-xs text-muted-foreground">PNG or JPG · max 5 MB · 200×200 px</p>
+            <p className="mb-1 text-xs font-medium text-foreground">Company Logo</p>
+            <p className="mb-2 text-xs text-muted-foreground">PNG or JPG · max 5 MB · 200×200 px</p>
             <button
               onClick={() => fileRef.current?.click()}
               disabled={logoUploading}
-              className="flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-xs font-semibold text-foreground shadow-sm hover:bg-muted/50 disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm hover:bg-muted/50 disabled:opacity-60"
             >
               <Upload className="size-3.5" />
               {logoUploading ? "Uploading…" : "Upload logo"}
             </button>
             {logoUploadError && (
-              <p className="mt-1.5 text-xs text-rose-500">{logoUploadError}</p>
+              <p className="mt-1 text-xs text-rose-500">{logoUploadError}</p>
             )}
             <input
               ref={fileRef}
@@ -176,10 +176,10 @@ export default function CompanySettings() {
 
         <Divider />
 
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Company Name</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Company Name</label>
               <input
                 value={companyName}
                 onChange={e => setCompanyName(e.target.value)}
@@ -188,7 +188,7 @@ export default function CompanySettings() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Website</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Website</label>
               <input
                 value={website}
                 onChange={e => setWebsite(e.target.value)}
@@ -197,9 +197,9 @@ export default function CompanySettings() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Industry</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Industry</label>
               <div className="relative">
                 <select value={industry} onChange={e => setIndustry(e.target.value)} className={selectCls}>
                   {["Technology","Finance","Healthcare","Education","Retail","Manufacturing","Consulting","Other"].map(v => (
@@ -210,7 +210,7 @@ export default function CompanySettings() {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Company Size</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Company Size</label>
               <div className="relative">
                 <select value={companySize} onChange={e => setCompanySize(e.target.value)} className={selectCls}>
                   {["1–10","11–50","51–200","201–500","501–1000","1000+"].map(v => (
@@ -225,10 +225,10 @@ export default function CompanySettings() {
 
         <Divider />
 
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Timezone</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Timezone</label>
               <div className="relative">
                 <select value={timezone} onChange={e => setTimezone(e.target.value)} className={selectCls}>
                   {[
@@ -242,7 +242,7 @@ export default function CompanySettings() {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Currency</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Currency</label>
               <div className="relative">
                 <select value={currency} onChange={e => setCurrency(e.target.value)} className={selectCls}>
                   {[
@@ -255,9 +255,9 @@ export default function CompanySettings() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Fiscal Year Start</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Fiscal Year Start</label>
               <div className="relative">
                 <select value={fiscalYear} onChange={e => setFiscalYear(e.target.value)} className={selectCls}>
                   {["January","February","March","April","May","June","July","August","September","October","November","December"].map(v => (
@@ -268,7 +268,7 @@ export default function CompanySettings() {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Date Format</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Date Format</label>
               <div className="relative">
                 <select value={dateFormat} onChange={e => setDateFormat(e.target.value)} className={selectCls}>
                   {["DD/MM/YYYY","MM/DD/YYYY","YYYY-MM-DD","DD MMM YYYY"].map(v => (
@@ -283,11 +283,11 @@ export default function CompanySettings() {
       </Card>
 
       <Card title="Working Hours" subtitle="Standard schedule applied across the organisation" icon={Clock}>
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
           {/* Time pickers */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Work Start</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Work Start</label>
               <input
                 type="time"
                 value={workStart}
@@ -296,7 +296,7 @@ export default function CompanySettings() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Work End</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Work End</label>
               <input
                 type="time"
                 value={workEnd}
@@ -314,8 +314,8 @@ export default function CompanySettings() {
             if (mins <= 0) return null
             const h = Math.floor(mins / 60), m = mins % 60
             return (
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+              <div className="flex items-center gap-1.5">
+                <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
                   {h > 0 ? `${h}h ` : ""}{m > 0 ? `${m}m` : ""} working day
                 </span>
               </div>
@@ -326,8 +326,8 @@ export default function CompanySettings() {
 
           {/* Day toggles */}
           <div>
-            <p className="mb-2.5 text-xs font-medium text-foreground">Working Days</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="mb-2 text-xs font-medium text-foreground">Working Days</p>
+            <div className="flex flex-wrap gap-1.5">
               {DAYS.map(d => {
                 const active = workDays.includes(d)
                 return (
@@ -346,7 +346,7 @@ export default function CompanySettings() {
                 )
               })}
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-1.5 text-xs text-muted-foreground">
               {workDays.length > 0
                 ? `${workDays.length} day${workDays.length !== 1 ? "s" : ""} selected`
                 : "No working days selected"}
@@ -356,25 +356,25 @@ export default function CompanySettings() {
       </Card>
 
       <Card title="Office Locations" subtitle="Physical and remote locations your company operates from" icon={MapPin}>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2.5">
           {/* List */}
           {locations.length > 0 ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               {locations.map(loc => (
                 <div
                   key={loc.id}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3"
+                  className="flex items-center gap-2.5 rounded-xl border border-border bg-muted/50 px-3 py-2.5"
                 >
                   <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-background shadow-sm">
                     <MapPin className="size-3.5 text-muted-foreground" />
                   </div>
-                  <span className="flex-1 text-sm font-medium text-foreground">{loc.name}</span>
-                  <span className={cn("rounded-full px-2.5 py-0.5 text-[11px] font-semibold", locTypeBadge[loc.type] ?? "bg-muted text-muted-foreground")}>
+                  <span className="flex-1 text-xs font-medium text-foreground">{loc.name}</span>
+                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold", locTypeBadge[loc.type] ?? "bg-muted text-muted-foreground")}>
                     {loc.type}
                   </span>
                   <button
                     onClick={() => removeLocation(loc.id)}
-                    className="ml-1 rounded-lg p-1.5 text-muted-foreground transition hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-900/20 dark:hover:text-rose-400"
+                    className="ml-1 rounded-lg p-1 text-muted-foreground transition hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-900/20 dark:hover:text-rose-400"
                   >
                     <Trash2 className="size-4" />
                   </button>
@@ -382,14 +382,14 @@ export default function CompanySettings() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center rounded-xl border border-dashed border-border py-8 text-center">
-              <MapPin className="mb-2 size-6 text-muted-foreground/40" />
+            <div className="flex flex-col items-center rounded-xl border border-dashed border-border py-6 text-center">
+              <MapPin className="mb-1.5 size-6 text-muted-foreground/40" />
               <p className="text-xs text-muted-foreground">No locations added yet</p>
             </div>
           )}
 
           {/* Add row */}
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-1.5 pt-1">
             <input
               value={newLocName}
               onChange={e => setNewLocName(e.target.value)}
@@ -401,7 +401,7 @@ export default function CompanySettings() {
               <select
                 value={newLocType}
                 onChange={e => setNewLocType(e.target.value)}
-                className={cn(selectCls, "w-28 pr-7")}
+                className={cn(selectCls, "w-28 pr-6")}
               >
                 {["HQ","Office","Branch","Remote"].map(t => <option key={t}>{t}</option>)}
               </select>
@@ -409,7 +409,7 @@ export default function CompanySettings() {
             </div>
             <button
               onClick={addLocation}
-              className="flex shrink-0 items-center gap-1.5 rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-semibold text-foreground shadow-sm hover:bg-muted/50"
+              className="flex shrink-0 items-center gap-1 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground shadow-sm hover:bg-muted/50"
             >
               <Plus className="size-3.5" />
               Add

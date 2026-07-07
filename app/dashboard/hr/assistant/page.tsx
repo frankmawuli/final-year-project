@@ -192,26 +192,26 @@ export default function AssistantPage() {
     <div className="flex h-full w-full overflow-hidden">
       {/* ── Left panel ── */}
       <aside className="flex w-67.5 shrink-0 flex-col border-r border-border bg-card">
-        <div className="px-4 py-4">
-          <span className="text-sm font-semibold text-foreground">assistant-ui</span>
+        <div className="px-3 py-3">
+          <span className="text-xs font-semibold text-foreground">assistant-ui</span>
         </div>
 
-        <div className="px-3 pb-3">
+        <div className="px-2.5 pb-2.5">
           <button
             onClick={newThread}
-            className="flex w-full items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent"
+            className="flex w-full items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs text-foreground transition-colors hover:bg-accent"
           >
             <Plus className="h-4 w-4" />
             New Thread
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-2 py-1">
+        <div className="flex-1 overflow-y-auto px-1.5 py-1">
           {threads.map((thread) => (
             <div
               key={thread.id}
               className={cn(
-                "group flex items-center gap-1 rounded-lg px-3 py-2 text-sm transition-colors",
+                "group flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs transition-colors",
                 activeThreadId === thread.id
                   ? "bg-accent text-foreground"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -236,36 +236,36 @@ export default function AssistantPage() {
 
       {/* ── Main panel ── */}
       <div className="flex flex-1 flex-col overflow-hidden bg-background">
-        <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-          <button className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-accent" />
-          <button className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+        <div className="flex items-center justify-between border-b border-border px-3 py-2">
+          <button className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-accent" />
+          <button className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
             <Share className="h-4 w-4" />
           </button>
         </div>
 
         {/* Messages / Welcome */}
-        <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-6">
+        <div className="flex flex-1 flex-col items-center overflow-y-auto px-3 py-5">
           {messages.length === 0 && !isStreaming ? (
-            <div className="flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-8">
+            <div className="flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-6">
               <div className="flex flex-col items-center gap-1 text-center">
-                <h1 className="text-2xl font-bold text-foreground">Hello there!</h1>
+                <h1 className="text-xl font-bold text-foreground">Hello there!</h1>
                 <p className="text-muted-foreground">How can I help you today?</p>
               </div>
-              <div className="grid w-full grid-cols-2 gap-3">
+              <div className="grid w-full grid-cols-2 gap-2.5">
                 {SUGGESTIONS.map((s) => (
                   <button
                     key={s.title}
                     onClick={() => sendMessage(`${s.title} ${s.sub}`)}
-                    className="rounded-xl border border-border bg-card p-4 text-left transition-colors hover:bg-accent"
+                    className="rounded-xl border border-border bg-card p-3 text-left transition-colors hover:bg-accent"
                   >
-                    <p className="text-sm font-medium text-foreground">{s.title}</p>
-                    <p className="text-sm text-muted-foreground">{s.sub}</p>
+                    <p className="text-xs font-medium text-foreground">{s.title}</p>
+                    <p className="text-xs text-muted-foreground">{s.sub}</p>
                   </button>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="flex w-full max-w-2xl flex-col gap-4">
+            <div className="flex w-full max-w-2xl flex-col gap-3">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -273,7 +273,7 @@ export default function AssistantPage() {
                 >
                   <div
                     className={cn(
-                      "max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm",
+                      "max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2.5 text-xs",
                       msg.role === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-card text-foreground",
@@ -287,9 +287,9 @@ export default function AssistantPage() {
               {/* In-flight streaming indicator */}
               {isStreaming && (
                 <div className="flex justify-start">
-                  <div className="flex max-w-[80%] flex-col gap-2">
+                  <div className="flex max-w-[80%] flex-col gap-1.5">
                     {toolStatuses.map((s, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div key={i} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         {s.done ? (
                           <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
                         ) : (
@@ -301,13 +301,13 @@ export default function AssistantPage() {
                     ))}
 
                     {streamingContent ? (
-                      <div className="whitespace-pre-wrap rounded-2xl bg-card px-4 py-3 text-sm text-foreground">
+                      <div className="whitespace-pre-wrap rounded-2xl bg-card px-3 py-2.5 text-xs text-foreground">
                         {streamingContent}
 
                       </div>
                     ) : (
                       toolStatuses.every((s) => s.done) && (
-                        <div className="flex h-9 items-center gap-2 rounded-2xl bg-card px-4 text-sm text-muted-foreground">
+                        <div className="flex h-9 items-center gap-1.5 rounded-2xl bg-card px-3 text-xs text-muted-foreground">
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
                           Thinking…
                         </div>
@@ -318,7 +318,7 @@ export default function AssistantPage() {
               )}
 
               {streamError && (
-                <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-xs text-destructive">
                   {streamError}
                 </div>
               )}
@@ -329,9 +329,9 @@ export default function AssistantPage() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-border px-4 pb-4 pt-3">
+        <div className="border-t border-border px-3 pb-3 pt-2.5">
           <div className="mx-auto max-w-2xl">
-            <div className="flex items-end gap-2 rounded-xl border border-border bg-card px-3 py-2.5">
+            <div className="flex items-end gap-1.5 rounded-xl border border-border bg-card px-2.5 py-2">
               <button className="mb-0.5 flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
                 <Plus className="h-4 w-4" />
               </button>
@@ -342,7 +342,7 @@ export default function AssistantPage() {
                 onKeyDown={handleKeyDown}
                 placeholder="Send a message..."
                 rows={1}
-                className="flex-1 resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                className="flex-1 resize-none bg-transparent text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
               {isStreaming ? (
                 <button

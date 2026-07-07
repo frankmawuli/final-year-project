@@ -31,31 +31,31 @@ export function Hero({ popularJobs }: HeroProps) {
     : popularJobs;
 
   return (
-    <section className="bg-card pt-10 sm:pt-16 pb-12 sm:pb-20 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-10 lg:gap-16">
+    <section className="bg-card pt-8 sm:pt-12 pb-10 sm:pb-16 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 flex items-center gap-8 lg:gap-12">
         {/* Left */}
         <div className="flex-1 min-w-0 max-w-[580px]">
           {/* Pill badge */}
-          <div className="inline-flex items-center bg-primary/10 text-primary text-xs font-medium px-3 py-1.5 rounded-full mb-6">
+          <div className="inline-flex items-center bg-primary/10 text-primary text-xs font-medium px-2.5 py-1 rounded-full mb-5">
             Find the right job. Build your future.
           </div>
 
           {/* Headline */}
-          <h1 className="text-[30px] sm:text-[38px] lg:text-[48px] leading-[1.15] font-bold text-foreground mb-4">
+          <h1 className="text-[30px] sm:text-[38px] lg:text-[48px] leading-[1.15] font-bold text-foreground mb-3">
             Find Jobs That
             <br />
             <span className="text-primary">Match Your Future</span>
           </h1>
-          <p className="text-[15px] text-muted-foreground leading-relaxed mb-9">
+          <p className="text-[15px] text-muted-foreground leading-relaxed mb-7">
             Discover opportunities, grow your skills, and
             <br className="hidden sm:block" />
             build the career you've always wanted.
           </p>
 
           {/* Search bar */}
-          <div className="relative mb-5">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-card shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] border border-border rounded-xl p-1.5 gap-1">
-            <div className="flex items-center gap-2 flex-1 px-3 py-2 sm:py-1.5">
+          <div className="relative mb-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-card shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] border border-border rounded-xl p-1 gap-1">
+            <div className="flex items-center gap-1.5 flex-1 px-2.5 py-1.5 sm:py-1">
               <Search className="w-4 h-4 text-muted-foreground shrink-0" />
               <input
                 type="text"
@@ -68,8 +68,8 @@ export function Hero({ popularJobs }: HeroProps) {
               />
             </div>
             <div className="hidden sm:block w-px h-8 bg-border shrink-0" />
-            <div className="sm:hidden h-px bg-border mx-2" />
-            <div className="flex items-center gap-2 flex-1 px-3 py-2 sm:py-1.5">
+            <div className="sm:hidden h-px bg-border mx-1.5" />
+            <div className="flex items-center gap-1.5 flex-1 px-2.5 py-1.5 sm:py-1">
               <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
               <input
                 type="text"
@@ -79,20 +79,20 @@ export function Hero({ popularJobs }: HeroProps) {
                 className="flex-1 text-[13.5px] outline-none bg-transparent text-foreground placeholder:text-muted-foreground min-w-0"
               />
             </div>
-            <div className="sm:hidden h-px bg-border mx-2" />
-            <button className="bg-primary hover:bg-primary/90 text-primary-foreground text-[13.5px] font-semibold px-5 py-2.5 rounded-lg transition-colors sm:shrink-0 w-full sm:w-auto">
+            <div className="sm:hidden h-px bg-border mx-1.5" />
+            <button className="bg-primary hover:bg-primary/90 text-primary-foreground text-[13.5px] font-semibold px-4 py-2 rounded-lg transition-colors sm:shrink-0 w-full sm:w-auto">
               Search Jobs
             </button>
           </div>
 
           {/* Keyword dropdown */}
           {showDropdown && filteredDropdown.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
               {filteredDropdown.map((job) => (
                 <button
                   key={job.id}
                   onMouseDown={() => { setKeyword(job.title); setShowDropdown(false); }}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-muted"
                 >
                   <div
                     className="flex size-9 shrink-0 items-center justify-center rounded-lg"
@@ -116,14 +116,14 @@ export function Hero({ popularJobs }: HeroProps) {
           </div>
 
           {/* Popular searches */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-[13px] text-muted-foreground font-medium">
               Popular Searches:
             </span>
             {POPULAR_SEARCHES.map((tag) => (
               <button
                 key={tag}
-                className="text-xs text-muted-foreground border border-border hover:border-primary hover:text-primary px-3 py-1 rounded-full transition-colors"
+                className="text-xs text-muted-foreground border border-border hover:border-primary hover:text-primary px-2.5 py-1 rounded-full transition-colors"
               >
                 {tag}
               </button>
@@ -134,14 +134,14 @@ export function Hero({ popularJobs }: HeroProps) {
         {/* Right – illustration */}
         <div className="hidden lg:flex flex-1 relative justify-center items-center min-h-[460px]">
           {/* Dot grid top-right */}
-          <div className="absolute top-6 right-14 grid grid-cols-5 gap-2 opacity-40 pointer-events-none">
+          <div className="absolute top-6 right-14 grid grid-cols-5 gap-1.5 opacity-40 pointer-events-none">
             {Array.from({ length: 25 }).map((_, i) => (
               <div key={i} className="w-[5px] h-[5px] rounded-full bg-primary" />
             ))}
           </div>
 
           {/* Plus sign */}
-          <span className="absolute top-8 right-2 text-2xl font-light text-muted-foreground/50 pointer-events-none">
+          <span className="absolute top-8 right-2 text-xl font-light text-muted-foreground/50 pointer-events-none">
             +
           </span>
 
@@ -169,8 +169,8 @@ export function Hero({ popularJobs }: HeroProps) {
           />
 
           {/* Floating card */}
-          <div className="absolute bottom-10 right-0 z-20 bg-card shadow-2xl rounded-xl p-3.5 flex items-center gap-3 w-[230px]">
-            <div className="flex -space-x-2 shrink-0">
+          <div className="absolute bottom-10 right-0 z-20 bg-card shadow-2xl rounded-xl p-3 flex items-center gap-2.5 w-[230px]">
+            <div className="flex -space-x-1.5 shrink-0">
               {AVATAR_COLORS.map((c, i) => (
                 <div
                   key={i}

@@ -122,9 +122,9 @@ type Tab = (typeof TABS)[number]
 function RunList({ runs }: { runs: RunRow[] }) {
   if (runs.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-2 py-10 text-center">
+      <div className="flex flex-col items-center gap-1.5 py-8 text-center">
         <CalendarDays className="size-10 text-muted" />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           No payroll runs yet — click “Run Payroll” to calculate your first one.
         </p>
       </div>
@@ -134,23 +134,23 @@ function RunList({ runs }: { runs: RunRow[] }) {
   return (
     <div className="flex flex-col divide-y divide-border">
       {runs.map((run) => (
-        <div key={run.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-          <div className="flex items-center gap-4">
+        <div key={run.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+          <div className="flex items-center gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/30">
               <CalendarDays className="size-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">{run.period}</p>
+              <p className="text-xs font-semibold text-foreground">{run.period}</p>
               <p className="text-xs text-muted-foreground">
                 {run.employees} employee{run.employees !== 1 ? "s" : ""} • {run.meta}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-5">
-            <p className="text-sm font-bold text-foreground">{run.amount}</p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs font-bold text-foreground">{run.amount}</p>
             <span
               className={cn(
-                "min-w-[90px] rounded-md px-3 py-1 text-center text-xs font-semibold",
+                "min-w-[90px] rounded-md px-2.5 py-1 text-center text-xs font-semibold",
                 run.status === "Completed"
                   ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
                   : "bg-blue-50 text-primary dark:bg-blue-900/30 dark:text-blue-400"
@@ -187,39 +187,39 @@ function EmployeesPayrollTab({
   return (
     <div className="rounded-2xl bg-card shadow-sm">
       {/* Table toolbar */}
-      <div className="flex items-center justify-between border-b border-border px-6 py-4">
-        <h2 className="text-base font-semibold text-foreground">Employee Payroll — {periodLabel}</h2>
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-muted px-3 py-2">
+      <div className="flex items-center justify-between border-b border-border px-5 py-3">
+        <h2 className="text-sm font-semibold text-foreground">Employee Payroll — {periodLabel}</h2>
+        <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted px-2.5 py-1.5">
           <Search className="size-4 shrink-0 text-muted-foreground" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search employees…"
-            className="w-44 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            className="w-44 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
           />
         </div>
       </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-border">
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Employee</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Base Salary</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Department</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Bonus</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Deductions</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Net Pay</th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Status</th>
+              <th className="px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Employee</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Base Salary</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Department</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Bonus</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Deductions</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Net Pay</th>
+              <th className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.map((emp) => (
               <tr key={emp.id} className="hover:bg-muted/50">
                 {/* Employee */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-2.5">
                     <img
                       src={emp.photo}
                       alt={emp.name}
@@ -233,23 +233,23 @@ function EmployeesPayrollTab({
                 </td>
 
                 {/* Base Salary */}
-                <td className="px-4 py-4 text-foreground">{fmt(emp.baseSalary)}</td>
+                <td className="px-3 py-3 text-foreground">{fmt(emp.baseSalary)}</td>
 
                 {/* Department */}
-                <td className="px-4 py-4 text-muted-foreground">{emp.department}</td>
+                <td className="px-3 py-3 text-muted-foreground">{emp.department}</td>
 
                 {/* Bonus */}
-                <td className="px-4 py-4 font-medium text-emerald-500">+{fmt(emp.bonus)}</td>
+                <td className="px-3 py-3 font-medium text-emerald-500">+{fmt(emp.bonus)}</td>
 
                 {/* Deductions */}
-                <td className="px-4 py-4 font-medium text-rose-500">-{fmt(emp.deductions)}</td>
+                <td className="px-3 py-3 font-medium text-rose-500">-{fmt(emp.deductions)}</td>
 
                 {/* Net Pay */}
-                <td className="px-4 py-4 font-semibold text-foreground">{fmt(emp.netPay)}</td>
+                <td className="px-3 py-3 font-semibold text-foreground">{fmt(emp.netPay)}</td>
 
                 {/* Status */}
-                <td className="px-4 py-4">
-                  <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", statusStyle[emp.status])}>
+                <td className="px-3 py-3">
+                  <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", statusStyle[emp.status])}>
                     {emp.status}
                   </span>
                 </td>
@@ -258,7 +258,7 @@ function EmployeesPayrollTab({
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                <td colSpan={7} className="px-5 py-10 text-center text-muted-foreground">
                   {employees.length === 0
                     ? "No payslips yet — run payroll to generate them."
                     : "No employees match your search."}
@@ -270,9 +270,9 @@ function EmployeesPayrollTab({
       </div>
 
       {/* Footer totals */}
-      <div className="flex items-center justify-between border-t border-border px-6 py-4">
+      <div className="flex items-center justify-between border-t border-border px-5 py-3">
         <p className="text-xs text-muted-foreground">{filtered.length} of {employees.length} employees</p>
-        <div className="flex items-center gap-8 text-sm">
+        <div className="flex items-center gap-6 text-xs">
           <span className="text-muted-foreground">
             Total base: <span className="font-semibold text-foreground">{fmt(filtered.reduce((s, e) => s + e.baseSalary, 0))}</span>
           </span>
@@ -393,8 +393,8 @@ export default function PayrollPage() {
     return (
       <>
         <HrNavigationPannel navItems={sidebarNav}/>
-        <main className="flex flex-1 items-center justify-center p-8">
-          <p className="text-sm text-muted-foreground">Loading payroll…</p>
+        <main className="flex flex-1 items-center justify-center p-6">
+          <p className="text-xs text-muted-foreground">Loading payroll…</p>
         </main>
       </>
     )
@@ -404,11 +404,11 @@ export default function PayrollPage() {
     return (
       <>
         <HrNavigationPannel navItems={sidebarNav}/>
-        <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
-          <p className="text-sm text-rose-500">{error}</p>
+        <main className="flex flex-1 flex-col items-center justify-center gap-3 p-6">
+          <p className="text-xs text-rose-500">{error}</p>
           <button
             onClick={() => { setLoading(true); loadData() }}
-            className="flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            className="flex items-center gap-1.5 rounded-xl border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
           >
             <RefreshCw className="size-4" /> Retry
           </button>
@@ -422,22 +422,22 @@ export default function PayrollPage() {
       {/* ── Text sidebar ── */}
       <HrNavigationPannel navItems={sidebarNav}/>
       {/* ── Main content ── */}
-      <main className="flex flex-1 flex-col overflow-auto p-8">
+      <main className="flex flex-1 flex-col overflow-auto p-6">
 
         {/* Stats row */}
-        <div className="mb-8 grid grid-cols-3 gap-6">
+        <div className="mb-6 grid grid-cols-3 gap-5">
           {stats.map(({ label, value, change, changeLabel, positive, Icon, iconBg }) => (
-            <div key={label} className="flex items-start justify-between rounded-2xl bg-card p-6 shadow-sm">
+            <div key={label} className="flex items-start justify-between rounded-2xl bg-card p-5 shadow-sm">
               <div>
-                <p className="mb-1 text-sm text-muted-foreground">{label}</p>
-                <p className="mb-2 text-3xl font-bold tracking-tight text-foreground">{value}</p>
-                <div className="flex items-center gap-1.5">
+                <p className="mb-1 text-xs text-muted-foreground">{label}</p>
+                <p className="mb-1.5 text-2xl font-bold tracking-tight text-foreground">{value}</p>
+                <div className="flex items-center gap-1">
                   {change && (
-                    <span className={cn("text-sm font-semibold", positive ? "text-emerald-500" : "text-rose-500")}>
+                    <span className={cn("text-xs font-semibold", positive ? "text-emerald-500" : "text-rose-500")}>
                       {change}
                     </span>
                   )}
-                  <span className="text-sm text-muted-foreground">{changeLabel}</span>
+                  <span className="text-xs text-muted-foreground">{changeLabel}</span>
                 </div>
               </div>
               <div className={cn("flex size-11 shrink-0 items-center justify-center rounded-full", iconBg)}>
@@ -448,14 +448,14 @@ export default function PayrollPage() {
         </div>
 
         {/* Tabs + actions */}
-        <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="mb-5 flex items-center justify-between gap-3">
           <div className="flex w-fit items-center gap-1 rounded-xl border border-border bg-card p-1 shadow-sm">
             {TABS.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "rounded-lg px-5 py-2 text-sm font-medium transition-colors",
+                  "rounded-lg px-4 py-1.5 text-xs font-medium transition-colors",
                   activeTab === tab
                     ? "bg-background text-foreground shadow-sm ring-1 ring-border"
                     : "text-muted-foreground hover:text-foreground"
@@ -466,16 +466,16 @@ export default function PayrollPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {runMsg && (
-              <p className={cn("text-sm font-medium", runMsg.error ? "text-rose-500" : "text-emerald-600")}>
+              <p className={cn("text-xs font-medium", runMsg.error ? "text-rose-500" : "text-emerald-600")}>
                 {runMsg.text}
               </p>
             )}
             <button
               onClick={runPayroll}
               disabled={running}
-              className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
             >
               <Play className="size-4" />
               {running ? "Calculating…" : "Run Payroll"}
@@ -485,15 +485,15 @@ export default function PayrollPage() {
 
         {/* ── Overview tab ── */}
         {activeTab === "Overview" && (
-          <div className="grid grid-cols-[1fr_360px] gap-6">
+          <div className="grid grid-cols-[1fr_360px] gap-5">
 
             {/* Recent Payroll Runs */}
-            <div className="rounded-2xl bg-card p-6 shadow-sm">
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-foreground">Recent Payroll Runs</h2>
+            <div className="rounded-2xl bg-card p-5 shadow-sm">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-base font-semibold text-foreground">Recent Payroll Runs</h2>
                 <button
                   onClick={() => setActiveTab("Payroll Runs")}
-                  className="text-sm font-medium text-primary hover:underline"
+                  className="text-xs font-medium text-primary hover:underline"
                 >
                   View all
                 </button>
@@ -502,20 +502,20 @@ export default function PayrollPage() {
             </div>
 
             {/* Right column */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-5">
 
               {/* Pay Distribution */}
-              <div className="rounded-2xl bg-card p-6 shadow-sm">
-                <h2 className="mb-5 text-lg font-semibold text-foreground">Pay Distribution</h2>
+              <div className="rounded-2xl bg-card p-5 shadow-sm">
+                <h2 className="mb-4 text-base font-semibold text-foreground">Pay Distribution</h2>
                 {distribution.length === 0 ? (
-                  <p className="py-4 text-sm text-muted-foreground">No payroll data yet.</p>
+                  <p className="py-3 text-xs text-muted-foreground">No payroll data yet.</p>
                 ) : (
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3">
                     {distribution.map(({ department, amount }) => (
                       <div key={department}>
-                        <div className="mb-1.5 flex items-center justify-between">
-                          <span className="text-sm text-foreground">{department}</span>
-                          <span className="text-sm font-semibold text-foreground">
+                        <div className="mb-1 flex items-center justify-between">
+                          <span className="text-xs text-foreground">{department}</span>
+                          <span className="text-xs font-semibold text-foreground">
                             ${amount.toLocaleString()}
                           </span>
                         </div>
@@ -533,14 +533,14 @@ export default function PayrollPage() {
 
               {/* Upcoming */}
               {upcoming && (
-                <div className="rounded-2xl bg-card p-6 shadow-sm">
-                  <h2 className="mb-4 text-lg font-semibold text-foreground">Upcoming</h2>
-                  <div className="flex items-center gap-3 rounded-xl bg-primary/10 px-4 py-4">
+                <div className="rounded-2xl bg-card p-5 shadow-sm">
+                  <h2 className="mb-3 text-base font-semibold text-foreground">Upcoming</h2>
+                  <div className="flex items-center gap-2.5 rounded-xl bg-primary/10 px-3 py-3">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary">
                       <Clock className="size-4 text-primary-foreground" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground">{upcoming.title}</p>
+                      <p className="text-xs font-semibold text-foreground">{upcoming.title}</p>
                       <p className="text-xs text-muted-foreground">{upcoming.sub}</p>
                     </div>
                     <ChevronRight className="size-4 text-muted-foreground" />
@@ -559,8 +559,8 @@ export default function PayrollPage() {
 
         {/* ── Payroll Runs tab ── */}
         {activeTab === "Payroll Runs" && (
-          <div className="rounded-2xl bg-card p-6 shadow-sm">
-            <h2 className="mb-5 text-lg font-semibold text-foreground">Payroll Runs</h2>
+          <div className="rounded-2xl bg-card p-5 shadow-sm">
+            <h2 className="mb-4 text-base font-semibold text-foreground">Payroll Runs</h2>
             <RunList runs={runs} />
           </div>
         )}

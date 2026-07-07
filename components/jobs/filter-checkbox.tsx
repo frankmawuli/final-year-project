@@ -13,7 +13,7 @@ export function FilterCheckbox({ label, count, checked, onChange }: Props) {
       className="flex items-center justify-between cursor-pointer group py-[5px]"
       onClick={() => onChange(!checked)}
     >
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2">
         <div
           className={cn(
             "w-[15px] h-[15px] rounded-[3px] border flex items-center justify-center shrink-0 transition-colors",

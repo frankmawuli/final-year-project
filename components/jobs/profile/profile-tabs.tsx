@@ -26,14 +26,14 @@ export function ProfileTabs({
 }) {
   return (
     <div className="bg-white rounded-t-xl border border-b-0 border-[#E5E7EB] flex items-center">
-      <nav className="scrollbar-hide flex flex-1 items-center gap-6 overflow-x-auto px-6">
+      <nav className="scrollbar-hide flex flex-1 items-center gap-5 overflow-x-auto px-5">
         {PROFILE_TABS.map((tab) => (
           <button
             key={tab}
             type="button"
             onClick={() => onChange(tab)}
             className={cn(
-              "shrink-0 whitespace-nowrap border-b-2 py-4 text-[13.5px] font-medium transition-colors",
+              "shrink-0 whitespace-nowrap border-b-2 py-3 text-[13.5px] font-medium transition-colors",
               active === tab
                 ? "border-primary font-semibold text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
@@ -46,7 +46,7 @@ export function ProfileTabs({
       <button
         type="button"
         aria-label="Scroll tabs"
-        className="mr-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
+        className="mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
       >
         <ChevronRight className="w-4 h-4" />
       </button>

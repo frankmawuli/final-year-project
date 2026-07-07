@@ -286,14 +286,14 @@ function AddScheduleModal({
     >
       <div className="w-120 rounded-2xl bg-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-sm font-semibold text-foreground">Add Schedule</h2>
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <h2 className="text-xs font-semibold text-foreground">Add Schedule</h2>
           <button onClick={onClose} className="rounded-full p-1 text-muted-foreground hover:bg-muted">
             <X className="size-4" />
           </button>
         </div>
 
-        <div className="flex flex-col gap-2.5 px-5 py-4">
+        <div className="flex flex-col gap-2 px-4 py-3">
           {/* Title */}
           <input
             type="text"
@@ -301,39 +301,39 @@ function AddScheduleModal({
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Interview title (auto-fills when you pick a candidate)"
             autoFocus
-            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-border px-2.5 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
 
           {/* Date */}
-          <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+          <div className="flex items-center gap-2.5 rounded-lg border border-border px-2.5 py-2 focus-within:border-primary">
             <CalendarIcon className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="flex-1 bg-transparent text-sm text-foreground outline-none"
+              className="flex-1 bg-transparent text-xs text-foreground outline-none"
             />
           </div>
 
           {/* Time range */}
-          <div className="flex items-center gap-2">
-            <div className="flex flex-1 items-center gap-2 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+          <div className="flex items-center gap-1.5">
+            <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-border px-2.5 py-2 focus-within:border-primary">
               <Clock className="size-3.5 shrink-0 text-muted-foreground" />
               <input
                 type="time"
                 value={toTimeStr(startMin)}
                 onChange={(e) => setStartMin(parseTimeStr(e.target.value))}
-                className="w-full bg-transparent text-sm text-foreground outline-none"
+                className="w-full bg-transparent text-xs text-foreground outline-none"
               />
             </div>
-            <span className="text-sm text-muted-foreground">→</span>
-            <div className="flex flex-1 items-center gap-2 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+            <span className="text-xs text-muted-foreground">→</span>
+            <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-border px-2.5 py-2 focus-within:border-primary">
               <Clock className="size-3.5 shrink-0 text-muted-foreground" />
               <input
                 type="time"
                 value={toTimeStr(endMin)}
                 onChange={(e) => setEndMin(parseTimeStr(e.target.value))}
-                className="w-full bg-transparent text-sm text-foreground outline-none"
+                className="w-full bg-transparent text-xs text-foreground outline-none"
               />
             </div>
           </div>
@@ -343,7 +343,7 @@ function AddScheduleModal({
             <button
               type="button"
               onClick={() => setShowJobDrop(v => !v)}
-              className="flex w-full items-center gap-3 rounded-lg border border-border px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+              className="flex w-full items-center gap-2.5 rounded-lg border border-border px-2.5 py-2 text-xs focus:border-primary focus:outline-none"
             >
               <Briefcase className="size-4 shrink-0 text-muted-foreground" />
               <span className={cn("flex-1 truncate text-left", jobId ? "text-foreground" : "text-muted-foreground")}>
@@ -369,17 +369,17 @@ function AddScheduleModal({
                       setGuests([])         // clear guests when job changes
                     }}
                     className={cn(
-                      "flex w-full items-center justify-between px-3 py-2.5 text-left hover:bg-muted",
+                      "flex w-full items-center justify-between px-2.5 py-2 text-left hover:bg-muted",
                       j.id === jobId && "bg-primary/5"
                     )}
                   >
-                    <span className="truncate text-sm text-foreground">{j.title}</span>
-                    <span className="ml-2 shrink-0 text-[10px] text-muted-foreground">
+                    <span className="truncate text-xs text-foreground">{j.title}</span>
+                    <span className="ml-1.5 shrink-0 text-[10px] text-muted-foreground">
                       {j._count.applications} applicant{j._count.applications !== 1 ? "s" : ""}
                     </span>
                   </button>
                 )) : (
-                  <p className="px-3 py-3 text-xs text-muted-foreground">No open job postings found</p>
+                  <p className="px-2.5 py-2.5 text-xs text-muted-foreground">No open job postings found</p>
                 )}
               </div>
             )}
@@ -389,14 +389,14 @@ function AddScheduleModal({
           {jobId && (
             <div ref={guestRef} className="relative">
               <div
-                className="flex min-h-10.5 flex-wrap items-center gap-1.5 cursor-text rounded-lg border border-border px-3 py-2 focus-within:border-primary"
+                className="flex min-h-10.5 flex-wrap items-center gap-1 cursor-text rounded-lg border border-border px-2.5 py-1.5 focus-within:border-primary"
                 onClick={() => setShowDrop(true)}
               >
                 <UserPlus className="size-4 shrink-0 text-muted-foreground" />
                 {guests.map(g => (
                   <span
                     key={g.id}
-                    className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                    className="flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary"
                   >
                     <CandidateAvatar name={g.name} avatarUrl={g.avatarUrl} size="sm" />
                     {g.name}
@@ -419,7 +419,7 @@ function AddScheduleModal({
                     guests.length === 0 ? "Search applicants by name or email" : ""
                   }
                   disabled={loadingApplicants}
-                  className="min-w-20 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-wait"
+                  className="min-w-20 flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-wait"
                 />
                 {loadingApplicants && <Loader2 className="size-3.5 shrink-0 animate-spin text-muted-foreground" />}
               </div>
@@ -432,16 +432,16 @@ function AddScheduleModal({
                       type="button"
                       onMouseDown={e => e.preventDefault()}
                       onClick={() => addGuest(c)}
-                      className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted"
+                      className="flex w-full items-center gap-2.5 px-2.5 py-1.5 text-left hover:bg-muted"
                     >
                       <CandidateAvatar name={c.name} avatarUrl={c.avatarUrl} size="md" />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-foreground">{c.name}</p>
+                        <p className="truncate text-xs font-medium text-foreground">{c.name}</p>
                         <p className="truncate text-xs text-muted-foreground">{c.email}</p>
                       </div>
                     </button>
                   )) : (
-                    <p className="px-3 py-3 text-xs text-muted-foreground">
+                    <p className="px-2.5 py-2.5 text-xs text-muted-foreground">
                       {guestSearch ? "No matching applicants" : "No applicants for this job"}
                     </p>
                   )}
@@ -451,31 +451,31 @@ function AddScheduleModal({
           )}
 
           {/* Meet link */}
-          <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+          <div className="flex items-center gap-2.5 rounded-lg border border-border px-2.5 py-2 focus-within:border-primary">
             <Link2 className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="url"
               value={meetLink}
               onChange={(e) => setMeetLink(e.target.value)}
               placeholder="https://meet.google.com/…"
-              className="flex-1 truncate bg-transparent text-sm text-primary outline-none placeholder:text-muted-foreground"
+              className="flex-1 truncate bg-transparent text-xs text-primary outline-none placeholder:text-muted-foreground"
             />
           </div>
 
           {/* Description */}
-          <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 focus-within:border-primary">
+          <div className="flex items-center gap-2.5 rounded-lg border border-border px-2.5 py-2 focus-within:border-primary">
             <AlignJustify className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="text"
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
               placeholder="Add description"
-              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
 
           {/* Color pickers */}
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-1.5 pt-1">
             {COLORS.map((c, i) => (
               <button
                 key={i}
@@ -493,18 +493,18 @@ function AddScheduleModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-3">
+        <div className="flex items-center justify-end gap-1.5 border-t border-border px-4 py-2.5">
           <button
             onClick={onClose}
             disabled={saving}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
+            className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
             {saving && <Loader2 className="size-3.5 animate-spin" />}
             Save
@@ -649,31 +649,31 @@ export default function InterviewsPage() {
 
       <main className="flex flex-1 flex-col overflow-hidden bg-card">
         {/* ── Top bar ── */}
-        <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3">
-          <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-2.5">
+          <div className="flex items-center gap-2.5">
             <h1 className="text-[15px] font-semibold text-foreground">{headerLabel}</h1>
             <button
               onClick={goToday}
-              className="rounded-md border border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted/50"
+              className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-muted/50"
             >
               Today
             </button>
-            <button onClick={prevWeek} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted">
+            <button onClick={prevWeek} className="rounded-md p-1 text-muted-foreground hover:bg-muted">
               <ChevronLeft className="size-4" />
             </button>
-            <button onClick={nextWeek} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted">
+            <button onClick={nextWeek} className="rounded-md p-1 text-muted-foreground hover:bg-muted">
               <ChevronRight className="size-4" />
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
+          <div className="flex items-center gap-1.5">
+            <button className="rounded-full p-1 text-muted-foreground hover:bg-muted">
               <Search className="size-4" />
             </button>
-            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
+            <button className="rounded-full p-1 text-muted-foreground hover:bg-muted">
               <HelpCircle className="size-4" />
             </button>
-            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
+            <button className="rounded-full p-1 text-muted-foreground hover:bg-muted">
               <Settings className="size-4" />
             </button>
             <div className="ml-1 flex rounded-lg border border-border bg-muted/50 p-0.5">
@@ -682,7 +682,7 @@ export default function InterviewsPage() {
                   key={v}
                   onClick={() => setView(v)}
                   className={cn(
-                    "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                    "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
                     view === v
                       ? "bg-card text-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
@@ -709,19 +709,19 @@ export default function InterviewsPage() {
               {/* Sticky day-header row */}
               <div className="sticky top-0 z-20 flex border-b border-border bg-card">
                 <div className="w-16 shrink-0 border-r border-border">
-                  <div className="flex h-14 items-end justify-center pb-2">
+                  <div className="flex h-14 items-end justify-center pb-1.5">
                     <span className="text-[10px] font-medium text-muted-foreground">UTC</span>
                   </div>
                 </div>
                 {weekDays.map((d, i) => {
                   const tod = isToday(d)
                   return (
-                    <div key={i} className="flex flex-1 flex-col items-center justify-center gap-1 border-r border-border py-2 last:border-r-0">
+                    <div key={i} className="flex flex-1 flex-col items-center justify-center gap-1 border-r border-border py-1.5 last:border-r-0">
                       <span className={cn("text-[11px] font-semibold uppercase tracking-wide", tod ? "text-primary" : "text-muted-foreground")}>
                         {DAY_ABBR[d.getDay()]}
                       </span>
                       <span className={cn(
-                        "flex size-8 items-center justify-center rounded-full text-sm font-bold",
+                        "flex size-8 items-center justify-center rounded-full text-xs font-bold",
                         tod ? "bg-primary text-primary-foreground" : "text-foreground"
                       )}>
                         {d.getDate()}
@@ -738,7 +738,7 @@ export default function InterviewsPage() {
                     {hours.map(h => (
                       <div
                         key={h}
-                        className="absolute right-0 flex w-full justify-end pr-2"
+                        className="absolute right-0 flex w-full justify-end pr-1.5"
                         style={{ top: `${(h - GRID_START) * HOUR_PX - 8}px` }}
                       >
                         <span className="text-[10px] text-muted-foreground">
@@ -795,7 +795,7 @@ export default function InterviewsPage() {
                             <div
                               key={iv.id}
                               className={cn(
-                                "group absolute left-1 right-1 overflow-hidden rounded-md px-2 py-1 text-xs shadow-sm",
+                                "group absolute left-1 right-1 overflow-hidden rounded-md px-1.5 py-1 text-xs shadow-sm",
                                 cancelled && "opacity-50"
                               )}
                               style={{

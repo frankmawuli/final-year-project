@@ -43,46 +43,46 @@ export default function LoginPage() {
   return (
     <div className="auth-layout">
       {/* ── Left: Branding panel ── */}
-      <div className="gradient-primary relative hidden flex-col items-start justify-between overflow-hidden p-12 text-white lg:flex">
+      <div className="gradient-primary relative hidden flex-col items-start justify-between overflow-hidden p-10 text-white lg:flex">
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-white/10" />
         <div className="absolute -bottom-32 -left-32 h-112 w-md rounded-full bg-white/10" />
 
-        <div className="relative flex items-center gap-2">
+        <div className="relative flex items-center gap-1.5">
           <Logo width={52} height={52} />
-          <span className="text-lg font-semibold tracking-tight">CoreRecruiter</span>
+          <span className="text-base font-semibold tracking-tight">CoreRecruiter</span>
         </div>
 
-        <div className="relative space-y-4">
-          <h1 className="text-4xl leading-tight font-bold tracking-tight">
+        <div className="relative space-y-3">
+          <h1 className="text-3xl leading-tight font-bold tracking-tight">
             Streamline your<br />hiring process
           </h1>
-          <p className="max-w-xs text-base text-white/75">
+          <p className="max-w-xs text-sm text-white/75">
             Manage candidates, schedule interviews, and collaborate with your team — all in one place.
           </p>
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="flex flex-wrap gap-1.5 pt-1.5">
             {["AI Screening", "Smart Pipelines", "Team Collaboration"].map((f) => (
-              <span key={f} className="rounded-full bg-white/15 px-3 py-1 text-sm font-medium backdrop-blur-sm">
+              <span key={f} className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
                 {f}
               </span>
             ))}
           </div>
         </div>
 
-        <p className="relative text-sm text-white/50">Trusted by 500+ companies worldwide</p>
+        <p className="relative text-xs text-white/50">Trusted by 500+ companies worldwide</p>
       </div>
 
       {/* ── Right: Form panel ── */}
-      <div className="flex items-center justify-center bg-background px-6 py-12">
-        <div className="w-full max-w-sm space-y-8">
+      <div className="flex items-center justify-center bg-background px-5 py-10">
+        <div className="w-full max-w-sm space-y-6">
           {/* Mobile logo */}
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-1.5 lg:hidden">
             <Logo width={52} height={52} />
-            <span className="text-lg font-semibold">CoreRecruiter</span>
+            <span className="text-base font-semibold">CoreRecruiter</span>
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h2>
-            <p className="text-sm text-muted-foreground">Sign in to your account to continue</p>
+          <div className="space-y-1.5">
+            <h2 className="text-xl font-bold tracking-tight text-foreground">Welcome back</h2>
+            <p className="text-xs text-muted-foreground">Sign in to your account to continue</p>
           </div>
 
           {/* Role switcher */}
@@ -93,7 +93,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setRole(r)}
                 className={cn(
-                  "flex-1 rounded-lg py-2 text-sm font-medium transition-all",
+                  "flex-1 rounded-lg py-1.5 text-xs font-medium transition-all",
                   role === r
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -105,15 +105,15 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-3" onSubmit={handleSubmit}>
             {error && (
-              <p className="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+              <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
                 {error}
               </p>
             )}
 
-            <div className="space-y-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-foreground">
+            <div className="space-y-1">
+              <label htmlFor="email" className="text-xs font-medium text-foreground">
                 Email address
               </label>
               <Input
@@ -123,13 +123,13 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={role === "hr" ? "admin@company.com" : "you@company.com"}
-                className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                className="h-11 rounded-xl border-border bg-card px-3 text-xs placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium text-foreground">
+                <label htmlFor="password" className="text-xs font-medium text-foreground">
                   Password
                 </label>
                 <Link href="/auth/reset-password" className="text-xs font-medium text-primary hover:underline">
@@ -144,7 +144,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="h-11 rounded-xl border-border bg-card px-4 pr-10 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                  className="h-11 rounded-xl border-border bg-card px-3 pr-8 text-xs placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
                 />
                 <button
                   type="button"
@@ -160,13 +160,13 @@ export default function LoginPage() {
               type="submit"
               size="lg"
               disabled={loading}
-              className="gradient-primary h-11 w-full rounded-xl border-0 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
+              className="gradient-primary h-11 w-full rounded-xl border-0 text-xs font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
             >
               {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
 
-          <div className="relative flex items-center gap-3">
+          <div className="relative flex items-center gap-2.5">
             <div className="h-px flex-1 bg-border" />
             <span className="text-xs text-muted-foreground">or</span>
             <div className="h-px flex-1 bg-border" />
@@ -176,9 +176,9 @@ export default function LoginPage() {
             variant="outline"
             size="lg"
             type="button"
-            className="h-11 w-full rounded-xl border-border text-sm font-medium"
+            className="h-11 w-full rounded-xl border-border text-xs font-medium"
           >
-            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+            <svg className="mr-1.5 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -187,7 +187,7 @@ export default function LoginPage() {
             Continue with Google
           </Button>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-xs text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link href="/auth/signup" className="font-medium text-primary hover:underline">
               Create account

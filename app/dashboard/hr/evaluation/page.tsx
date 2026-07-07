@@ -141,7 +141,7 @@ function AiScoreBadge({ score }: { score: number }) {
   const bg    = score >= 85 ? "#def8ee" : score >= 70 ? "#fffbd4" : "#fef2f2"
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold"
+      className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-bold"
       style={{ background: bg, color }}
     >
       {score >= 85 && (
@@ -158,7 +158,7 @@ function StatusBadge({ status }: { status: EvalStatus }) {
   const { bg, text } = statusConfig[status]
   return (
     <span
-      className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold"
+      className="inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
       style={{ background: bg, color: text }}
     >
       {status}
@@ -188,7 +188,7 @@ function StatusDropdown({
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex h-[28px] min-w-[130px] items-center justify-between gap-1.5 rounded border border-border bg-white px-2.5 text-xs font-medium text-[#374151] hover:bg-muted"
+        className="flex h-[28px] min-w-[130px] items-center justify-between gap-1 rounded border border-border bg-white px-2 text-xs font-medium text-[#374151] hover:bg-muted"
       >
         <span>{value}</span>
         <ChevronDown className="size-3 shrink-0 text-[#8181a5]" />
@@ -202,7 +202,7 @@ function StatusDropdown({
                 key={opt}
                 onClick={() => { onChange(opt); setOpen(false) }}
                 className={cn(
-                  "flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-muted",
+                  "flex w-full items-center gap-1.5 px-2.5 py-1.5 text-xs transition-colors hover:bg-muted",
                   opt === value ? "font-semibold" : "font-medium"
                 )}
                 style={{ color: text }}
@@ -232,16 +232,16 @@ function ProfilePanel({
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
 
       <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-base font-semibold text-[#1f2937]">Applicant Profile</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+          <h2 className="text-sm font-semibold text-[#1f2937]">Applicant Profile</h2>
+          <button onClick={onClose} className="rounded-lg p-1 text-[#8181a5] hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Identity */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3">
             {candidate.photo ? (
               <img
                 src={candidate.photo}
@@ -249,19 +249,19 @@ function ProfilePanel({
                 className="size-16 shrink-0 rounded-full object-cover ring-2 ring-border"
               />
             ) : (
-              <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] ring-2 ring-border text-lg font-bold text-[#8a8cd9]">
+              <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] ring-2 ring-border text-base font-bold text-[#8a8cd9]">
                 {candidate.name.charAt(0)}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-lg font-bold text-[#1f2937]">{candidate.name}</p>
-              <p className="text-sm font-medium text-[#3d70fa]">{candidate.position}</p>
-              <div className="mt-1 flex flex-wrap gap-2 text-xs text-[#667388]">
+              <p className="text-base font-bold text-[#1f2937]">{candidate.name}</p>
+              <p className="text-xs font-medium text-[#3d70fa]">{candidate.position}</p>
+              <div className="mt-1 flex flex-wrap gap-1.5 text-xs text-[#667388]">
                 <span className="flex items-center gap-1">
                   <Mail className="size-3" />{candidate.email}
                 </span>
               </div>
-              <div className="mt-1 flex flex-wrap gap-3 text-xs text-[#667388]">
+              <div className="mt-1 flex flex-wrap gap-2.5 text-xs text-[#667388]">
                 <span className="flex items-center gap-1">
                   <Phone className="size-3" />{candidate.phone}
                 </span>
@@ -273,7 +273,7 @@ function ProfilePanel({
           </div>
 
           {/* AI Score + Status */}
-          <div className="flex items-center gap-3 rounded-xl border border-border bg-[#f8fafc] px-4 py-3">
+          <div className="flex items-center gap-2.5 rounded-xl border border-border bg-[#f8fafc] px-3 py-2.5">
             <div className="flex flex-col items-center gap-1">
               <p className="text-[10px] uppercase tracking-wide text-[#8181a5]">AI Score</p>
               <AiScoreBadge score={candidate.aiScore} />
@@ -293,26 +293,26 @@ function ProfilePanel({
           {/* About */}
           {candidate.about && (
             <div>
-              <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
+              <p className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
                 <Star className="size-3.5 text-[#ffc555]" />About
               </p>
-              <p className="text-sm leading-relaxed text-[#667388]">{candidate.about}</p>
+              <p className="text-xs leading-relaxed text-[#667388]">{candidate.about}</p>
             </div>
           )}
 
           {/* Skills */}
           <div>
-            <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
+            <p className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
               <Briefcase className="size-3.5 text-[#5e81f4]" />Skills
             </p>
             {loading ? (
-              <div className="flex items-center gap-2 text-xs text-[#8181a5]">
+              <div className="flex items-center gap-1.5 text-xs text-[#8181a5]">
                 <Loader2 className="size-3.5 animate-spin" />Loading…
               </div>
             ) : candidate.skills.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {candidate.skills.map((s) => (
-                  <span key={s} className="rounded-full bg-[#f0f0ff] px-2.5 py-0.5 text-xs font-medium text-[#8a8cd9]">
+                  <span key={s} className="rounded-full bg-[#f0f0ff] px-2 py-0.5 text-xs font-medium text-[#8a8cd9]">
                     {s}
                   </span>
                 ))}
@@ -324,20 +324,20 @@ function ProfilePanel({
 
           {/* Experience */}
           <div>
-            <p className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
+            <p className="mb-2.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
               <Briefcase className="size-3.5 text-[#3b82f6]" />Experience
             </p>
             {loading ? (
-              <div className="flex items-center gap-2 text-xs text-[#8181a5]">
+              <div className="flex items-center gap-1.5 text-xs text-[#8181a5]">
                 <Loader2 className="size-3.5 animate-spin" />Loading…
               </div>
             ) : candidate.experience.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {candidate.experience.map((exp, i) => (
-                  <div key={i} className="flex items-start gap-3">
+                  <div key={i} className="flex items-start gap-2.5">
                     <div className="mt-1 size-2 shrink-0 rounded-full bg-[#5e81f4]" />
                     <div>
-                      <p className="text-sm font-semibold text-[#1f2937]">{exp.role}</p>
+                      <p className="text-xs font-semibold text-[#1f2937]">{exp.role}</p>
                       <p className="text-xs text-[#667388]">{exp.company} · {exp.duration}</p>
                     </div>
                   </div>
@@ -350,20 +350,20 @@ function ProfilePanel({
 
           {/* Education */}
           <div>
-            <p className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
+            <p className="mb-2.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
               <GraduationCap className="size-3.5 text-[#4aa785]" />Education
             </p>
             {loading ? (
-              <div className="flex items-center gap-2 text-xs text-[#8181a5]">
+              <div className="flex items-center gap-1.5 text-xs text-[#8181a5]">
                 <Loader2 className="size-3.5 animate-spin" />Loading…
               </div>
             ) : candidate.education.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {candidate.education.map((edu, i) => (
-                  <div key={i} className="flex items-start gap-3">
+                  <div key={i} className="flex items-start gap-2.5">
                     <div className="mt-1 size-2 shrink-0 rounded-full bg-[#4aa785]" />
                     <div>
-                      <p className="text-sm font-semibold text-[#1f2937]">{edu.degree}</p>
+                      <p className="text-xs font-semibold text-[#1f2937]">{edu.degree}</p>
                       <p className="text-xs text-[#667388]">{edu.school} · {edu.year}</p>
                     </div>
                   </div>
@@ -377,16 +377,16 @@ function ProfilePanel({
           {/* Documents */}
           {candidate.documents.length > 0 && (
             <div>
-              <p className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-[#1f2937]">
+              <p className="mb-2.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
                 <FileText className="size-3.5 text-[#ffc555]" />Submitted Documents
               </p>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {candidate.documents.map((doc, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between rounded-lg border border-border bg-[#f8fafc] px-3 py-2.5"
+                    className="flex items-center justify-between rounded-lg border border-border bg-[#f8fafc] px-2.5 py-2"
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2">
                       <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#eff6ff]">
                         <FileText className="size-4 text-[#3b82f6]" />
                       </div>
@@ -399,7 +399,7 @@ function ProfilePanel({
                       href={doc.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-lg p-1.5 text-[#5e81f4] hover:bg-[#f0f0ff]"
+                      className="rounded-lg p-1 text-[#5e81f4] hover:bg-[#f0f0ff]"
                       title="Download"
                     >
                       <Download className="size-4" />
@@ -497,35 +497,35 @@ export default function EvaluationPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-hidden p-6">
+      <main className="flex flex-1 flex-col overflow-hidden p-5">
         {/* Search */}
-        <div className="mb-5 flex items-center gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
+        <div className="mb-4 flex items-center gap-2.5 rounded-lg bg-white px-3 py-2.5 shadow-sm">
           <Search className="size-5 shrink-0 text-[#8181a5]" />
           <input
             type="text"
             placeholder="Search ⌘K"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-[#1f2937] outline-none placeholder:text-[rgba(34,48,62,0.4)]"
+            className="flex-1 bg-transparent text-xs text-[#1f2937] outline-none placeholder:text-[rgba(34,48,62,0.4)]"
           />
-          <button className="rounded-lg p-1.5 text-[#8181a5] hover:bg-muted">
+          <button className="rounded-lg p-1 text-[#8181a5] hover:bg-muted">
             <SlidersHorizontal className="size-5" />
           </button>
         </div>
 
         {listError && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-600">
             {listError}
           </div>
         )}
 
         {/* Table card */}
         <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-          <div className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center border-b border-border px-6 py-3.5">
+          <div className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center border-b border-border px-5 py-3">
             {["Candidate Name", "Job Position", "Applied", "AI Score", "Status", "Actions"].map((h, i) => (
               <span
                 key={h}
-                className={cn("text-sm font-medium text-[#1f2937]", i === 5 && "text-right")}
+                className={cn("text-xs font-medium text-[#1f2937]", i === 5 && "text-right")}
               >
                 {h}
               </span>
@@ -540,31 +540,31 @@ export default function EvaluationPage() {
             ) : rows.length > 0 ? rows.map((c) => (
               <div
                 key={c.id}
-                className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center gap-x-3 px-6 py-3 transition-colors hover:bg-[#f8fafc]"
+                className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center gap-x-2.5 px-5 py-2.5 transition-colors hover:bg-[#f8fafc]"
               >
                 {/* Name */}
-                <div className="flex min-w-0 items-center gap-3">
+                <div className="flex min-w-0 items-center gap-2.5">
                   {c.photo ? (
                     <img src={c.photo} alt={c.name} className="size-9 shrink-0 rounded-full object-cover" />
                   ) : (
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] text-sm font-bold text-[#8a8cd9]">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] text-xs font-bold text-[#8a8cd9]">
                       {c.name.charAt(0)}
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-[#1f2937]">{c.name}</p>
+                    <p className="truncate text-xs font-medium text-[#1f2937]">{c.name}</p>
                     <p className="truncate text-xs text-[#667388]">{c.email}</p>
                   </div>
                 </div>
 
                 {/* Position */}
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-[#1f2937]">{c.position}</p>
+                  <p className="truncate text-xs text-[#1f2937]">{c.position}</p>
                   <p className="truncate text-xs text-[#8181a5]">{c.department}</p>
                 </div>
 
                 {/* Applied */}
-                <span className="text-sm text-[#667388]">{c.appliedAt}</span>
+                <span className="text-xs text-[#667388]">{c.appliedAt}</span>
 
                 {/* AI Score */}
                 <div>
@@ -577,21 +577,21 @@ export default function EvaluationPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end gap-2">
+                <div className="flex items-center justify-end gap-1.5">
                   <StatusDropdown
                     value={c.status}
                     onChange={(v) => updateStatus(c.id, v)}
                   />
                   <button
                     onClick={() => handleView(c)}
-                    className="h-[28px] rounded border border-[#6e39cb] px-3 text-xs font-medium text-[#6e39cb] transition-colors hover:bg-[#6e39cb]/5"
+                    className="h-[28px] rounded border border-[#6e39cb] px-2.5 text-xs font-medium text-[#6e39cb] transition-colors hover:bg-[#6e39cb]/5"
                   >
                     View
                   </button>
                 </div>
               </div>
             )) : (
-              <div className="flex h-32 items-center justify-center text-sm text-[#8181a5]">
+              <div className="flex h-32 items-center justify-center text-xs text-[#8181a5]">
                 No candidates match your search.
               </div>
             )}
@@ -599,7 +599,7 @@ export default function EvaluationPage() {
         </div>
 
         {/* Pagination */}
-        <div className="mt-4 flex items-center justify-end gap-1">
+        <div className="mt-3 flex items-center justify-end gap-1">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
@@ -612,7 +612,7 @@ export default function EvaluationPage() {
               key={p}
               onClick={() => setPage(p)}
               className={cn(
-                "flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
+                "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
                 p === page ? "bg-[#3b6feb] text-white" : "text-[#4b5563] hover:bg-muted"
               )}
             >

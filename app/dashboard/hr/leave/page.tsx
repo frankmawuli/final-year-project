@@ -151,15 +151,15 @@ export default function LeavePage() {
 
       <main className="flex flex-1 flex-col overflow-hidden">
         {/* Toolbar */}
-        <div className="flex items-center gap-3 border-b border-border bg-card px-6 py-3">
-          <div className="flex flex-1 items-center gap-2 rounded-lg bg-muted px-4 py-2.5">
+        <div className="flex items-center gap-2.5 border-b border-border bg-card px-5 py-2.5">
+          <div className="flex flex-1 items-center gap-1.5 rounded-lg bg-muted px-3 py-2">
             <Search className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by employee name…"
-              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
           <button className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted">
@@ -169,19 +169,19 @@ export default function LeavePage() {
 
         {/* Action error banner */}
         {actionError && (
-          <div className="mx-6 mt-4 rounded-lg bg-rose-50 px-4 py-2.5 text-sm text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+          <div className="mx-5 mt-3 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
             {actionError}
           </div>
         )}
 
         {/* Table */}
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-5">
           <div className="rounded-xl border border-border bg-card shadow-sm">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border">
                   {["Employee", "Department", "Leave Type", "Start Date", "End Date", "Status", "Actions"].map((col) => (
-                    <th key={col} className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <th key={col} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       {col}
                     </th>
                   ))}
@@ -190,19 +190,19 @@ export default function LeavePage() {
               <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-16 text-center text-sm text-muted-foreground">
+                    <td colSpan={7} className="px-5 py-12 text-center text-xs text-muted-foreground">
                       Loading…
                     </td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-16 text-center text-sm text-rose-500">
+                    <td colSpan={7} className="px-5 py-12 text-center text-xs text-rose-500">
                       {error}
                     </td>
                   </tr>
                 ) : requests.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-16 text-center text-sm text-muted-foreground">
+                    <td colSpan={7} className="px-5 py-12 text-center text-xs text-muted-foreground">
                       No leave requests found.
                     </td>
                   </tr>
@@ -210,8 +210,8 @@ export default function LeavePage() {
                   requests.map((r) => (
                     <tr key={r.id} className="hover:bg-muted/50">
                       {/* Employee */}
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2.5">
                           <img
                             src={r.photo}
                             alt={r.name}
@@ -225,43 +225,43 @@ export default function LeavePage() {
                       </td>
 
                       {/* Department */}
-                      <td className="px-4 py-4 text-muted-foreground">{r.department}</td>
+                      <td className="px-3 py-3 text-muted-foreground">{r.department}</td>
 
                       {/* Leave type */}
-                      <td className="px-4 py-4">
-                        <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", leaveTypeBadge[r.type])}>
+                      <td className="px-3 py-3">
+                        <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", leaveTypeBadge[r.type])}>
                           {TYPE_LABELS[r.type]}
                         </span>
                       </td>
 
                       {/* Start date */}
-                      <td className="px-4 py-4 text-foreground">{formatDate(r.startDate)}</td>
+                      <td className="px-3 py-3 text-foreground">{formatDate(r.startDate)}</td>
 
                       {/* End date */}
-                      <td className="px-4 py-4 text-foreground">{formatDate(r.endDate)}</td>
+                      <td className="px-3 py-3 text-foreground">{formatDate(r.endDate)}</td>
 
                       {/* Status */}
-                      <td className="px-4 py-4">
-                        <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", statusBadge[r.status])}>
+                      <td className="px-3 py-3">
+                        <span className={cn("rounded-full border px-2.5 py-1 text-xs font-semibold", statusBadge[r.status])}>
                           {r.status.charAt(0) + r.status.slice(1).toLowerCase()}
                         </span>
                       </td>
 
                       {/* Actions — only PENDING rows can be acted on */}
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-3">
                         {r.status === "PENDING" ? (
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleUpdateStatus(r.id, "APPROVED")}
                               disabled={actionLoading === r.id}
-                              className="rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-100 disabled:opacity-50 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
+                              className="rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-600 hover:bg-emerald-100 disabled:opacity-50 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
                             >
                               {actionLoading === r.id ? "…" : "Approve"}
                             </button>
                             <button
                               onClick={() => handleUpdateStatus(r.id, "REJECTED")}
                               disabled={actionLoading === r.id}
-                              className="rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100 disabled:opacity-50 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/30"
+                              className="rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-100 disabled:opacity-50 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/30"
                             >
                               {actionLoading === r.id ? "…" : "Reject"}
                             </button>
@@ -278,7 +278,7 @@ export default function LeavePage() {
 
             {/* Pagination */}
             {!loading && !error && totalPages > 1 && (
-              <div className="flex items-center justify-between border-t border-border px-5 py-3">
+              <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
                 <p className="text-xs text-muted-foreground">
                   Showing {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, total)} of {total}
                 </p>
@@ -288,7 +288,7 @@ export default function LeavePage() {
                       key={i}
                       onClick={() => setPage(i + 1)}
                       className={cn(
-                        "flex size-8 items-center justify-center rounded-lg text-sm font-medium",
+                        "flex size-8 items-center justify-center rounded-lg text-xs font-medium",
                         page === i + 1 ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
                       )}
                     >

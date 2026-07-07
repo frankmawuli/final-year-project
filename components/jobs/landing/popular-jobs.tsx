@@ -10,13 +10,13 @@ interface PopularJobsProps {
 
 export function PopularJobs({ popularJobs }: PopularJobsProps) {
   return (
-    <section className="py-12 sm:py-16 bg-white lg:my-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section className="py-10 sm:py-12 bg-white lg:my-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5">
         {/* Header */}
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="text-[22px] font-bold text-foreground">Popular Jobs</h2>
-            <div className="w-10 h-[3px] bg-primary rounded-full mt-2" />
+            <div className="w-10 h-[3px] bg-primary rounded-full mt-1.5" />
           </div>
           <Link
             href="jobs/job-listing"
@@ -28,16 +28,16 @@ export function PopularJobs({ popularJobs }: PopularJobsProps) {
         </div>
 
         {/* Cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {popularJobs.map((job) => (
             <Link
               key={job.id}
               href={`/apply/${job.id}`}
-              className="p-5 rounded-xl border border-border bg-card hover:shadow-md transition-all cursor-pointer block"
+              className="p-4 rounded-xl border border-border bg-card hover:shadow-md transition-all cursor-pointer block"
             >
               {/* Company row */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-2.5">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2">
                   {job.company.logo_url ? (
                     <img
                       src={job.company.logo_url}
@@ -66,16 +66,16 @@ export function PopularJobs({ popularJobs }: PopularJobsProps) {
 
               {/* Title */}
               <h3 className="text-[14px] font-semibold text-foreground mb-1">{job.title}</h3>
-              <p className="text-[11.5px] text-muted-foreground mb-3">
+              <p className="text-[11.5px] text-muted-foreground mb-2.5">
                 {PUBLIC_TYPE_LABEL[job.employment.type]} · {PUBLIC_LOCATION_LABEL[job.location.arrangement]}
               </p>
 
               {/* Tags */}
-              <div className="flex flex-wrap gap-1.5 mb-4">
+              <div className="flex flex-wrap gap-1 mb-3">
                 {job.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="text-[10.5px] text-primary bg-primary/10 px-2.5 py-0.5 rounded-full font-medium"
+                    className="text-[10.5px] text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium"
                   >
                     {tag}
                   </span>

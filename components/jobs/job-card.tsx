@@ -31,7 +31,7 @@ export function JobCard({ job }: { job: PublicJobListItem }) {
   return (
     <Link
       href={`/apply/${job.id}`}
-      className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex flex-col gap-3 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer"
+      className="bg-white rounded-xl border border-[#E5E7EB] p-3 flex flex-col gap-2.5 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer"
     >
       <div className="flex items-start justify-between">
         {job.company.logo_url ? (
@@ -68,7 +68,7 @@ export function JobCard({ job }: { job: PublicJobListItem }) {
         <span className="text-[10.5px] text-[#9CA3AF] uppercase tracking-[0.04em]">{loc}</span>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1.5 flex-wrap">
         <span className="text-[11px] text-[#6B7280]">
           {PUBLIC_LEVEL_LABEL[job.employment.experience_level]}
         </span>
@@ -84,18 +84,18 @@ export function JobCard({ job }: { job: PublicJobListItem }) {
 
       <p className="text-[11.5px] text-[#6B7280] leading-[1.6] line-clamp-3">{job.description}</p>
 
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-1">
         {job.tags.map((tag) => (
           <span
             key={tag}
-            className="text-[10.5px] text-[#6B7280] border border-[#E5E7EB] px-2.5 py-[3px] rounded-md font-medium"
+            className="text-[10.5px] text-[#6B7280] border border-[#E5E7EB] px-2 py-[3px] rounded-md font-medium"
           >
             {tag}
           </span>
         ))}
       </div>
 
-      <div className="flex items-center justify-between pt-2 border-t border-[#F3F4F6]">
+      <div className="flex items-center justify-between pt-1.5 border-t border-[#F3F4F6]">
         <span className="text-[11px] text-[#9CA3AF]">{postedLabel(job.meta.posted_at)}</span>
         <button
           className={cn("transition-colors", saved ? "text-red-500" : "text-[#D1D5DB] hover:text-red-400")}

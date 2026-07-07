@@ -30,8 +30,8 @@ export const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"]
 export const LOCATIONS  = ["Remote", "On-site", "Hybrid"]
 export const LEVELS     = ["Junior", "Mid-level", "Senior", "Lead", "Executive"]
 
-export const fieldCls = "h-10 w-full rounded-xl border border-border bg-muted/50 px-3 text-sm text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
-export const areaCls  = "w-full resize-none rounded-xl border border-border bg-muted/50 px-3 py-2.5 text-sm text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+export const fieldCls = "h-10 w-full rounded-xl border border-border bg-muted/50 px-2.5 text-xs text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+export const areaCls  = "w-full resize-none rounded-xl border border-border bg-muted/50 px-2.5 py-2 text-xs text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
 
 // ── Public API label maps ──────────────────────────────────────────────────────
 export const PUBLIC_TYPE_LABEL: Record<PublicJobType, string> = {

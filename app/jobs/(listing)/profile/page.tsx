@@ -71,7 +71,7 @@ export default function JobProfile() {
 
   return (
     <div className="min-h-screen bg-[#F5F6F8]">
-      <div className="max-w-[1340px] mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row gap-6">
+      <div className="max-w-[1340px] mx-auto px-3 sm:px-5 py-5 flex flex-col md:flex-row gap-5">
         <ProfileSidebar
           data={sidebarData}
           onUploadCv={() => setActiveTab("CV / Portfolio / Cover Letter")}
@@ -80,7 +80,7 @@ export default function JobProfile() {
         <main className="w-full md:w-[calc(100%-21.25rem)]">
           <ProfileTabs active={activeTab} onChange={setActiveTab} />
           {tabContent[activeTab] ?? (
-            <div className="bg-white rounded-b-xl border border-[#E5E7EB] px-6 py-16 text-center text-[13.5px] text-muted-foreground">
+            <div className="bg-white rounded-b-xl border border-[#E5E7EB] px-5 py-12 text-center text-[13.5px] text-muted-foreground">
               {activeTab} content coming soon.
             </div>
           )}

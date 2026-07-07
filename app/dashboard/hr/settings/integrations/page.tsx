@@ -141,27 +141,27 @@ export default function IntegrationsPage() {
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="mb-4">
-        <h2 className="text-base font-semibold text-foreground">Integrations</h2>
-        <p className="text-sm text-muted-foreground">Connect your favourite tools and services to streamline your workflow.</p>
+      <div className="mb-3">
+        <h2 className="text-sm font-semibold text-foreground">Integrations</h2>
+        <p className="text-xs text-muted-foreground">Connect your favourite tools and services to streamline your workflow.</p>
       </div>
 
       <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
         {INTEGRATIONS.map(({ id, name, description, Logo }, i) => (
           <div key={id}>
-            <div className="flex items-center gap-4 px-6 py-4">
+            <div className="flex items-center gap-3 px-5 py-3">
               <div className="shrink-0">
                 <Logo />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground">{name}</p>
+                <p className="text-xs font-semibold text-foreground">{name}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
               </div>
               <div className="shrink-0">
                 <button
                   onClick={() => toggle(id)}
                   className={cn(
-                    "rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
+                    "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
                     connected[id]
                       ? "bg-primary text-primary-foreground hover:bg-primary/90"
                       : "border border-border bg-background text-foreground hover:bg-muted"
@@ -171,7 +171,7 @@ export default function IntegrationsPage() {
                 </button>
               </div>
             </div>
-            {i < INTEGRATIONS.length - 1 && <hr className="border-border mx-6" />}
+            {i < INTEGRATIONS.length - 1 && <hr className="border-border mx-5" />}
           </div>
         ))}
       </div>

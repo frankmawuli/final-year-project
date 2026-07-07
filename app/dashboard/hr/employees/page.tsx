@@ -101,10 +101,10 @@ function DotMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => voi
       </button>
       {open && (
         <div className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-lg border border-border bg-card shadow-lg">
-          <button onClick={() => { onEdit(); setOpen(false) }} className="block w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted">
+          <button onClick={() => { onEdit(); setOpen(false) }} className="block w-full px-3 py-1.5 text-left text-xs text-foreground hover:bg-muted">
             Edit
           </button>
-          <button onClick={() => { onDelete(); setOpen(false) }} className="block w-full px-4 py-2 text-left text-sm text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30">
+          <button onClick={() => { onDelete(); setOpen(false) }} className="block w-full px-3 py-1.5 text-left text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30">
             Remove
           </button>
         </div>
@@ -128,8 +128,8 @@ function EmployeeCard({
   onDelete:      (id: number) => void
 }) {
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-      <div className="mb-3 flex items-start justify-between">
+    <div className="flex flex-col rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+      <div className="mb-2.5 flex items-start justify-between">
         <div className="w-5" />
         <img
           src={emp.photo}
@@ -139,12 +139,12 @@ function EmployeeCard({
         <DotMenu onEdit={() => onEdit(emp)} onDelete={() => onDelete(emp.id)} />
       </div>
 
-      <div className="mb-4 text-center">
-        <p className="text-base font-bold text-foreground">{emp.name}</p>
-        <p className="text-sm text-muted-foreground">{emp.role}</p>
+      <div className="mb-3 text-center">
+        <p className="text-sm font-bold text-foreground">{emp.name}</p>
+        <p className="text-xs text-muted-foreground">{emp.role}</p>
       </div>
 
-      <div className="mb-4 space-y-1.5 text-sm">
+      <div className="mb-3 space-y-1 text-xs">
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground">Employee ID</span>
           <span className="font-semibold text-foreground">{emp.empId}</span>
@@ -155,25 +155,25 @@ function EmployeeCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-1.5">
         <a
           href={`tel:${emp.phone}`}
           title={`Call ${emp.name}`}
-          className="flex items-center justify-center rounded-lg bg-emerald-50 py-2 text-emerald-600 transition-colors hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
+          className="flex items-center justify-center rounded-lg bg-emerald-50 py-1.5 text-emerald-600 transition-colors hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
         >
           <Phone className="size-4" />
         </a>
         <button
           onClick={() => onMessage(emp)}
           title="Send message via email"
-          className="flex items-center justify-center rounded-lg bg-violet-50 py-2 text-violet-600 transition-colors hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-400 dark:hover:bg-violet-900/30"
+          className="flex items-center justify-center rounded-lg bg-violet-50 py-1.5 text-violet-600 transition-colors hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-400 dark:hover:bg-violet-900/30"
         >
           <MessageSquare className="size-4" />
         </button>
         <button
           onClick={() => onViewProfile(emp)}
           title="View profile"
-          className="flex items-center justify-center rounded-lg bg-blue-50 py-2 text-blue-600 transition-colors hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+          className="flex items-center justify-center rounded-lg bg-blue-50 py-1.5 text-blue-600 transition-colors hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
         >
           <User className="size-4" />
         </button>
@@ -195,38 +195,38 @@ function EmailModal({ emp, onClose }: { emp: Employee; onClose: () => void }) {
     setTimeout(onClose, 1800)
   }
 
-  const fieldCls = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+  const fieldCls = "w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl">
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <div className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
             <div className="flex size-8 items-center justify-center rounded-lg bg-violet-50 dark:bg-violet-900/20">
               <Mail className="size-4 text-violet-600 dark:text-violet-400" />
             </div>
-            <h2 className="text-base font-semibold text-foreground">Send Message</h2>
+            <h2 className="text-sm font-semibold text-foreground">Send Message</h2>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
         {sent ? (
-          <div className="flex flex-col items-center gap-3 py-8">
+          <div className="flex flex-col items-center gap-2.5 py-6">
             <div className="flex size-12 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-900/20">
               <Mail className="size-6 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <p className="text-sm font-medium text-foreground">Message sent to {emp.name}!</p>
+            <p className="text-xs font-medium text-foreground">Message sent to {emp.name}!</p>
           </div>
         ) : (
-          <form onSubmit={handleSend} className="space-y-4">
+          <form onSubmit={handleSend} className="space-y-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-foreground">To</label>
-              <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/50 px-3 py-2.5">
+              <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-2.5 py-2">
                 <img src={emp.photo} alt={emp.name} className="size-6 rounded-full object-cover" />
                 <div>
-                  <p className="text-sm font-medium text-foreground">{emp.name}</p>
+                  <p className="text-xs font-medium text-foreground">{emp.name}</p>
                   <p className="text-xs text-muted-foreground">{emp.email}</p>
                 </div>
               </div>
@@ -254,11 +254,11 @@ function EmailModal({ emp, onClose }: { emp: Employee; onClose: () => void }) {
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-1">
-              <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">
+            <div className="flex justify-end gap-1.5 pt-1">
+              <button type="button" onClick={onClose} className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
                 Cancel
               </button>
-              <button type="submit" className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90">
+              <button type="submit" className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
                 <Mail className="size-4" /> Send Email
               </button>
             </div>
@@ -334,22 +334,22 @@ function CompensationSection({ employeeId, onBack }: { employeeId: number; onBac
     }
   }
 
-  const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+  const inputCls = "w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
   const labelCls = "mb-1 block text-xs font-medium text-foreground"
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-3 flex items-center gap-1.5">
         <div className="flex size-8 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
           <Banknote className="size-4 text-emerald-600 dark:text-emerald-400" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-foreground">Compensation</h3>
+          <h3 className="text-xs font-semibold text-foreground">Compensation</h3>
           <p className="text-xs text-muted-foreground">Salary and payout details — visible to HR admins only</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2.5">
         <div>
           <label className={labelCls}>Base Salary (monthly)</label>
           <input className={inputCls} type="number" min="0" placeholder="0.00" value={baseSalary} onChange={(e) => setBaseSalary(e.target.value)} />
@@ -403,17 +403,17 @@ function CompensationSection({ employeeId, onBack }: { employeeId: number; onBac
         )}
       </div>
 
-      <div className={cn("mt-5 flex items-center gap-3", onBack ? "justify-between" : "justify-end")}>
+      <div className={cn("mt-4 flex items-center gap-2.5", onBack ? "justify-between" : "justify-end")}>
         {onBack && (
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
           >
             <ChevronLeft className="size-4" /> Back
           </button>
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {msg && (
             <p className={cn("text-xs font-medium", msg.error ? "text-rose-500" : "text-emerald-600")}>{msg.text}</p>
           )}
@@ -421,7 +421,7 @@ function CompensationSection({ employeeId, onBack }: { employeeId: number; onBac
             type="button"
             onClick={save}
             disabled={saving || !baseSalary}
-            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+            className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
             {saving ? "Saving…" : "Save Compensation"}
           </button>
@@ -484,32 +484,32 @@ function EmployeeFormModal({
     }
   }
 
-  const inputCls    = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-  const readonlyCls = "w-full rounded-lg border border-border bg-muted/50 px-3 py-2.5 text-sm text-muted-foreground cursor-not-allowed"
+  const inputCls    = "w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+  const readonlyCls = "w-full rounded-lg border border-border bg-muted/50 px-2.5 py-2 text-xs text-muted-foreground cursor-not-allowed"
   const labelCls    = "mb-1 block text-xs font-medium text-foreground"
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-card p-6 shadow-2xl">
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <h2 className="text-base font-semibold text-foreground">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-card p-5 shadow-2xl">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-foreground">
               {step === 1 ? (isEdit ? "Edit Employee" : "Add New Employee") : "Compensation"}
             </h2>
             {isEdit && (
-              <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">
                 {step}/2
               </span>
             )}
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
         {step === 1 && (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-2.5">
             {/* Full Name — read-only on edit (name is on user record, not patchable) */}
             <div className="col-span-2">
               <label className={labelCls}>Full Name {!isEdit && "*"}</label>
@@ -574,19 +574,19 @@ function EmployeeFormModal({
           </div>
 
           {saveErr && (
-            <p className="rounded-lg bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+            <p className="rounded-lg bg-rose-50 px-2.5 py-1.5 text-xs font-medium text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
               {saveErr}
             </p>
           )}
 
-          <div className="flex justify-end gap-2 pt-1">
-            <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">
+          <div className="flex justify-end gap-1.5 pt-1">
+            <button type="button" onClick={onClose} className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+              className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
             >
               {saving ? "Saving…" : isEdit ? (dirty ? "Save & Continue" : "Next") : "Add Employee"}
             </button>
@@ -624,12 +624,12 @@ function CompensationSummary({ employeeId }: { employeeId: number }) {
         : "Bank transfer"
 
   return (
-    <div className="rounded-xl border border-border bg-muted/50 p-4">
-      <div className="mb-2 flex items-center gap-2">
+    <div className="rounded-xl border border-border bg-muted/50 p-3">
+      <div className="mb-1.5 flex items-center gap-1.5">
         <Banknote className="size-4 text-emerald-600 dark:text-emerald-400" />
-        <p className="text-sm font-semibold text-foreground">Compensation</p>
+        <p className="text-xs font-semibold text-foreground">Compensation</p>
       </div>
-      <p className="text-lg font-bold text-foreground">
+      <p className="text-base font-bold text-foreground">
         {comp.currency} {comp.baseSalary.toLocaleString()}
         <span className="text-xs font-normal text-muted-foreground"> /month</span>
       </p>
@@ -646,28 +646,28 @@ function ProfilePanel({ emp, onClose, onMessage }: { emp: Employee; onClose: () 
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
       <aside className="fixed right-0 top-0 z-40 flex h-full w-[400px] flex-col bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-base font-semibold text-foreground">Employee Profile</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+          <h2 className="text-sm font-semibold text-foreground">Employee Profile</h2>
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-muted/50 py-6">
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          <div className="flex flex-col items-center gap-2.5 rounded-xl border border-border bg-muted/50 py-5">
             <img src={emp.photo} alt={emp.name} className="size-20 rounded-full object-cover ring-2 ring-background shadow" />
             <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{emp.name}</p>
-              <p className="text-sm font-medium text-primary">{emp.role}</p>
+              <p className="text-base font-bold text-foreground">{emp.name}</p>
+              <p className="text-xs font-medium text-primary">{emp.role}</p>
               {emp.department && (
-                <span className="mt-1 inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">
+                <span className="mt-1 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
                   {emp.department}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="space-y-2.5 text-sm">
+          <div className="space-y-2 text-xs">
             {[
               { icon: IdCard,    label: "Employee ID", value: emp.empId      },
               { icon: Calendar,  label: "Joined",      value: emp.joinDate   },
@@ -678,7 +678,7 @@ function ProfilePanel({ emp, onClose, onMessage }: { emp: Employee; onClose: () 
             ]
               .filter(({ value }) => value)
               .map(({ icon: Icon, label, value }) => (
-                <div key={label} className="flex items-center gap-3">
+                <div key={label} className="flex items-center gap-2.5">
                   <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                     <Icon className="size-3.5 text-primary" />
                   </div>
@@ -692,32 +692,32 @@ function ProfilePanel({ emp, onClose, onMessage }: { emp: Employee; onClose: () 
 
           {emp.bio && (
             <div>
-              <p className="mb-2 text-sm font-semibold text-foreground">About</p>
-              <p className="text-sm leading-relaxed text-muted-foreground">{emp.bio}</p>
+              <p className="mb-1.5 text-xs font-semibold text-foreground">About</p>
+              <p className="text-xs leading-relaxed text-muted-foreground">{emp.bio}</p>
             </div>
           )}
 
           {emp.skills.length > 0 && (
             <div>
-              <p className="mb-2 text-sm font-semibold text-foreground">Skills</p>
-              <div className="flex flex-wrap gap-2">
+              <p className="mb-1.5 text-xs font-semibold text-foreground">Skills</p>
+              <div className="flex flex-wrap gap-1.5">
                 {emp.skills.map((s) => (
-                  <span key={s} className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">{s}</span>
+                  <span key={s} className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{s}</span>
                 ))}
               </div>
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2.5">
             <button
               onClick={onMessage}
-              className="flex items-center justify-center gap-2 rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-primary py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
               <Mail className="size-4" /> Send Message
             </button>
             <a
               href={`tel:${emp.phone}`}
-              className="flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 py-2.5 text-sm font-semibold text-emerald-600 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 py-2 text-xs font-semibold text-emerald-600 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
             >
               <Phone className="size-4" /> Call
             </a>
@@ -831,28 +831,28 @@ export default function EmployeesPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-hidden p-6">
+      <main className="flex flex-1 flex-col overflow-hidden p-5">
         {/* Search */}
-        <div className="mb-4 flex items-center gap-3 rounded-lg bg-card px-4 py-3 shadow-sm">
+        <div className="mb-3 flex items-center gap-2.5 rounded-lg bg-card px-3 py-2.5 shadow-sm">
           <Search className="size-5 shrink-0 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search ⌘K"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
           />
-          <button className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <button className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <SlidersHorizontal className="size-5" />
           </button>
         </div>
 
         {/* Header row */}
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div />
           <button
             onClick={() => setEditing(null)}
-            className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
+            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
           >
             <Plus className="size-4" /> Add Employee
           </button>
@@ -860,15 +860,15 @@ export default function EmployeesPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+          <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
             Loading employees…
           </div>
         ) : error ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-rose-500">
+          <div className="flex flex-1 items-center justify-center text-xs text-rose-500">
             {error}
           </div>
         ) : employees.length > 0 ? (
-          <div className="grid flex-1 auto-rows-min grid-cols-3 gap-4">
+          <div className="grid flex-1 auto-rows-min grid-cols-3 gap-3">
             {employees.map((emp) => (
               <EmployeeCard
                 key={emp.id}
@@ -881,14 +881,14 @@ export default function EmployeesPage() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+          <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
             No employees found.
           </div>
         )}
 
         {/* Pagination */}
         {!loading && !error && totalPages > 1 && (
-          <div className="mt-5 flex items-center justify-end gap-1">
+          <div className="mt-4 flex items-center justify-end gap-1">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
@@ -901,7 +901,7 @@ export default function EmployeesPage() {
                 key={p}
                 onClick={() => setPage(p)}
                 className={cn(
-                  "flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
+                  "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
                   p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
                 )}
               >

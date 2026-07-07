@@ -81,14 +81,14 @@ function LocationsMultiSelect({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex h-10 w-full items-center justify-between rounded-lg border border-[#E5E7EB] bg-white px-3.5 text-[13.5px] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        className="flex h-10 w-full items-center justify-between rounded-lg border border-[#E5E7EB] bg-white px-3 text-[13.5px] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
       >
         <span className={cn("truncate", value.length ? "text-foreground" : "text-muted-foreground")}>
           {value[0] ?? "Select locations"}
         </span>
-        <span className="flex shrink-0 items-center gap-2">
+        <span className="flex shrink-0 items-center gap-1.5">
           {value.length > 1 && (
-            <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
+            <span className="rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-semibold text-primary-foreground">
               +{value.length - 1}
             </span>
           )}
@@ -102,7 +102,7 @@ function LocationsMultiSelect({
           {LOCATIONS.map((location) => (
             <label
               key={location}
-              className="flex cursor-pointer items-center gap-2.5 px-3.5 py-2 text-[13.5px] text-foreground hover:bg-[#F5F6F8]"
+              className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-[13.5px] text-foreground hover:bg-[#F5F6F8]"
             >
               <input
                 type="checkbox"
@@ -199,22 +199,22 @@ export function EmploymentSection() {
     ].filter(Boolean);
 
     return (
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Employment & Availability</h3>
-        <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
           Keeping this section up to date will help employers & recruiters find you. They will know
           the field you are in, what your preferred industries are, and if you are actively looking.
         </p>
         {profile?.headline && (
-          <p className="mt-3 text-[13.5px] font-medium text-primary">{profile.headline}</p>
+          <p className="mt-2.5 text-[13.5px] font-medium text-primary">{profile.headline}</p>
         )}
         {bits.length > 0 && (
           <p className="mt-1 text-[13px] text-muted-foreground">
             {bits.join(" · ")}
           </p>
         )}
-        <div className="mt-4 flex justify-center">
-          <Button variant="outline" size="sm" className="rounded-full px-4" onClick={handleEdit}>
+        <div className="mt-3 flex justify-center">
+          <Button variant="outline" size="sm" className="rounded-full px-3" onClick={handleEdit}>
             <Pencil className="size-3.5" />
             {profile?.headline ? "Edit" : "Add"}
           </Button>
@@ -225,7 +225,7 @@ export function EmploymentSection() {
 
   return (
     <div>
-      <div className="flex items-center gap-4 px-6 py-6">
+      <div className="flex items-center gap-3 px-5 py-5">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary">
           {profile?.avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -238,7 +238,7 @@ export function EmploymentSection() {
           <Button
             variant="outline"
             size="sm"
-            className="rounded-full px-4"
+            className="rounded-full px-3"
             disabled={uploadingPhoto}
             onClick={() => photoInputRef.current?.click()}
           >
@@ -257,13 +257,13 @@ export function EmploymentSection() {
             className="hidden"
             onChange={(e) => handlePhotoChange(e.target.files?.[0])}
           />
-          <p className="mt-2 text-[12px] text-muted-foreground">
+          <p className="mt-1.5 text-[12px] text-muted-foreground">
             Upload an image no larger than 5MB for file types .jpg .png
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 border-t border-[#F3F4F6] px-6 py-6 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-[#F3F4F6] px-5 py-5 sm:grid-cols-3">
         <div>
           <FormLabel>Professional Headline</FormLabel>
           <FormInput
@@ -387,7 +387,7 @@ export function EmploymentSection() {
 
         <div className="sm:col-span-3">
           <FormLabel>Monthly Salary Expectation (Gross)</FormLabel>
-          <div className="grid grid-cols-3 gap-x-6">
+          <div className="grid grid-cols-3 gap-x-5">
             <FormSelect value={draft.currency} onChange={(e) => update("currency", e.target.value)}>
               <option value="" disabled>
                 Currency
@@ -409,10 +409,10 @@ export function EmploymentSection() {
         </div>
       </div>
 
-      <div className="border-t border-[#F3F4F6] px-6 py-6">
+      <div className="border-t border-[#F3F4F6] px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Preferences</h3>
-        <div className="mt-4 space-y-3">
-          <label className="flex w-fit cursor-pointer items-center gap-2.5 text-[13.5px] text-foreground">
+        <div className="mt-3 space-y-2.5">
+          <label className="flex w-fit cursor-pointer items-center gap-2 text-[13.5px] text-foreground">
             <input
               type="checkbox"
               checked={draft.activelyLooking}
@@ -421,7 +421,7 @@ export function EmploymentSection() {
             />
             I am actively looking for a job
           </label>
-          <label className="flex w-fit cursor-pointer items-center gap-2.5 text-[13.5px] text-foreground">
+          <label className="flex w-fit cursor-pointer items-center gap-2 text-[13.5px] text-foreground">
             <input
               type="checkbox"
               checked={draft.displayProfile}
@@ -430,7 +430,7 @@ export function EmploymentSection() {
             />
             Display my profile to potential employers
           </label>
-          <label className="flex w-fit cursor-pointer items-center gap-2.5 text-[13.5px] text-foreground">
+          <label className="flex w-fit cursor-pointer items-center gap-2 text-[13.5px] text-foreground">
             <input
               type="checkbox"
               checked={draft.willingToRelocate}
@@ -442,9 +442,9 @@ export function EmploymentSection() {
         </div>
       </div>
 
-      {error && <p className="px-6 pb-2 text-[13px] text-destructive">{error}</p>}
+      {error && <p className="px-5 pb-1.5 text-[13px] text-destructive">{error}</p>}
 
-      <div className="flex justify-end gap-3 border-t border-[#F3F4F6] px-6 py-4">
+      <div className="flex justify-end gap-2.5 border-t border-[#F3F4F6] px-5 py-3">
         <Button
           variant="outline"
           className="border-primary text-primary hover:bg-primary/5"

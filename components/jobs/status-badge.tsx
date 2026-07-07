@@ -11,7 +11,7 @@ export type StatusKey = keyof typeof statusStyles
 
 export function StatusBadge({ status }: { status: StatusKey }) {
   return (
-    <span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", statusStyles[status])}>
+    <span className={cn("rounded-full px-1.5 py-0.5 text-xs font-bold", statusStyles[status])}>
       {STATUS_LABEL[status]}
     </span>
   )

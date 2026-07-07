@@ -191,7 +191,7 @@ function ChartTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg">
+    <div className="rounded-lg border border-border bg-card px-2.5 py-1.5 shadow-lg">
       {label && <p className="mb-1 text-xs font-semibold text-foreground">{label}</p>}
       {payload.map((p, i) => (
         <p key={i} className="text-xs text-muted-foreground">
@@ -211,13 +211,13 @@ function KpiCard({ label, value, sub, color, suffix }: {
   suffix?: string
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
       <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-      <div className="mt-2 flex items-end gap-1">
-        <span className="text-3xl font-bold leading-none" style={{ color }}>{value}</span>
-        {suffix && <span className="mb-0.5 text-sm text-muted-foreground">{suffix}</span>}
+      <div className="mt-1.5 flex items-end gap-1">
+        <span className="text-2xl font-bold leading-none" style={{ color }}>{value}</span>
+        {suffix && <span className="mb-0.5 text-xs text-muted-foreground">{suffix}</span>}
       </div>
-      <p className="mt-1.5 text-xs text-muted-foreground">{sub}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{sub}</p>
     </div>
   )
 }
@@ -233,12 +233,12 @@ function DrillPanel({ label, items, onClose, onSelect }: {
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
       <aside className="fixed right-0 top-0 z-40 flex h-full w-[380px] flex-col bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Filtered Reports</p>
             <h2 className="mt-0.5 font-bold text-foreground">{label} · {items.length}</h2>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
@@ -249,13 +249,13 @@ function DrillPanel({ label, items, onClose, onSelect }: {
               <button
                 key={r.id}
                 onClick={() => onSelect(r)}
-                className="flex w-full items-start gap-3 px-5 py-4 text-left transition-colors hover:bg-muted/50"
+                className="flex w-full items-start gap-2.5 px-4 py-3 text-left transition-colors hover:bg-muted/50"
               >
                 <img src={r.photo} alt={r.name} className="mt-0.5 size-9 shrink-0 rounded-full object-cover" />
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-1.5">
                     <p className="truncate font-semibold text-foreground">{r.name}</p>
-                    <span className={cn("shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", typeBadge[r.reportType])}>
+                    <span className={cn("shrink-0 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold", typeBadge[r.reportType])}>
                       <TypeIcon className="size-2.5" />{r.reportType}
                     </span>
                   </div>
@@ -284,22 +284,22 @@ function DetailPanel({ report, onClose, onStatusChange }: {
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
       <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-base font-semibold text-foreground">Report Detail</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+          <h2 className="text-sm font-semibold text-foreground">Report Detail</h2>
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div className="flex-1 overflow-y-auto px-5 py-4">
           {/* Employee hero */}
-          <div className="mb-5 flex items-center gap-4 rounded-xl border border-border bg-muted/50 px-5 py-4">
+          <div className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3">
             <img src={report.photo} alt={report.name} className="size-14 shrink-0 rounded-full object-cover ring-2 ring-background shadow" />
             <div className="min-w-0">
               <p className="font-bold text-foreground">{report.name}</p>
               <p className="text-xs text-muted-foreground">{report.email}</p>
-              <div className="mt-1.5 flex items-center gap-2">
-                <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
+              <div className="mt-1 flex items-center gap-1.5">
+                <span className="flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[11px] text-primary">
                   <Building2 className="size-3" />{report.department}
                 </span>
               </div>
@@ -307,25 +307,25 @@ function DetailPanel({ report, onClose, onStatusChange }: {
           </div>
 
           {/* Type + title */}
-          <div className="mb-5 flex flex-col gap-3">
-            <div className="flex items-start gap-3">
+          <div className="mb-4 flex flex-col gap-2.5">
+            <div className="flex items-start gap-2.5">
               <div className={cn("flex size-9 shrink-0 items-center justify-center rounded-xl", typeBadge[report.reportType].split(" ")[0])}>
                 <Icon className={cn("size-4", typeBadge[report.reportType].split(" ")[1])} />
               </div>
               <div>
                 <p className="font-semibold text-foreground">{report.title}</p>
-                <span className={cn("mt-1 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold", typeBadge[report.reportType])}>
+                <span className={cn("mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold", typeBadge[report.reportType])}>
                   {report.reportType}
                 </span>
               </div>
             </div>
 
-            <div className="space-y-2 rounded-xl border border-border bg-muted/50 p-4 text-sm">
+            <div className="space-y-1.5 rounded-xl border border-border bg-muted/50 p-3 text-xs">
               {[
                 { icon: CalendarDays, label: "Period",    value: report.period      },
                 { icon: FileText,     label: "Submitted", value: report.submittedOn },
               ].map(({ icon: Ic, label, value }) => (
-                <div key={label} className="flex items-center gap-3">
+                <div key={label} className="flex items-center gap-2.5">
                   <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-background shadow-sm">
                     <Ic className="size-3.5 text-muted-foreground" />
                   </div>
@@ -334,12 +334,12 @@ function DetailPanel({ report, onClose, onStatusChange }: {
                 </div>
               ))}
               {report.score !== undefined && (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-background shadow-sm">
                     <TrendingUp className="size-3.5 text-muted-foreground" />
                   </div>
                   <span className="w-24 shrink-0 text-muted-foreground">Score</span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
+                  <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-bold text-primary">
                     {report.score} / 100
                   </span>
                 </div>
@@ -348,15 +348,15 @@ function DetailPanel({ report, onClose, onStatusChange }: {
           </div>
 
           {/* Summary */}
-          <div className="mb-5">
-            <p className="mb-2 text-sm font-semibold text-foreground">Summary</p>
-            <p className="text-sm leading-relaxed text-muted-foreground">{report.summary}</p>
+          <div className="mb-4">
+            <p className="mb-1.5 text-xs font-semibold text-foreground">Summary</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">{report.summary}</p>
           </div>
 
           {/* Status update */}
           <div>
-            <p className="mb-2 text-sm font-semibold text-foreground">Update Status</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="mb-1.5 text-xs font-semibold text-foreground">Update Status</p>
+            <div className="flex flex-wrap gap-1.5">
               {STATUS_OPTIONS.map((s) => {
                 const { dot } = statusStyle[s]
                 const active  = s === report.status
@@ -365,7 +365,7 @@ function DetailPanel({ report, onClose, onStatusChange }: {
                     key={s}
                     onClick={() => onStatusChange(s)}
                     className={cn(
-                      "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all",
+                      "flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all",
                       active
                         ? cn("border-current", statusStyle[s].badge)
                         : "border-border text-muted-foreground hover:border-current hover:text-foreground"
@@ -443,11 +443,11 @@ export default function HRReportsPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex-1 overflow-auto p-6">
-        <div className="space-y-6">
+      <main className="flex-1 overflow-auto p-5">
+        <div className="space-y-5">
 
           {/* ── KPI cards ── */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 gap-3">
             <KpiCard label="Total Reports"      value={kpi.total}    sub="All submissions"         color="#3b6feb"  />
             <KpiCard label="Active"             value={kpi.active}   sub="Submitted or in review"  color="#f59e0b"  />
             <KpiCard label="Resolved"           value={kpi.resolved} sub="Resolved and closed"     color="#10b981"  />
@@ -455,15 +455,15 @@ export default function HRReportsPage() {
           </div>
 
           {/* ── Charts grid ── */}
-          <div className="grid grid-cols-[3fr_2fr] gap-6">
+          <div className="grid grid-cols-[3fr_2fr] gap-5">
 
             {/* Left column */}
-            <div className="space-y-6">
+            <div className="space-y-5">
 
               {/* Submissions over time */}
-              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
                 <p className="mb-1 font-semibold text-foreground">Submissions Over Time</p>
-                <p className="mb-4 text-xs text-muted-foreground">Report volume per month</p>
+                <p className="mb-3 text-xs text-muted-foreground">Report volume per month</p>
                 <ResponsiveContainer width="100%" height={220}>
                   <AreaChart data={timeData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                     <defs>
@@ -491,9 +491,9 @@ export default function HRReportsPage() {
               </div>
 
               {/* Department bar chart */}
-              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
                 <p className="mb-1 font-semibold text-foreground">Reports by Department</p>
-                <p className="mb-4 text-xs text-muted-foreground">Click a bar to see individual reports</p>
+                <p className="mb-3 text-xs text-muted-foreground">Click a bar to see individual reports</p>
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={deptCounts} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
@@ -516,12 +516,12 @@ export default function HRReportsPage() {
             </div>
 
             {/* Right column */}
-            <div className="space-y-6">
+            <div className="space-y-5">
 
               {/* Report type donut */}
-              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
                 <p className="mb-1 font-semibold text-foreground">Report Types</p>
-                <p className="mb-2 text-xs text-muted-foreground">Click a slice to see reports</p>
+                <p className="mb-1.5 text-xs text-muted-foreground">Click a slice to see reports</p>
                 <ResponsiveContainer width="100%" height={240}>
                   <PieChart>
                     <Pie
@@ -548,9 +548,9 @@ export default function HRReportsPage() {
               </div>
 
               {/* Status donut */}
-              <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
                 <p className="mb-1 font-semibold text-foreground">By Status</p>
-                <p className="mb-2 text-xs text-muted-foreground">Click a slice to see reports</p>
+                <p className="mb-1.5 text-xs text-muted-foreground">Click a slice to see reports</p>
                 <ResponsiveContainer width="100%" height={240}>
                   <PieChart>
                     <Pie

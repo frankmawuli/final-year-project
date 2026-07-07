@@ -11,21 +11,21 @@ const FOOTER_LINKS: Record<string, string[]> = {
 
 export function Footer() {
   return (
-    <footer className="bg-card border-t border-border pt-10 sm:pt-14 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 sm:gap-10 mb-10">
+    <footer className="bg-card border-t border-border pt-8 sm:pt-11 pb-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8 mb-8">
           {/* Brand column */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-1.5 mb-3">
               <LogoJobs width={46} height={46} />
               <span className="font-semibold text-[14px] text-foreground">
                 CoreRecruiter Jobs
               </span>
             </div>
-            <p className="text-[12px] text-muted-foreground leading-relaxed mb-5">
+            <p className="text-[12px] text-muted-foreground leading-relaxed mb-4">
               Connecting talent with opportunities. Building better futures together.
             </p>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               {[Facebook, Linkedin, Twitter, Instagram].map((Icon, i) => (
                 <Link
                   key={i}
@@ -41,8 +41,8 @@ export function Footer() {
           {/* Link columns */}
           {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
             <div key={heading}>
-              <h4 className="text-[13px] font-semibold text-foreground mb-4">{heading}</h4>
-              <ul className="space-y-2.5">
+              <h4 className="text-[13px] font-semibold text-foreground mb-3">{heading}</h4>
+              <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link}>
                     <Link
@@ -59,7 +59,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-border pt-6 text-center">
+        <div className="border-t border-border pt-5 text-center">
           <p className="text-[11.5px] text-muted-foreground">
             © 2024 CoreRecruiter Jobs. All rights reserved.
           </p>

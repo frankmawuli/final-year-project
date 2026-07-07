@@ -14,14 +14,14 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[1152px] px-6 py-12">
+      <div className="mx-auto max-w-[1152px] px-5 py-10">
         {/* ── Step indicator ── */}
-        <div className="mb-16 flex items-center justify-center">
+        <div className="mb-12 flex items-center justify-center">
           
         </div>
 
         {/* ── Main content ── */}
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-6">
           {/* Left: illustration */}
           <div className="flex items-center justify-center rounded-2xl ">
             <img
@@ -33,27 +33,27 @@ export default function OnboardingPage() {
 
           {/* Right: info card */}
           <div className="flex items-center">
-            <div className="w-full rounded-2xl bg-card p-12 shadow-lg">
+            <div className="w-full rounded-2xl bg-card p-10 shadow-lg">
               {/* Rocket icon */}
-              <div className="mb-8 flex size-16 items-center justify-center rounded-xl bg-primary/10">
+              <div className="mb-6 flex size-16 items-center justify-center rounded-xl bg-primary/10">
                 <img src={rocketIcon} alt="" className="size-6" />
               </div>
 
               {/* Heading */}
-              <h1 className="mb-4 text-[2.25rem] font-bold leading-tight tracking-tight text-foreground">
+              <h1 className="mb-3 text-[2.25rem] font-bold leading-tight tracking-tight text-foreground">
                 Set up your company
                 <br />
                 workspace
               </h1>
 
               {/* Description */}
-              <p className="mb-5 text-lg leading-relaxed text-muted-foreground">
+              <p className="mb-4 text-base leading-relaxed text-muted-foreground">
                 Let&apos;s configure your organization so you can start managing employees, payroll,
                 and HR operations.
               </p>
 
               {/* Estimated time */}
-              <div className="mb-10 flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="mb-8 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <img src={clockIcon} alt="" className="size-3.5" />
                 <span>Estimated time: 2 minutes</span>
               </div>
@@ -61,7 +61,7 @@ export default function OnboardingPage() {
               {/* CTA */}
               <Button
                 asChild
-                className="h-14 w-full rounded-xl border-0 bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90"
+                className="h-14 w-full rounded-xl border-0 bg-primary text-sm font-semibold text-primary-foreground shadow-lg hover:bg-primary/90"
               >
                 <Link href="/onboarding/company-info">Start Setup</Link>
               </Button>

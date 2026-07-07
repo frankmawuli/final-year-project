@@ -19,7 +19,7 @@ export default function SettingsLayout({
   return (
     <>
       <HrNavigationPannel navItems={navItems} />
-      <main className="flex flex-1 flex-col overflow-y-auto p-6">
+      <main className="flex flex-1 flex-col overflow-y-auto p-5">
         {children}
       </main>
     </>

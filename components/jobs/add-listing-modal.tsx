@@ -34,9 +34,9 @@ function ListEditor({
   return (
     <div>
       <FieldLabel>{label}</FieldLabel>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1.5">
         {items.map((item, i) => (
-          <div key={i} className="flex items-center gap-2">
+          <div key={i} className="flex items-center gap-1.5">
             <span className="mt-0.5 size-1.5 shrink-0 rounded-full bg-primary" />
             <input
               value={item}
@@ -56,7 +56,7 @@ function ListEditor({
         <button
           type="button"
           onClick={add}
-          className="flex w-fit items-center gap-1.5 rounded-lg border border-dashed border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+          className="flex w-fit items-center gap-1 rounded-lg border border-dashed border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
         >
           <Plus className="size-3" /> Add item
         </button>
@@ -80,10 +80,10 @@ function SkillsInput({ skills, onChange }: { skills: string[]; onChange: (s: str
   return (
     <div
       onClick={() => inputRef.current?.focus()}
-      className="flex min-h-[44px] cursor-text flex-wrap items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-3 py-2 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+      className="flex min-h-[44px] cursor-text flex-wrap items-center gap-1 rounded-xl border border-border bg-muted/50 px-2.5 py-1.5 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
     >
       {skills.map((s) => (
-        <span key={s} className="flex items-center gap-1 rounded-lg border border-border bg-card px-2.5 py-0.5 text-[12px] font-medium text-foreground">
+        <span key={s} className="flex items-center gap-1 rounded-lg border border-border bg-card px-2 py-0.5 text-[12px] font-medium text-foreground">
           {s}
           <button type="button" onClick={() => onChange(skills.filter((x) => x !== s))}>
             <X className="size-3 text-muted-foreground hover:text-rose-500" />
@@ -97,7 +97,7 @@ function SkillsInput({ skills, onChange }: { skills: string[]; onChange: (s: str
         onKeyDown={onKey}
         onBlur={commit}
         placeholder={skills.length === 0 ? "Type a skill and press Enter…" : ""}
-        className="min-w-[140px] flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        className="min-w-[140px] flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
       />
     </div>
   )
@@ -183,31 +183,31 @@ export function AddListingModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 backdrop-blur-sm">
       <div className="relative flex max-h-[90vh] w-full max-w-[620px] flex-col overflow-hidden rounded-2xl bg-card shadow-2xl">
 
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-5 py-3">
           <div>
-            <h2 className="text-base font-bold text-foreground">{editJob ? "Edit Listing" : "Add New Listing"}</h2>
+            <h2 className="text-sm font-bold text-foreground">{editJob ? "Edit Listing" : "Add New Listing"}</h2>
             <p className="text-xs text-muted-foreground">{editJob ? "Update the job details below" : "Fill in all details to publish the job"}</p>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-semibold text-primary">{step}/3</span>
-            <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold text-primary">{step}/3</span>
+            <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
               <X className="size-5" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div className="flex-1 overflow-y-auto px-5 py-4">
           {error && (
-            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs text-rose-700">
               {error}
             </div>
           )}
 
           {step === 1 && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <div>
                 <FieldLabel>Job Title *</FieldLabel>
                 <input
@@ -218,7 +218,7 @@ export function AddListingModal({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <FieldLabel>Department</FieldLabel>
                   <select
@@ -239,7 +239,7 @@ export function AddListingModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <FieldLabel>Level</FieldLabel>
                   <select className={fieldCls} value={level} onChange={(e) => setLevel(e.target.value)}>
@@ -254,7 +254,7 @@ export function AddListingModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <FieldLabel>Salary Min</FieldLabel>
                   <input
@@ -279,7 +279,7 @@ export function AddListingModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <FieldLabel>Experience Required</FieldLabel>
                   <input
@@ -310,7 +310,7 @@ export function AddListingModal({
           )}
 
           {step === 2 && (
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4">
               <div>
                 <FieldLabel>Job Description</FieldLabel>
                 <textarea
@@ -342,10 +342,10 @@ export function AddListingModal({
           )}
 
           {step === 3 && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <div>
                 <FieldLabel>Required Skills</FieldLabel>
-                <p className="mb-2 text-xs text-muted-foreground">
+                <p className="mb-1.5 text-xs text-muted-foreground">
                   Type a skill and press{" "}
                   <kbd className="rounded bg-muted px-1 font-mono text-[11px]">Enter</kbd> or{" "}
                   <kbd className="rounded bg-muted px-1 font-mono text-[11px]">,</kbd> to add it.
@@ -353,11 +353,11 @@ export function AddListingModal({
                 <SkillsInput skills={skills} onChange={setSkills} />
               </div>
               {skills.length > 0 && (
-                <div className="rounded-xl border border-border bg-muted/50 p-4">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Preview</p>
-                  <div className="flex flex-wrap gap-2">
+                <div className="rounded-xl border border-border bg-muted/50 p-3">
+                  <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Preview</p>
+                  <div className="flex flex-wrap gap-1.5">
                     {skills.map((s) => (
-                      <span key={s} className="rounded-lg border border-border bg-card px-3 py-1.5 text-[13px] font-medium text-foreground">
+                      <span key={s} className="rounded-lg border border-border bg-card px-2.5 py-1 text-[13px] font-medium text-foreground">
                         {s}
                       </span>
                     ))}
@@ -368,16 +368,16 @@ export function AddListingModal({
           )}
         </div>
 
-        <div className="flex items-center justify-between border-t border-border px-6 py-4">
+        <div className="flex items-center justify-between border-t border-border px-5 py-3">
           <button
             type="button"
             onClick={() => (step > 1 ? setStep(step - 1) : onClose())}
-            className="rounded-xl border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            className="rounded-xl border border-border px-4 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
           >
             {step === 1 ? "Cancel" : "← Back"}
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {[1, 2, 3].map((s) => (
               <div key={s} className={cn("size-1.5 rounded-full transition-colors", s === step ? "bg-primary" : "bg-border")} />
             ))}
@@ -389,7 +389,7 @@ export function AddListingModal({
               disabled={step === 1 && !canNext1}
               onClick={() => setStep(step + 1)}
               className={cn(
-                "rounded-xl px-5 py-2 text-sm font-semibold text-white transition-colors",
+                "rounded-xl px-4 py-1.5 text-xs font-semibold text-white transition-colors",
                 step === 1 && !canNext1
                   ? "cursor-not-allowed bg-primary/40"
                   : "bg-primary hover:bg-primary/90",
@@ -402,7 +402,7 @@ export function AddListingModal({
               type="button"
               onClick={handleSubmit}
               disabled={submitting}
-              className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary/90 disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary/90 disabled:opacity-60"
             >
               {submitting && <Loader2 className="size-4 animate-spin" />}
               {editJob ? "Save Changes" : "Post Listing"}

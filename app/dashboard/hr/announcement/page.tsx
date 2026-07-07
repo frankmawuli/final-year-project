@@ -51,7 +51,7 @@ function ToolbarBtn({
       onMouseDown={(e) => { e.preventDefault(); onClick() }}
       title={title}
       className={cn(
-        "flex size-8 items-center justify-center rounded-md text-sm transition-colors",
+        "flex size-8 items-center justify-center rounded-md text-xs transition-colors",
         active
           ? "bg-primary text-primary-foreground"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -193,27 +193,27 @@ export default function AnnouncementPage() {
         <div className="flex flex-1 overflow-hidden mx-auto w-full max-w-[1280px]">
 
           {/* ── Compose panel ── */}
-          <section className="flex flex-1 flex-col overflow-y-auto border-r border-border p-6">
-            <div className="mb-6 flex items-center gap-3">
+          <section className="flex flex-1 flex-col overflow-y-auto border-r border-border p-5">
+            <div className="mb-5 flex items-center gap-2.5">
               <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10">
                 <Megaphone className="size-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-foreground">New Announcement</h1>
+                <h1 className="text-base font-bold text-foreground">New Announcement</h1>
                 <p className="text-xs text-muted-foreground">Send a message to your team or an individual</p>
               </div>
             </div>
 
-            <div className="flex flex-1 flex-col gap-4">
+            <div className="flex flex-1 flex-col gap-3">
               {/* Recipient */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 <label className="text-[13px] font-medium text-foreground">Recipient</label>
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                   <button
                     type="button"
                     onClick={() => { setToMode("ALL"); setSelected(null); setSearch("") }}
                     className={cn(
-                      "flex items-center gap-2 rounded-lg border px-4 py-2 text-[13px] font-medium transition-colors",
+                      "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[13px] font-medium transition-colors",
                       toMode === "ALL"
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-border bg-muted text-muted-foreground hover:border-primary/40",
@@ -225,7 +225,7 @@ export default function AnnouncementPage() {
                     type="button"
                     onClick={() => setToMode("INDIVIDUAL")}
                     className={cn(
-                      "flex items-center gap-2 rounded-lg border px-4 py-2 text-[13px] font-medium transition-colors",
+                      "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[13px] font-medium transition-colors",
                       toMode === "INDIVIDUAL"
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-border bg-muted text-muted-foreground hover:border-primary/40",
@@ -238,8 +238,8 @@ export default function AnnouncementPage() {
                 {toMode === "INDIVIDUAL" && (
                   <div id="emp-dropdown" className="relative">
                     {selected ? (
-                      <div className="flex h-[44px] items-center justify-between rounded-lg border border-primary bg-primary/5 px-3">
-                        <div className="flex items-center gap-2">
+                      <div className="flex h-[44px] items-center justify-between rounded-lg border border-primary bg-primary/5 px-2.5">
+                        <div className="flex items-center gap-1.5">
                           {selected.user.avatarUrl ? (
                             <img src={selected.user.avatarUrl} alt={selected.user.name} className="size-6 rounded-full object-cover" />
                           ) : (
@@ -258,7 +258,7 @@ export default function AnnouncementPage() {
                       </div>
                     ) : (
                       <>
-                        <div className="flex h-[44px] items-center rounded-lg border border-border bg-muted px-3 gap-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+                        <div className="flex h-[44px] items-center rounded-lg border border-border bg-muted px-2.5 gap-1.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
                           <Search className="size-4 shrink-0 text-muted-foreground" />
                           <input
                             value={search}
@@ -275,7 +275,7 @@ export default function AnnouncementPage() {
                                 key={emp.id}
                                 type="button"
                                 onMouseDown={(e) => { e.preventDefault(); setSelected(emp); setDropdown(false); setSearch("") }}
-                                className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-muted"
+                                className="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-muted"
                               >
                                 {emp.user.avatarUrl ? (
                                   <img src={emp.user.avatarUrl} alt={emp.user.name} className="size-7 rounded-full object-cover" />
@@ -299,21 +299,21 @@ export default function AnnouncementPage() {
               </div>
 
               {/* Subject */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 <label className="text-[13px] font-medium text-foreground">Subject</label>
                 <input
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="e.g. Q1 Performance Review Reminder"
-                  className="h-[44px] rounded-lg border border-border bg-muted px-3.5 text-[13px] text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  className="h-[44px] rounded-lg border border-border bg-muted px-3 text-[13px] text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
               </div>
 
               {/* Rich text editor */}
-              <div className="flex flex-1 flex-col gap-2">
+              <div className="flex flex-1 flex-col gap-1.5">
                 <label className="text-[13px] font-medium text-foreground">Message</label>
 
-                <div className="flex flex-wrap items-center gap-0.5 rounded-t-lg border border-b-0 border-border bg-muted/50 px-2 py-1.5">
+                <div className="flex flex-wrap items-center gap-0.5 rounded-t-lg border border-b-0 border-border bg-muted/50 px-1.5 py-1">
                   <ToolbarBtn onClick={() => exec("bold")} title="Bold" active={isActive("bold")}>
                     <Bold className="size-3.5" />
                   </ToolbarBtn>
@@ -364,19 +364,19 @@ export default function AnnouncementPage() {
                   suppressContentEditableWarning
                   data-placeholder="Write your announcement here…"
                   className={cn(
-                    "min-h-[200px] flex-1 rounded-b-lg border border-border bg-white px-4 py-3 text-[13px] text-foreground outline-none",
+                    "min-h-[200px] flex-1 rounded-b-lg border border-border bg-white px-3 py-2.5 text-[13px] text-foreground outline-none",
                     "focus:border-primary focus:ring-2 focus:ring-primary/20",
-                    "[&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-2",
-                    "[&_h2]:text-base [&_h2]:font-semibold [&_h2]:mb-1.5",
-                    "[&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-1",
-                    "[&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-1",
+                    "[&_h1]:text-lg [&_h1]:font-bold [&_h1]:mb-1.5",
+                    "[&_h2]:text-sm [&_h2]:font-semibold [&_h2]:mb-1",
+                    "[&_ul]:list-disc [&_ul]:pl-4 [&_ul]:my-1",
+                    "[&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:my-1",
                     "empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground empty:before:pointer-events-none",
                   )}
                 />
               </div>
 
               {/* Footer */}
-              <div className="flex flex-col gap-2 pt-1">
+              <div className="flex flex-col gap-1.5 pt-1">
                 {sendError && (
                   <p className="text-[12px] text-red-600">{sendError}</p>
                 )}
@@ -399,7 +399,7 @@ export default function AnnouncementPage() {
                     onClick={handleSend}
                     disabled={sending || !subject.trim() || (toMode === "INDIVIDUAL" && !selected)}
                     className={cn(
-                      "flex items-center gap-2 rounded-xl px-6 py-2.5 text-[13px] font-semibold text-primary-foreground shadow-sm transition-all",
+                      "flex items-center gap-1.5 rounded-xl px-5 py-2 text-[13px] font-semibold text-primary-foreground shadow-sm transition-all",
                       "bg-primary hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50",
                     )}
                   >
@@ -417,32 +417,32 @@ export default function AnnouncementPage() {
 
           {/* ── Sent history panel ── */}
           <section className="flex w-[320px] shrink-0 flex-col overflow-y-auto bg-white">
-            <div className="sticky top-0 border-b border-border bg-white px-5 py-4">
-              <p className="text-sm font-semibold text-foreground">Sent Announcements</p>
+            <div className="sticky top-0 border-b border-border bg-white px-4 py-3">
+              <p className="text-xs font-semibold text-foreground">Sent Announcements</p>
               <p className="text-xs text-muted-foreground">
                 {listLoading ? "Loading…" : `${announcements.length} total`}
               </p>
             </div>
 
             {listLoading ? (
-              <div className="flex flex-1 items-center justify-center py-16">
+              <div className="flex flex-1 items-center justify-center py-12">
                 <span className="size-5 animate-spin rounded-full border-2 border-border border-t-primary" />
               </div>
             ) : listError ? (
-              <div className="px-5 py-6 text-[13px] text-red-500">{listError}</div>
+              <div className="px-4 py-5 text-[13px] text-red-500">{listError}</div>
             ) : announcements.length === 0 ? (
-              <div className="flex flex-1 flex-col items-center justify-center gap-2 py-16 text-center">
+              <div className="flex flex-1 flex-col items-center justify-center gap-1.5 py-12 text-center">
                 <Megaphone className="size-8 text-muted-foreground/40" />
                 <p className="text-[13px] text-muted-foreground">No announcements yet</p>
               </div>
             ) : (
               <div className="flex flex-col divide-y divide-border">
                 {announcements.map((item) => (
-                  <div key={item.id} className="flex flex-col gap-1.5 px-5 py-4 transition-colors hover:bg-muted/40">
-                    <div className="flex items-start justify-between gap-2">
+                  <div key={item.id} className="flex flex-col gap-1 px-4 py-3 transition-colors hover:bg-muted/40">
+                    <div className="flex items-start justify-between gap-1.5">
                       <p className="text-[13px] font-semibold leading-snug text-foreground">{item.subject}</p>
                       <span className={cn(
-                        "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium",
+                        "shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium",
                         item.recipientType === "ALL"
                           ? "bg-primary/10 text-primary"
                           : item.recipientType === "DEPARTMENT"
@@ -453,7 +453,7 @@ export default function AnnouncementPage() {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+                    <div className="flex items-center gap-1 text-[12px] text-muted-foreground">
                       {item.recipientType === "ALL" ? (
                         <><Users className="size-3.5" /> All Employees</>
                       ) : item.recipientType === "DEPARTMENT" ? (

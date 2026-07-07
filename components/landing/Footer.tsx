@@ -6,11 +6,11 @@ import { Logo } from "@/components/logo";
 function FooterCol({ heading, links }: { heading: string; links: string[] }) {
   return (
     <div>
-      <h4 className="mb-4 text-sm font-semibold text-gray-900">{heading}</h4>
-      <ul className="space-y-3">
+      <h4 className="mb-3 text-xs font-semibold text-gray-900">{heading}</h4>
+      <ul className="space-y-2.5">
         {links.map((link) => (
           <li key={link}>
-            <a href="#" className="text-sm text-gray-500 transition-colors hover:text-gray-900">
+            <a href="#" className="text-xs text-gray-500 transition-colors hover:text-gray-900">
               {link}
             </a>
           </li>
@@ -22,20 +22,20 @@ function FooterCol({ heading, links }: { heading: string; links: string[] }) {
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-100 bg-white py-14">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-12 grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-7">
+    <footer className="border-t border-gray-100 bg-white py-11">
+      <div className="mx-auto max-w-7xl px-5">
+        <div className="mb-10 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-7">
           {/* Brand */}
           <div className="col-span-2 md:col-span-3 lg:col-span-2">
-            <Link href="/" className="mb-4 flex items-center gap-2">
+            <Link href="/" className="mb-3 flex items-center gap-1.5">
               <Logo width={46} height={46} />
-              <span className="text-sm font-bold text-gray-900">CoreRecruiter</span>
+              <span className="text-xs font-bold text-gray-900">CoreRecruiter</span>
             </Link>
-            <p className="mb-6 max-w-[200px] text-sm leading-relaxed text-gray-500">
+            <p className="mb-5 max-w-[200px] text-xs leading-relaxed text-gray-500">
               The all-in-one recruitment platform that helps you hire better, manage smarter, and
               grow together.
             </p>
-            <div className="flex gap-2.5">
+            <div className="flex gap-2">
               {[Linkedin, Facebook, Twitter, Instagram].map((Icon, i) => (
                 <a
                   key={i}
@@ -55,15 +55,15 @@ export function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold text-gray-900">Newsletter</h4>
-            <p className="mb-4 text-sm leading-relaxed text-gray-500">
+            <h4 className="mb-3 text-xs font-semibold text-gray-900">Newsletter</h4>
+            <p className="mb-3 text-xs leading-relaxed text-gray-500">
               Get the latest updates and HR insights straight to your inbox.
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="h-9 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="h-9 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-2.5 text-xs outline-none placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
               <Button
                 size="icon"
@@ -76,9 +76,9 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-8 md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-100 pt-6 md:flex-row">
           <p className="text-xs text-gray-400">© 2024 CoreRecruiter. All rights reserved.</p>
-          <div className="flex flex-wrap gap-5">
+          <div className="flex flex-wrap gap-4">
             {["Privacy Policy", "Terms of Service", "Security", "Cookies Settings"].map((item) => (
               <a
                 key={item}

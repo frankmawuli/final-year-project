@@ -64,28 +64,28 @@ function VerifyEmailForm() {
 
   return (
     <AuthShell branding={jobsBranding}>
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Verify your email</h2>
-        <p className="text-sm text-muted-foreground">
+      <div className="space-y-1.5">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">Verify your email</h2>
+        <p className="text-xs text-muted-foreground">
           We sent a 6-digit code to{" "}
           <span className="font-medium text-foreground">{email || "your email"}</span>
         </p>
       </div>
 
-      <form className="space-y-4" onSubmit={handleVerify}>
+      <form className="space-y-3" onSubmit={handleVerify}>
         {error && (
-          <p className="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+          <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
             {error}
           </p>
         )}
         {success && (
-          <p className="rounded-lg bg-green-500/10 px-4 py-2.5 text-sm text-green-600 dark:text-green-400">
+          <p className="rounded-lg bg-green-500/10 px-3 py-2 text-xs text-green-600 dark:text-green-400">
             {success}
           </p>
         )}
 
-        <div className="space-y-1.5">
-          <label htmlFor="code" className="text-sm font-medium text-foreground">
+        <div className="space-y-1">
+          <label htmlFor="code" className="text-xs font-medium text-foreground">
             Verification code
           </label>
           <Input
@@ -97,7 +97,7 @@ function VerifyEmailForm() {
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
             placeholder="000000"
-            className="h-11 rounded-xl border-border bg-card px-4 text-center text-lg tracking-[0.5em] placeholder:tracking-normal placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+            className="h-11 rounded-xl border-border bg-card px-3 text-center text-base tracking-[0.5em] placeholder:tracking-normal placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
           />
         </div>
 
@@ -105,13 +105,13 @@ function VerifyEmailForm() {
           type="submit"
           size="lg"
           disabled={loading}
-          className="gradient-primary h-11 w-full rounded-xl border-0 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
+          className="gradient-primary h-11 w-full rounded-xl border-0 text-xs font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
         >
           {loading ? "Verifying…" : "Verify email"}
         </Button>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-xs text-muted-foreground">
         Didn&apos;t receive a code?{" "}
         <button
           type="button"
@@ -123,7 +123,7 @@ function VerifyEmailForm() {
         </button>
       </p>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-xs text-muted-foreground">
         <Link href="/jobs/login" className="font-medium text-primary hover:underline">
           Back to sign in
         </Link>

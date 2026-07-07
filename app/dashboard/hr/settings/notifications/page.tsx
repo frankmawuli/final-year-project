@@ -50,13 +50,13 @@ function Card({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-      <div className="mb-5 flex items-center gap-3">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div className="mb-4 flex items-center gap-2.5">
         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
           <Icon className="size-4 text-muted-foreground" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground">{title}</p>
+          <p className="text-xs font-semibold text-foreground">{title}</p>
           <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
@@ -100,9 +100,9 @@ function Row({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex items-center justify-between gap-3">
       <div>
-        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs font-medium text-foreground">{label}</p>
         <p className="text-xs text-muted-foreground">{hint}</p>
       </div>
       {children}
@@ -112,10 +112,10 @@ function Row({
 
 function SaveRow({ onSave }: { onSave: () => void }) {
   return (
-    <div className="flex justify-end pt-2">
+    <div className="flex justify-end pt-1.5">
       <button
         onClick={onSave}
-        className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+        className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
       >
         Save changes
       </button>
@@ -134,28 +134,28 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <Card title="Notification Channels" subtitle="Configure email and in-app alerts for each event" icon={Bell}>
         <div className="overflow-hidden rounded-xl border border-border">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-border bg-muted/50">
-                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Event</th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Email</th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">In-App</th>
+                <th className="px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Event</th>
+                <th className="px-3 py-2.5 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Email</th>
+                <th className="px-3 py-2.5 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">In-App</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {rows.map(({ key, label, hint }) => (
                 <tr key={key} className="hover:bg-muted/50">
-                  <td className="px-4 py-3.5">
-                    <p className="text-sm font-medium text-foreground">{label}</p>
+                  <td className="px-3 py-3">
+                    <p className="text-xs font-medium text-foreground">{label}</p>
                     <p className="text-xs text-muted-foreground">{hint}</p>
                   </td>
-                  <td className="px-4 py-3.5 text-center">
+                  <td className="px-3 py-3 text-center">
                     <Toggle checked={email[key]} onChange={v => setEmail(p => ({ ...p, [key]: v }))} />
                   </td>
-                  <td className="px-4 py-3.5 text-center">
+                  <td className="px-3 py-3 text-center">
                     <Toggle checked={inApp[key]} onChange={v => setInApp(p => ({ ...p, [key]: v }))} />
                   </td>
                 </tr>
@@ -166,7 +166,7 @@ export default function NotificationsPage() {
       </Card>
 
       <Card title="Automated Reminders" subtitle="Periodic nudges for pending actions" icon={Bell}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {reminderRows.map(({ key, label, hint }, i, arr) => (
             <div key={key}>
               <Row label={label} hint={hint}>

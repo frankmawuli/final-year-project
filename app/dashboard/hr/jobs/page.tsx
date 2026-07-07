@@ -105,26 +105,26 @@ export default function JobsPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-y-auto p-6">
-        <div className="mb-4 flex items-center gap-3 rounded-lg bg-card px-4 py-3 shadow-sm">
+      <main className="flex flex-1 flex-col overflow-y-auto p-5">
+        <div className="mb-3 flex items-center gap-2.5 rounded-lg bg-card px-3 py-2.5 shadow-sm">
           <Search className="size-5 shrink-0 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search ⌘K"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
           />
-          <button className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <button className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <SlidersHorizontal className="size-5" />
           </button>
         </div>
 
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div />
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
+            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
           >
             <Plus className="size-4" />
             Add Listing
@@ -136,20 +136,20 @@ export default function JobsPage() {
             <Loader2 className="size-8 animate-spin text-primary" />
           </div>
         ) : error ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-rose-600">{error}</div>
+          <div className="flex flex-1 items-center justify-center text-xs text-rose-600">{error}</div>
         ) : jobs.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+          <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
             No listings found.
           </div>
         ) : (
-          <div className="grid flex-1 grid-cols-2 content-start gap-4">
+          <div className="grid flex-1 grid-cols-2 content-start gap-3">
             {jobs.map((job) => (
               <JobCard key={job.id} job={job} onDelete={handleDelete} onPublish={handlePublish} />
             ))}
           </div>
         )}
 
-        <div className="mt-6 flex items-center justify-end gap-2">
+        <div className="mt-5 flex items-center justify-end gap-1.5">
           <button
             onClick={() => handlePage(Math.max(1, page - 1))}
             disabled={page === 1}
@@ -162,7 +162,7 @@ export default function JobsPage() {
               key={p}
               onClick={() => handlePage(p)}
               className={cn(
-                "flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
+                "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
                 p === page
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-muted",

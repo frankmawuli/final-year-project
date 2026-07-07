@@ -20,10 +20,10 @@ function MetricCard({
   pct: number;
 }) {
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
       <div className="mb-1 text-xs text-gray-400">{title}</div>
       <div className="text-[28px] font-bold leading-none text-gray-900">{value}</div>
-      <div className="mb-3 mt-0.5 text-xs text-gray-400">{label}</div>
+      <div className="mb-2.5 mt-0.5 text-xs text-gray-400">{label}</div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
         <div className="h-1.5 rounded-full bg-primary" style={{ width: `${pct}%` }} />
       </div>
@@ -33,33 +33,33 @@ function MetricCard({
 
 export function WhyChooseSection() {
   return (
-    <section className="bg-gray-50 py-20">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+    <section className="bg-gray-50 py-16">
+      <div className="mx-auto max-w-7xl px-5">
+        <div className="grid items-center gap-10 lg:grid-cols-2">
           {/* Left */}
           <div>
-            <div className="mb-4 text-xs font-bold uppercase tracking-widest text-primary">
+            <div className="mb-3 text-xs font-bold uppercase tracking-widest text-primary">
               Why Choose CoreRecruiter
             </div>
-            <h2 className="mb-6 text-4xl font-bold leading-tight text-gray-900">
+            <h2 className="mb-5 text-3xl font-bold leading-tight text-gray-900">
               Smarter Tools.
               <br />
               Stronger Teams.
               <br />
               Better Results.
             </h2>
-            <p className="mb-8 max-w-md text-base leading-relaxed text-gray-500">
+            <p className="mb-6 max-w-md text-sm leading-relaxed text-gray-500">
               CoreRecruiter combines AI, automation, and human-centric design to help organizations
               achieve more.
             </p>
-            <Button className="h-10 gap-2 bg-primary text-white hover:bg-primary/90">
+            <Button className="h-10 gap-1.5 bg-primary text-white hover:bg-primary/90">
               See How It Works
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
 
           {/* Right — metric cards */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {metrics.map((m) => (
               <MetricCard key={m.title} {...m} />
             ))}

@@ -98,11 +98,11 @@ function FieldLabel({
   optional?: boolean
 }) {
   return (
-    <label className="mb-1.5 block text-[13px] font-medium text-foreground">
+    <label className="mb-1 block text-[13px] font-medium text-foreground">
       {children}
       {required && <span className="ml-0.5 text-rose-500">*</span>}
       {optional && (
-        <span className="ml-1.5 text-[11px] font-normal text-muted-foreground">(optional)</span>
+        <span className="ml-1 text-[11px] font-normal text-muted-foreground">(optional)</span>
       )}
     </label>
   )
@@ -137,7 +137,7 @@ function TextInput({
         )}
       >
         {prefix && (
-          <div className="flex shrink-0 items-center border-r border-border px-3 text-muted-foreground">
+          <div className="flex shrink-0 items-center border-r border-border px-2.5 text-muted-foreground">
             {prefix}
           </div>
         )}
@@ -147,7 +147,7 @@ function TextInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          className="h-full flex-1 bg-transparent px-3.5 text-[13px] text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
+          className="h-full flex-1 bg-transparent px-3 text-[13px] text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
         />
       </div>
       {error && <p className="mt-1 text-[11px] text-rose-500">{error}</p>}
@@ -181,7 +181,7 @@ function SelectInput({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-full w-full appearance-none bg-transparent px-3.5 text-[13px] text-foreground outline-none"
+          className="h-full w-full appearance-none bg-transparent px-3 text-[13px] text-foreground outline-none"
           style={{ color: value ? "var(--foreground)" : "var(--muted-foreground)" }}
         >
           <option value="" disabled hidden>
@@ -220,12 +220,12 @@ function TagInput({
     }
   }
   return (
-    <div className="min-h-[80px] rounded-lg border border-border bg-muted p-3 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-      <div className="mb-2 flex flex-wrap gap-1.5">
+    <div className="min-h-[80px] rounded-lg border border-border bg-muted p-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+      <div className="mb-1.5 flex flex-wrap gap-1">
         {items.map((item, i) => (
           <span
             key={i}
-            className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-[12px] font-medium text-primary"
+            className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[12px] font-medium text-primary"
           >
             {item}
             <button type="button" onClick={() => onRemove(i)}>
@@ -234,7 +234,7 @@ function TagInput({
           </span>
         ))}
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-1.5">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -289,7 +289,7 @@ function AvatarUpload({
   }
 
   return (
-    <div className="flex items-center gap-5">
+    <div className="flex items-center gap-4">
       <div className="relative">
         <div className="flex size-[80px] items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border bg-muted">
           {preview ? (
@@ -326,12 +326,12 @@ function AvatarUpload({
         <p className="text-[13px] font-medium text-foreground">Profile Photo</p>
         <p className="mt-0.5 text-[12px] text-muted-foreground">JPG or PNG · max 5 MB</p>
         {uploadError && <p className="mt-0.5 text-[11px] text-rose-500">{uploadError}</p>}
-        <div className="mt-2 flex gap-2">
+        <div className="mt-1.5 flex gap-1.5">
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
-            className="rounded-lg border border-border bg-card px-3 py-1.5 text-[12px] font-medium text-foreground hover:bg-muted disabled:opacity-60"
+            className="rounded-lg border border-border bg-card px-2.5 py-1 text-[12px] font-medium text-foreground hover:bg-muted disabled:opacity-60"
           >
             Upload photo
           </button>
@@ -339,7 +339,7 @@ function AvatarUpload({
             <button
               type="button"
               onClick={() => onChange(null)}
-              className="rounded-lg border border-border px-3 py-1.5 text-[12px] font-medium text-muted-foreground hover:bg-muted"
+              className="rounded-lg border border-border px-2.5 py-1 text-[12px] font-medium text-muted-foreground hover:bg-muted"
             >
               Remove
             </button>
@@ -406,7 +406,7 @@ function ResumeUpload({
           if (f) handleFile(f)
         }}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed py-6 transition-colors",
+          "flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed py-5 transition-colors",
           dragging
             ? "border-primary bg-primary/10"
             : activeError
@@ -425,12 +425,12 @@ function ResumeUpload({
           }}
         />
         {uploading ? (
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-1.5">
             <Loader2 className="size-6 animate-spin text-primary" />
             <p className="text-[13px] text-muted-foreground">Uploading {displayName}…</p>
           </div>
         ) : displayName ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
               <FileText className="size-5 text-primary" />
             </div>
@@ -445,7 +445,7 @@ function ResumeUpload({
                 setDisplayName(null)
                 onChange(null, null)
               }}
-              className="ml-2 rounded-full p-1 hover:bg-muted"
+              className="ml-1.5 rounded-full p-1 hover:bg-muted"
             >
               <XIcon className="size-4 text-muted-foreground" />
             </button>
@@ -517,7 +517,7 @@ function Step1({
   onAvatarChange: (url: string | null) => void
 }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div>
         <FieldLabel>Profile Photo</FieldLabel>
         <AvatarUpload preview={avatarPreview} onChange={onAvatarChange} />
@@ -534,7 +534,7 @@ function Step1({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <FieldLabel required>Email Address</FieldLabel>
           <TextInput
@@ -572,7 +572,7 @@ function Step2({
   onChange: (next: Partial<Step2Data>) => void
 }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div>
         <FieldLabel required>Current Job Title / Role</FieldLabel>
         <TextInput
@@ -586,7 +586,7 @@ function Step2({
 
       <div>
         <FieldLabel required>Skills & Expertise</FieldLabel>
-        <p className="mb-2 text-[12px] text-muted-foreground">
+        <p className="mb-1.5 text-[12px] text-muted-foreground">
           Type a skill and press Enter or click +
         </p>
         <TagInput
@@ -635,7 +635,7 @@ function Step3({
   onChange: (f: keyof Step3Data, v: string) => void
 }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div>
         <FieldLabel required>Highest Degree / Certification</FieldLabel>
         <SelectInput
@@ -658,7 +658,7 @@ function Step3({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <FieldLabel required>Year of Graduation</FieldLabel>
           <SelectInput
@@ -704,12 +704,12 @@ function Step4({
   }
 
   return (
-    <div className="space-y-5">
-      <div className="rounded-xl border border-border bg-muted/50 p-4">
-        <p className="mb-4 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
+    <div className="space-y-4">
+      <div className="rounded-xl border border-border bg-muted/50 p-3">
+        <p className="mb-3 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
           Professional Networks
         </p>
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           <div>
             <FieldLabel optional>LinkedIn</FieldLabel>
             <TextInput
@@ -752,26 +752,26 @@ function Step4({
 
       {/* Extra links */}
       {data.extraLinks.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <p className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
             Additional Links
           </p>
           {data.extraLinks.map((link, i) => (
-            <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+            <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5">
               <div className="w-full sm:w-[130px] sm:shrink-0">
                 <input
                   value={link.label}
                   onChange={(e) => updateExtraLink(i, "label", e.target.value)}
                   placeholder="Label"
-                  className="h-[44px] w-full rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary"
+                  className="h-[44px] w-full rounded-lg border border-border bg-muted px-2.5 text-[12px] text-foreground outline-none focus:border-primary"
                 />
               </div>
-              <div className="flex w-full sm:flex-1 gap-2">
+              <div className="flex w-full sm:flex-1 gap-1.5">
                 <input
                   value={link.url}
                   onChange={(e) => updateExtraLink(i, "url", e.target.value)}
                   placeholder="https://…"
-                  className="h-[44px] flex-1 rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary"
+                  className="h-[44px] flex-1 rounded-lg border border-border bg-muted px-2.5 text-[12px] text-foreground outline-none focus:border-primary"
                 />
                 <button
                   type="button"
@@ -789,7 +789,7 @@ function Step4({
       <button
         type="button"
         onClick={addExtraLink}
-        className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border px-4 py-2.5 text-[12px] font-medium text-primary hover:border-primary hover:bg-primary/5"
+        className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-border px-3 py-2 text-[12px] font-medium text-primary hover:border-primary hover:bg-primary/5"
       >
         <Plus className="size-3.5" /> Add another link
       </button>
@@ -807,15 +807,15 @@ function Step5({
   onChange: (next: Partial<Step5Data>) => void
 }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div>
         <FieldLabel required>Cover Letter / Bio</FieldLabel>
-        <p className="mb-2 text-[12px] text-muted-foreground">
+        <p className="mb-1.5 text-[12px] text-muted-foreground">
           Tell us why you're a great fit for this role.
         </p>
         <div
           className={cn(
-            "rounded-lg border bg-muted p-4",
+            "rounded-lg border bg-muted p-3",
             errors.coverLetter ? "border-rose-400" : "border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
           )}
         >
@@ -837,10 +837,10 @@ function Step5({
 
       <div>
         <FieldLabel optional>References</FieldLabel>
-        <p className="mb-2 text-[12px] text-muted-foreground">
+        <p className="mb-1.5 text-[12px] text-muted-foreground">
           Name, title, and contact info for any professional references.
         </p>
-        <div className="rounded-lg border border-border bg-muted p-4 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+        <div className="rounded-lg border border-border bg-muted p-3 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
           <textarea
             value={data.references}
             onChange={(e) => onChange({ references: e.target.value })}
@@ -852,7 +852,7 @@ function Step5({
       </div>
 
       {/* Privacy notice */}
-      <div className="rounded-xl border border-border bg-primary/5 p-4">
+      <div className="rounded-xl border border-border bg-primary/5 p-3">
         <p className="mb-1 text-[13px] font-semibold text-foreground">Data & Privacy</p>
         <p className="text-[12px] leading-relaxed text-muted-foreground">
           Your application data will be stored securely and used solely for recruitment purposes.
@@ -863,7 +863,7 @@ function Step5({
       {/* Consent checkbox */}
       <label
         className={cn(
-          "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors",
+          "flex cursor-pointer items-start gap-2.5 rounded-xl border p-3 transition-colors",
           data.consent ? "border-primary bg-primary/5" : "border-border bg-muted hover:border-primary/50",
           errors.consent && "border-rose-400"
         )}
@@ -901,15 +901,15 @@ function Step5({
 // ── Left sidebar ────────────────────────────────────────────────
 function SidebarStepList({ current }: { current: number }) {
   return (
-    <aside className="hidden sm:flex w-[260px] shrink-0 flex-col bg-primary/5 p-6">
-      <div className="mb-8">
+    <aside className="hidden sm:flex w-[260px] shrink-0 flex-col bg-primary/5 p-5">
+      <div className="mb-6">
         <div
           className="flex size-9 items-center justify-center rounded-xl"
           style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
         >
           <FileText className="size-5 text-white" />
         </div>
-        <h2 className="mt-3 text-[15px] font-bold text-foreground">Job Application</h2>
+        <h2 className="mt-2.5 text-[15px] font-bold text-foreground">Job Application</h2>
         <p className="mt-0.5 text-[12px] text-muted-foreground">Complete all steps to apply</p>
       </div>
 
@@ -921,7 +921,7 @@ function SidebarStepList({ current }: { current: number }) {
             <div
               key={id}
               className={cn(
-                "flex items-start gap-3 rounded-xl p-3 transition-colors",
+                "flex items-start gap-2.5 rounded-xl p-2.5 transition-colors",
                 isActive ? "bg-card shadow-sm" : isCompleted ? "opacity-80" : "opacity-50"
               )}
             >
@@ -959,8 +959,8 @@ function SidebarStepList({ current }: { current: number }) {
       </div>
 
       {/* Progress */}
-      <div className="mt-auto pt-8">
-        <div className="mb-1.5 flex justify-between text-[11px] text-muted-foreground">
+      <div className="mt-auto pt-6">
+        <div className="mb-1 flex justify-between text-[11px] text-muted-foreground">
           <span>Progress</span>
           <span>{Math.round(((current - 1) / STEPS.length) * 100)}%</span>
         </div>
@@ -978,31 +978,31 @@ function SidebarStepList({ current }: { current: number }) {
 // ── Success screen ──────────────────────────────────────────────
 function SuccessScreen({ onBack }: { onBack: () => void }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-5 sm:p-8 text-center">
+    <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6 text-center">
       <div
-        className="mb-5 flex size-16 items-center justify-center rounded-full"
+        className="mb-4 flex size-16 items-center justify-center rounded-full"
         style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
       >
         <Check className="size-8 text-white" strokeWidth={2.5} />
       </div>
-      <h2 className="mb-2 text-[22px] font-bold text-foreground">Application Submitted!</h2>
+      <h2 className="mb-1.5 text-[22px] font-bold text-foreground">Application Submitted!</h2>
       <p className="mb-1 text-[14px] text-muted-foreground">
         Thank you for applying. We've received your application.
       </p>
-      <p className="mb-8 text-[13px] text-muted-foreground">
+      <p className="mb-6 text-[13px] text-muted-foreground">
         Our team will review your profile and reach out within 5–7 business days.
       </p>
-      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto">
         <button
           type="button"
           onClick={onBack}
-          className="rounded-xl border border-border px-6 py-2.5 text-[13px] font-medium text-foreground hover:bg-muted"
+          className="rounded-xl border border-border px-5 py-2 text-[13px] font-medium text-foreground hover:bg-muted"
         >
           ← Back to Jobs
         </button>
         <button
           type="button"
-          className="rounded-xl px-6 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+          className="rounded-xl px-5 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
           style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
         >
           Check Application Status
@@ -1149,7 +1149,7 @@ function JobApplicationForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-3 sm:p-6">
+    <div className="flex min-h-screen items-center justify-center bg-background p-2.5 sm:p-5">
       <div className="flex w-full max-w-[940px] overflow-hidden rounded-2xl bg-card shadow-xl">
 
         {/* Sidebar – hidden on mobile */}
@@ -1159,10 +1159,10 @@ function JobApplicationForm() {
         {submitted ? (
           <SuccessScreen onBack={() => router.push("/apply")} />
         ) : (
-          <div className="flex flex-1 flex-col p-5 sm:p-8">
+          <div className="flex flex-1 flex-col p-4 sm:p-6">
             {/* Mobile-only progress indicator */}
-            <div className="sm:hidden mb-5">
-              <div className="mb-2 flex items-center justify-between text-[11px]">
+            <div className="sm:hidden mb-4">
+              <div className="mb-1.5 flex items-center justify-between text-[11px]">
                 <span className="font-semibold uppercase tracking-wider text-primary">
                   Step {step} of {STEPS.length}
                 </span>
@@ -1190,7 +1190,7 @@ function JobApplicationForm() {
             <h1 className="mb-1 text-[20px] sm:text-[24px] font-bold leading-tight tracking-tight text-foreground">
               {stepLabels[step]}
             </h1>
-            <p className="mb-6 text-[13px] text-muted-foreground">{stepSubtitles[step]}</p>
+            <p className="mb-5 text-[13px] text-muted-foreground">{stepSubtitles[step]}</p>
 
             {/* Step content */}
             <div className="flex-1 overflow-y-auto pr-1">
@@ -1245,9 +1245,9 @@ function JobApplicationForm() {
             </div>
 
             {/* Navigation */}
-            <div className="mt-6 border-t border-border pt-5">
+            <div className="mt-5 border-t border-border pt-4">
               {submitError && (
-                <p className="mb-3 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-[12px] text-rose-600">
+                <p className="mb-2.5 rounded-lg border border-rose-300 bg-rose-50 px-2.5 py-1.5 text-[12px] text-rose-600">
                   {submitError}
                 </p>
               )}
@@ -1256,12 +1256,12 @@ function JobApplicationForm() {
                   type="button"
                   onClick={() => (step > 1 ? setStep((s) => s - 1) : router.back())}
                   disabled={submitting}
-                  className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  className="flex items-center gap-1 text-[13px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
                 >
                   ← Back
                 </button>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   {step === 4 && (
                     <button
                       type="button"
@@ -1275,7 +1275,7 @@ function JobApplicationForm() {
                     type="button"
                     onClick={handleNext}
                     disabled={submitting}
-                    className="flex items-center gap-2 rounded-xl px-7 py-2.5 text-[13px] font-semibold text-primary-foreground shadow-lg transition-opacity hover:opacity-90 disabled:opacity-70"
+                    className="flex items-center gap-1.5 rounded-xl px-6 py-2 text-[13px] font-semibold text-primary-foreground shadow-lg transition-opacity hover:opacity-90 disabled:opacity-70"
                     style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
                   >
                     {submitting && <Loader2 className="size-3.5 animate-spin" />}

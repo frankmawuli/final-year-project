@@ -52,16 +52,16 @@ function FileRow({
   onRemove: (id: string) => void
 }) {
   const { Icon, cls } = fileIcon(item.file)
-  const fieldCls = "w-full rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+  const fieldCls = "w-full rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-xs text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
 
   return (
     <div className={cn(
-      "rounded-xl border bg-white p-4 shadow-sm transition-all",
+      "rounded-xl border bg-white p-3 shadow-sm transition-all",
       item.status === "done"  ? "border-[#16a34a]/40 bg-[#f0fdf4]" :
       item.status === "error" ? "border-[#dc2626]/40 bg-[#fef2f2]" :
       "border-border"
     )}>
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-2.5">
         {/* File icon */}
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-white shadow-sm">
           <Icon className={cn("size-5", cls)} />
@@ -69,11 +69,11 @@ function FileRow({
 
         {/* Info */}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-foreground">{item.file.name}</p>
+          <p className="truncate text-xs font-medium text-foreground">{item.file.name}</p>
           <p className="text-xs text-muted-foreground">{fmtSize(item.file.size)}</p>
 
           {item.status === "uploading" && (
-            <div className="mt-2">
+            <div className="mt-1.5">
               <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                 <span>Uploading…</span>
                 <span>{item.progress}%</span>
@@ -88,19 +88,19 @@ function FileRow({
           )}
 
           {item.status === "done" && (
-            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-[#16a34a]">
+            <div className="mt-1 flex items-center gap-1 text-xs text-[#16a34a]">
               <CheckCircle2 className="size-3.5" /> Uploaded successfully
             </div>
           )}
 
           {item.status === "error" && (
-            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-[#dc2626]">
+            <div className="mt-1 flex items-center gap-1 text-xs text-[#dc2626]">
               <AlertCircle className="size-3.5" /> Upload failed — please try again
             </div>
           )}
 
           {item.status === "queued" && (
-            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="mt-2.5 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs font-medium text-foreground">Category</label>
                 <select
@@ -131,7 +131,7 @@ function FileRow({
         {item.status !== "uploading" && (
           <button
             onClick={() => onRemove(item.id)}
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
           >
             <X className="size-4" />
           </button>
@@ -209,18 +209,18 @@ export default function UploadPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Mobile title */}
-      <div className="border-b border-border bg-white px-4 py-3 lg:hidden">
-        <h1 className="text-base font-semibold text-foreground">Upload Files</h1>
+      <div className="border-b border-border bg-white px-3 py-2.5 lg:hidden">
+        <h1 className="text-sm font-semibold text-foreground">Upload Files</h1>
         <p className="mt-0.5 text-xs text-muted-foreground">Documents › Upload</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+      <div className="flex-1 overflow-y-auto p-3 md:p-5 lg:p-6">
         <div className="mx-auto max-w-2xl">
 
           {/* Page heading */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-foreground">Upload Documents</h2>
-            <p className="mt-0.5 text-sm text-muted-foreground">
+          <div className="mb-5">
+            <h2 className="text-base font-semibold text-foreground">Upload Documents</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
               Upload supporting documents — medical certs, receipts, IDs, or training certs. Max {MAX_MB} MB per file.
             </p>
           </div>
@@ -232,7 +232,7 @@ export default function UploadPage() {
             onDrop={onDrop}
             onClick={() => inputRef.current?.click()}
             className={cn(
-              "relative mb-5 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-12 transition-all",
+              "relative mb-4 flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-dashed px-5 py-10 transition-all",
               dragging
                 ? "border-primary bg-primary/5 scale-[1.01]"
                 : "border-border bg-white hover:border-primary/50 hover:bg-muted/30"
@@ -245,16 +245,16 @@ export default function UploadPage() {
               <CloudUpload className={cn("size-7", dragging ? "text-primary" : "text-muted-foreground")} />
             </div>
             <div className="text-center">
-              <p className="text-sm font-semibold text-foreground">
+              <p className="text-xs font-semibold text-foreground">
                 {dragging ? "Drop files here" : "Drag & drop files here"}
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 or <span className="font-medium text-primary">click to browse</span>
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-1.5">
               {["PDF", "PNG", "JPG"].map((t) => (
-                <span key={t} className="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                <span key={t} className="rounded-full border border-border bg-muted px-2 py-1 text-[11px] font-medium text-muted-foreground">
                   {t}
                 </span>
               ))}
@@ -271,9 +271,9 @@ export default function UploadPage() {
 
           {/* ── Errors ── */}
           {errors.length > 0 && (
-            <div className="mb-4 rounded-xl border border-[#dc2626]/30 bg-[#fef2f2] p-4">
+            <div className="mb-3 rounded-xl border border-[#dc2626]/30 bg-[#fef2f2] p-3">
               {errors.map((e, i) => (
-                <div key={i} className="flex items-start gap-2 text-sm text-[#dc2626]">
+                <div key={i} className="flex items-start gap-1.5 text-xs text-[#dc2626]">
                   <AlertCircle className="mt-0.5 size-4 shrink-0" />
                   {e}
                 </div>
@@ -283,7 +283,7 @@ export default function UploadPage() {
 
           {/* ── File list ── */}
           {items.length > 0 && (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               {items.map((item) => (
                 <FileRow
                   key={item.id}
@@ -296,13 +296,13 @@ export default function UploadPage() {
               {/* Summary after done */}
               {allDone && (
                 <div className={cn(
-                  "flex items-center gap-3 rounded-xl border p-4",
+                  "flex items-center gap-2.5 rounded-xl border p-3",
                   errorCount > 0
                     ? "border-[#d97706]/30 bg-[#fffbeb]"
                     : "border-[#16a34a]/30 bg-[#f0fdf4]"
                 )}>
                   <CheckCircle2 className={cn("size-5 shrink-0", errorCount > 0 ? "text-[#d97706]" : "text-[#16a34a]")} />
-                  <div className="text-sm">
+                  <div className="text-xs">
                     <p className="font-semibold text-foreground">
                       {doneCount} file{doneCount !== 1 ? "s" : ""} uploaded successfully
                       {errorCount > 0 && ` · ${errorCount} failed`}
@@ -315,17 +315,17 @@ export default function UploadPage() {
               )}
 
               {/* Upload / Clear buttons */}
-              <div className="flex gap-3 pt-1">
+              <div className="flex gap-2.5 pt-1">
                 <button
                   onClick={() => { setItems([]); setErrors([]) }}
-                  className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                  className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-foreground hover:bg-muted"
                 >
                   Clear all
                 </button>
                 {hasQueued && (
                   <button
                     onClick={handleUpload}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-semibold text-white hover:opacity-90"
                   >
                     <Upload className="size-4" />
                     Upload {items.filter((i) => i.status === "queued").length} file
@@ -337,9 +337,9 @@ export default function UploadPage() {
           )}
 
           {/* ── Guidelines ── */}
-          <div className="mt-8 rounded-2xl border border-border bg-white p-5 shadow-sm">
-            <p className="mb-3 text-sm font-semibold text-foreground">Upload guidelines</p>
-            <ul className="flex flex-col gap-2">
+          <div className="mt-6 rounded-2xl border border-border bg-white p-4 shadow-sm">
+            <p className="mb-2.5 text-xs font-semibold text-foreground">Upload guidelines</p>
+            <ul className="flex flex-col gap-1.5">
               {[
                 "Accepted formats: PDF, PNG, JPG",
                 `Maximum file size: ${MAX_MB} MB per file`,
@@ -347,8 +347,8 @@ export default function UploadPage() {
                 "Documents are reviewed by HR within 1–2 business days",
                 "Uploaded files are stored securely and only accessible to you and HR",
               ].map((g, i) => (
-                <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                  <span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
                   {g}
                 </li>
               ))}

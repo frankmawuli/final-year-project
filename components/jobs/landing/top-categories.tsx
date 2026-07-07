@@ -24,21 +24,21 @@ const CATEGORIES = [
 
 export function TopCategories() {
   return (
-    <section className="py-12 sm:py-16 bg-white lg:my-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section className="py-10 sm:py-12 bg-white lg:my-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5">
         {/* Section title */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <h2 className="text-[22px] font-bold text-foreground">Top Categories</h2>
-          <div className="w-10 h-[3px] bg-primary rounded-full mx-auto mt-2" />
+          <div className="w-10 h-[3px] bg-primary rounded-full mx-auto mt-1.5" />
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {CATEGORIES.map(({ Icon, name, count }) => (
             <Link
               key={name}
               href="#"
-              className="group flex items-center gap-4 p-5 rounded-xl border border-border bg-card "
+              className="group flex items-center gap-3 p-4 rounded-xl border border-border bg-card "
             >
               <div className="w-12 h-12 rounded-xl  flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
                 <Icon className="w-[22px] h-[22px] text-primary" />
@@ -54,7 +54,7 @@ export function TopCategories() {
         </div>
 
         {/* Browse link */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-6">
           <Link
             href="#"
             className="inline-flex items-center gap-1 text-[13.5px] font-medium text-primary hover:underline"

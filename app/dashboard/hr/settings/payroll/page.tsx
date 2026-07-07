@@ -22,13 +22,13 @@ function Card({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-      <div className="mb-5 flex items-center gap-3">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div className="mb-4 flex items-center gap-2.5">
         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
           <Icon className="size-4 text-muted-foreground" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground">{title}</p>
+          <p className="text-xs font-semibold text-foreground">{title}</p>
           <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
@@ -72,9 +72,9 @@ function Row({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex items-center justify-between gap-3">
       <div>
-        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs font-medium text-foreground">{label}</p>
         {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       </div>
       {children}
@@ -92,16 +92,16 @@ function SaveRow({
   message:  { text: string; error: boolean } | null
 }) {
   return (
-    <div className="flex items-center justify-end gap-4 pt-2">
+    <div className="flex items-center justify-end gap-3 pt-1.5">
       {message && (
-        <p className={cn("text-sm", message.error ? "text-rose-500" : "text-emerald-600")}>
+        <p className={cn("text-xs", message.error ? "text-rose-500" : "text-emerald-600")}>
           {message.text}
         </p>
       )}
       <button
         onClick={onSave}
         disabled={saving}
-        className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
+        className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
       >
         {saving ? "Saving…" : "Save changes"}
       </button>
@@ -111,10 +111,10 @@ function SaveRow({
 
 // ── Shared style strings ──────────────────────────────────────
 const inputCls =
-  "w-full rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
+  "w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 const selectCls =
-  "w-full appearance-none rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 pr-9 text-sm text-foreground outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
+  "w-full appearance-none rounded-xl border border-border bg-muted/50 px-3 py-2 pr-7 text-xs text-foreground outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 // ── Page ──────────────────────────────────────────────────────
 export default function Payroll() {
@@ -199,12 +199,12 @@ export default function Payroll() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <Card title="Company Funding Account" subtitle="Account salaries are paid from — shown on the bank advice file" icon={Landmark}>
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Bank Name</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Bank Name</label>
               <input
                 value={bankName}
                 onChange={e => setBankName(e.target.value)}
@@ -213,7 +213,7 @@ export default function Payroll() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Branch</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Branch</label>
               <input
                 value={bankBranch}
                 onChange={e => setBankBranch(e.target.value)}
@@ -222,9 +222,9 @@ export default function Payroll() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Account Name</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Account Name</label>
               <input
                 value={acctName}
                 onChange={e => setAcctName(e.target.value)}
@@ -233,7 +233,7 @@ export default function Payroll() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Account Number</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Account Number</label>
               <input
                 value={acctNumber}
                 onChange={e => setAcctNumber(e.target.value)}
@@ -249,10 +249,10 @@ export default function Payroll() {
       </Card>
 
       <Card title="Pay Cycle" subtitle="Define how and when salaries are disbursed" icon={Banknote}>
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Pay Frequency</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Pay Frequency</label>
               <div className="relative">
                 <select value={payCycle} onChange={e => setPayCycle(e.target.value)} className={selectCls}>
                   {["Weekly", "Bi-weekly", "Monthly"].map(v => <option key={v}>{v}</option>)}
@@ -261,7 +261,7 @@ export default function Payroll() {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Pay Day (day of month)</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Pay Day (day of month)</label>
               <div className="relative">
                 <select value={payDay} onChange={e => setPayDay(e.target.value)} className={selectCls}>
                   {Array.from({ length: 28 }, (_, i) => String(i + 1)).map(d => <option key={d}>{d}</option>)}
@@ -271,7 +271,7 @@ export default function Payroll() {
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground">Payment Method</label>
+            <label className="mb-1 block text-xs font-medium text-foreground">Payment Method</label>
             <div className="relative max-w-xs">
               <select value={payMethod} onChange={e => setPayMethod(e.target.value)} className={selectCls}>
                 {["Bank Transfer", "Mobile Money", "Cheque", "Cash"].map(v => <option key={v}>{v}</option>)}
@@ -283,10 +283,10 @@ export default function Payroll() {
       </Card>
 
       <Card title="Tax & Deductions" subtitle="Default tax configuration and pension settings" icon={Banknote}>
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Tax Scheme</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Tax Scheme</label>
               <div className="relative">
                 <select value={taxScheme} onChange={e => setTaxScheme(e.target.value)} className={selectCls}>
                   {["PAYE", "Flat Rate", "Graduated", "Exempt"].map(v => <option key={v}>{v}</option>)}
@@ -295,7 +295,7 @@ export default function Payroll() {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-foreground">Employee Pension (%)</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Employee Pension (%)</label>
               <input
                 type="number"
                 min="0"
@@ -310,14 +310,14 @@ export default function Payroll() {
       </Card>
 
       <Card title="Standard Allowances" subtitle="Included in every payslip by default" icon={Banknote}>
-        <div className="flex flex-col gap-2.5">
-          <div className="grid grid-cols-[1fr_120px_40px] gap-2 px-1">
+        <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-[1fr_120px_40px] gap-1.5 px-1">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Allowance</span>
             <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Amount ($)</span>
             <span />
           </div>
           {allowances.map((a, i) => (
-            <div key={a.id} className="grid grid-cols-[1fr_120px_40px] items-center gap-2">
+            <div key={a.id} className="grid grid-cols-[1fr_120px_40px] items-center gap-1.5">
               <input
                 value={a.name}
                 onChange={e => setAllowances(p => p.map((x, j) => j === i ? { ...x, name: e.target.value } : x))}
@@ -342,7 +342,7 @@ export default function Payroll() {
           ))}
           <button
             onClick={() => setAllowances(p => [...p, { id: Date.now(), name: "", amount: "" }])}
-            className="flex w-fit items-center gap-1.5 rounded-xl border border-dashed border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary hover:text-primary"
+            className="flex w-fit items-center gap-1 rounded-xl border border-dashed border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:border-primary hover:text-primary"
           >
             <Plus className="size-3.5" /> Add Allowance
           </button>
@@ -350,7 +350,7 @@ export default function Payroll() {
       </Card>
 
       <Card title="Payroll Workflow" subtitle="Automation and approval settings for pay runs" icon={Banknote}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <Row label="Auto-process on pay day" hint="Payroll runs automatically without a manual trigger">
             <Toggle checked={autoProcess} onChange={setAutoProcess} />
           </Row>
