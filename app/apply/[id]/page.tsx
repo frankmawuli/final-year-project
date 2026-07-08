@@ -169,17 +169,8 @@ export default function JobDetailPage() {
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex flex-wrap items-center gap-1.5">
                     <h1 className="text-lg font-bold text-foreground">{job.title}</h1>
-                    {employment.department && (
-                      <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold", deptColors[employment.department] ?? "bg-muted text-muted-foreground")}>
-                        {employment.department}
-                      </span>
-                    )}
-                    <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                      {PUBLIC_TYPE_LABEL[employment.type]}
-                    </span>
-                    <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                      {PUBLIC_LEVEL_LABEL[employment.experience_level]}
-                    </span>
+                    
+                  
                   </div>
                   <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-xs text-muted-foreground">
                     <span className="font-medium text-foreground">{company.name}</span>

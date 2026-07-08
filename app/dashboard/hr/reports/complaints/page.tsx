@@ -200,7 +200,7 @@ const seed: Complaint[] = [
     title: "Lack of remote work equipment support",
     category: "Policy Violation", priority: "Low",
     submittedOn: "Jan 15, 2026", status: "Closed",
-    description: "My request for a second monitor for home office use was denied despite the company policy stating remote employees are eligible for up to $500 in equipment annually. My manager approved the request but IT purchasing declined without explanation.",
+    description: "My request for a second monitor for home office use was denied despite the company policy stating remote employees are eligible for up to ₵500 in equipment annually. My manager approved the request but IT purchasing declined without explanation.",
     updates: [
       { date: "Jan 16, 2026", text: "Procurement team contacted for clarification on the policy." },
       { date: "Jan 20, 2026", text: "Equipment approved. Budget code issue resolved. Monitor delivered Feb 3." },

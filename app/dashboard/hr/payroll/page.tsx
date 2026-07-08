@@ -11,16 +11,14 @@ import {
   type ApiPayrollSummary,
   type ApiPayslip,
 } from "@/services/payroll.service"
-
-// ── Constants ─────────────────────────────────────────────────
-const DEFAULT_PHOTO = "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png"
+import { Avatar } from "@/components/avatar"
 
 // ── Types ─────────────────────────────────────────────────────
 interface PayrollEmployee {
   id:         string
   name:       string
   email:      string
-  photo:      string
+  photo:      string | null
   department: string
   baseSalary: number
   bonus:      number
@@ -80,7 +78,7 @@ function mapRun(run: ApiPayrollRun): RunRow {
     period:    formatPeriod(run.period),
     employees: run.employeeCount,
     meta:      paid ? `Paid ${shortDate(run.paidAt ?? run.payDate)}` : `Due ${shortDate(run.payDate)}`,
-    amount:    `$${run.totals.net.toLocaleString()}`,
+    amount:    `₵${run.totals.net.toLocaleString()}`,
     status:    runStatusLabel[run.status] ?? run.status,
   }
 }
@@ -97,7 +95,7 @@ function mapPayslip(slip: ApiPayslip): PayrollEmployee {
     id:         slip.id,
     name:       slip.employee.user.name,
     email:      slip.employee.user.email,
-    photo:      slip.employee.user.avatarUrl ?? DEFAULT_PHOTO,
+    photo:      slip.employee.user.avatarUrl,
     department: slip.employee.department ?? "—",
     baseSalary: slip.baseSalary,
     bonus:      slip.bonus,
@@ -182,7 +180,7 @@ function EmployeesPayrollTab({
       e.email.toLowerCase().includes(search.toLowerCase())
   )
 
-  const fmt = (n: number) => `$${n.toLocaleString()}`
+  const fmt = (n: number) => `₵${n.toLocaleString()}`
 
   return (
     <div className="rounded-2xl bg-card shadow-sm">
@@ -220,10 +218,10 @@ function EmployeesPayrollTab({
                 {/* Employee */}
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2.5">
-                    <img
+                    <Avatar
                       src={emp.photo}
                       alt={emp.name}
-                      className="size-9 shrink-0 rounded-full object-cover"
+                      className="size-9 shrink-0"
                     />
                     <div>
                       <p className="font-medium text-foreground">{emp.name}</p>
@@ -346,7 +344,7 @@ export default function PayrollPage() {
     }
   }
 
-  const fmtMoney = (n: number) => `$${Math.round(n).toLocaleString()}`
+  const fmtMoney = (n: number) => `₵${Math.round(n).toLocaleString()}`
   const fmtPct   = (n: number) => `${n >= 0 ? "+" : ""}${n}%`
 
   const stats = [
@@ -516,7 +514,7 @@ export default function PayrollPage() {
                         <div className="mb-1 flex items-center justify-between">
                           <span className="text-xs text-foreground">{department}</span>
                           <span className="text-xs font-semibold text-foreground">
-                            ${amount.toLocaleString()}
+                            ₵{amount.toLocaleString()}
                           </span>
                         </div>
                         <div className="h-2 overflow-hidden rounded-full bg-muted">

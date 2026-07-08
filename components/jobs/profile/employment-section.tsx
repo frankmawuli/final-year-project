@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { FormInput, FormLabel, FormSelect } from "@/components/jobs/profile/form-controls";
 import { JOB_FUNCTIONS, LOCATIONS, QUALIFICATIONS, WORK_TYPES } from "@/components/jobs/profile/constants";
 import { useApplicantAuth } from "@/context/applicant-auth-context";
-import { uploadService } from "@/services/upload.service";
+import { applicantAuthService } from "@/services/applicant-auth.service";
 import type { ApplicantProfile } from "@/services/applicant-auth.service";
 
 const EXPERIENCE_OPTIONS = ["No experience", "1 year", "2 years", "3-5 years", "5+ years"];
@@ -180,8 +180,8 @@ export function EmploymentSection() {
     }
     setUploadingPhoto(true);
     try {
-      const { url } = await uploadService.image(file, accessToken);
-      await updateProfile({ avatarUrl: url });
+      const { data } = await applicantAuthService.uploadPhoto(accessToken, file);
+      await updateProfile({ avatarUrl: data.url });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to upload photo.");
     } finally {

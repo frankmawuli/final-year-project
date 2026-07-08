@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
+import { toast } from "sonner"
 import { Building2, XCircle, Upload, ChevronDown, Clock, MapPin, Trash2, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
 import { uploadService } from "@/services/upload.service"
+import { onboardingService } from "@/services/onboarding.service"
 
 // ── Constants ─────────────────────────────────────────────────
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -48,14 +50,15 @@ function Divider() {
   return <hr className="my-3 border-border" />
 }
 
-function SaveRow({ onSave }: { onSave: () => void }) {
+function SaveRow({ onSave, saving }: { onSave: () => void; saving: boolean }) {
   return (
     <div className="flex justify-end pt-1.5">
       <button
         onClick={onSave}
-        className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+        disabled={saving}
+        className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
       >
-        Save changes
+        {saving ? "Saving…" : "Save changes"}
       </button>
     </div>
   )
@@ -80,7 +83,7 @@ export default function CompanySettings() {
   const [industry,    setIndustry]    = useState("Technology")
   const [companySize, setCompanySize] = useState("11–50")
   const [timezone,    setTimezone]    = useState("UTC+0 — London")
-  const [currency,    setCurrency]    = useState("USD — US Dollar")
+  const [currency,    setCurrency]    = useState("GHS — Ghanaian Cedi")
   const [fiscalYear,  setFiscalYear]  = useState("January")
   const [dateFormat,  setDateFormat]  = useState("DD/MM/YYYY")
   const [workStart,   setWorkStart]   = useState("09:00")
@@ -89,7 +92,36 @@ export default function CompanySettings() {
   const [locations,   setLocations]   = useState<{ id: string; name: string; type: string }[]>([])
   const [newLocName,  setNewLocName]  = useState("")
   const [newLocType,  setNewLocType]  = useState("Office")
+  const [loading,     setLoading]     = useState(true)
+  const [saving,      setSaving]      = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!accessToken) return
+    let cancelled = false
+    onboardingService
+      .getCompany(accessToken)
+      .then((res) => {
+        if (cancelled) return
+        const company = res.data
+        setCompanyName(company.name ?? "")
+        setWebsite(company.website ?? "")
+        if (company.industry) setIndustry(company.industry)
+        if (company.size) setCompanySize(company.size)
+        if (company.timezone) setTimezone(company.timezone)
+        if (company.logoUrl) {
+          setLogoUrl(company.logoUrl)
+          setLogoPreview(company.logoUrl)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) toast.error("Failed to load company settings")
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [accessToken])
 
   async function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -122,8 +154,28 @@ export default function CompanySettings() {
     setLocations(prev => prev.filter(l => l.id !== id))
   }
 
-  function onSave() {
-    // TODO: persist settings
+  async function onSave() {
+    if (!accessToken) return
+    setSaving(true)
+    try {
+      await onboardingService.updateCompany(accessToken, {
+        name: companyName || undefined,
+        website: website || undefined,
+        industry,
+        size: companySize,
+        timezone,
+        logoUrl: logoUrl || undefined,
+      })
+      toast.success("Company settings saved")
+    } catch {
+      toast.error("Failed to save company settings")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return <p className="text-xs text-muted-foreground">Loading company settings…</p>
   }
 
   return (
@@ -418,7 +470,7 @@ export default function CompanySettings() {
         </div>
       </Card>
 
-      <SaveRow onSave={onSave} />
+      <SaveRow onSave={onSave} saving={saving} />
     </div>
   )
 }

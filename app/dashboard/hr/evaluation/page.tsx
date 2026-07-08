@@ -2,13 +2,14 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import {
-  Search, SlidersHorizontal, ChevronLeft, ChevronRight,
+  Search, ChevronLeft, ChevronRight,
   ChevronDown, X, Download, MapPin, Mail, Phone,
   Briefcase, GraduationCap, FileText, Star, Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { useAuth } from "@/context/auth-context"
+import { FilterDropdown } from "@/components/filter-dropdown"
 import {
   applicationsService,
   type ApiApplicantDetail,
@@ -432,11 +433,16 @@ export default function EvaluationPage() {
   const [listLoading, setListLoading] = useState(true)
   const [listError, setListError]     = useState<string | null>(null)
   const [search, setSearch]           = useState("")
+  const [statusFilter, setStatusFilter] = useState<EvalStatus | "All">("All")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [page, setPage]               = useState(1)
   const [totalPages, setTotalPages]   = useState(1)
   const [viewing, setViewing]         = useState<Candidate | null>(null)
   const [panelLoading, setPanelLoading] = useState(false)
+
+  const hasFilters = search !== "" || statusFilter !== "All"
+  const clearFilters = () => { setSearch(""); setStatusFilter("All"); setPage(1) }
+  const handleStatusFilter = (v: EvalStatus | "All") => { setStatusFilter(v); setPage(1) }
 
   // Debounce search → reset to page 1 when it settles
   useEffect(() => {
@@ -447,13 +453,13 @@ export default function EvaluationPage() {
     return () => clearTimeout(t)
   }, [search])
 
-  const fetchList = useCallback(async (p: number, q: string) => {
+  const fetchList = useCallback(async (p: number, q: string, statusVal: EvalStatus | "All") => {
     if (!accessToken) return
     setListLoading(true)
     setListError(null)
     try {
       const res = await applicationsService.list(
-        { search: q || undefined, page: p, limit: 8 },
+        { search: q || undefined, status: statusVal !== "All" ? EVAL_TO_STATUS[statusVal] : undefined, page: p, limit: 8 },
         accessToken,
       )
       setRows(res.data.map(fromApplicant))
@@ -466,8 +472,8 @@ export default function EvaluationPage() {
   }, [accessToken])
 
   useEffect(() => {
-    fetchList(page, debouncedSearch)
-  }, [fetchList, page, debouncedSearch])
+    fetchList(page, debouncedSearch, statusFilter)
+  }, [fetchList, page, debouncedSearch, statusFilter])
 
   const handleView = async (c: Candidate) => {
     setViewing(c)
@@ -489,7 +495,7 @@ export default function EvaluationPage() {
     try {
       await applicationsService.updateStatus(id, EVAL_TO_STATUS[status], accessToken!)
     } catch {
-      fetchList(page, debouncedSearch) // revert on failure
+      fetchList(page, debouncedSearch, statusFilter) // revert on failure
     }
   }
 
@@ -497,135 +503,150 @@ export default function EvaluationPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-hidden p-5">
+      <main className="flex flex-1 flex-col overflow-hidden">
         {/* Search */}
-        <div className="mb-4 flex items-center gap-2.5 rounded-lg bg-white px-3 py-2.5 shadow-sm">
-          <Search className="size-5 shrink-0 text-[#8181a5]" />
-          <input
-            type="text"
-            placeholder="Search ⌘K"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-xs text-[#1f2937] outline-none placeholder:text-[rgba(34,48,62,0.4)]"
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-border bg-white px-5 py-2.5">
+          <div className="flex flex-1 items-center gap-1.5">
+            <Search className="size-5 shrink-0 text-[#8181a5]" />
+            <input
+              type="text"
+              placeholder="Search ⌘K"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1 bg-transparent text-xs text-[#1f2937] outline-none placeholder:text-[rgba(34,48,62,0.4)]"
+            />
+          </div>
+          <FilterDropdown
+            label="Status"
+            value={statusFilter}
+            options={STATUS_OPTIONS}
+            onChange={handleStatusFilter}
           />
-          <button className="rounded-lg p-1 text-[#8181a5] hover:bg-muted">
-            <SlidersHorizontal className="size-5" />
-          </button>
+          {hasFilters && (
+            <button
+              onClick={clearFilters}
+              className="whitespace-nowrap rounded-lg border border-border px-2.5 py-2 text-xs text-muted-foreground hover:bg-muted"
+            >
+              Clear
+            </button>
+          )}
         </div>
 
-        {listError && (
-          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-600">
-            {listError}
-          </div>
-        )}
+        <div className="flex flex-1 flex-col overflow-hidden p-5">
+          {listError && (
+            <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-600">
+              {listError}
+            </div>
+          )}
 
-        {/* Table card */}
-        <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-          <div className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center border-b border-border px-5 py-3">
-            {["Candidate Name", "Job Position", "Applied", "AI Score", "Status", "Actions"].map((h, i) => (
-              <span
-                key={h}
-                className={cn("text-xs font-medium text-[#1f2937]", i === 5 && "text-right")}
-              >
-                {h}
-              </span>
-            ))}
-          </div>
+          {/* Table card */}
+          <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+            <div className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center border-b border-border px-5 py-3">
+              {["Candidate Name", "Job Position", "Applied", "AI Score", "Status", "Actions"].map((h, i) => (
+                <span
+                  key={h}
+                  className={cn("text-xs font-medium text-[#1f2937]", i === 5 && "text-right")}
+                >
+                  {h}
+                </span>
+              ))}
+            </div>
 
-          <div className="flex-1 overflow-y-auto divide-y divide-border">
-            {listLoading ? (
-              <div className="flex h-32 items-center justify-center">
-                <Loader2 className="size-5 animate-spin text-[#8181a5]" />
-              </div>
-            ) : rows.length > 0 ? rows.map((c) => (
-              <div
-                key={c.id}
-                className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center gap-x-2.5 px-5 py-2.5 transition-colors hover:bg-[#f8fafc]"
-              >
-                {/* Name */}
-                <div className="flex min-w-0 items-center gap-2.5">
-                  {c.photo ? (
-                    <img src={c.photo} alt={c.name} className="size-9 shrink-0 rounded-full object-cover" />
-                  ) : (
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] text-xs font-bold text-[#8a8cd9]">
-                      {c.name.charAt(0)}
+            <div className="flex-1 overflow-y-auto divide-y divide-border">
+              {listLoading ? (
+                <div className="flex h-32 items-center justify-center">
+                  <Loader2 className="size-5 animate-spin text-[#8181a5]" />
+                </div>
+              ) : rows.length > 0 ? rows.map((c) => (
+                <div
+                  key={c.id}
+                  className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center gap-x-2.5 px-5 py-2.5 transition-colors hover:bg-[#f8fafc]"
+                >
+                  {/* Name */}
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    {c.photo ? (
+                      <img src={c.photo} alt={c.name} className="size-9 shrink-0 rounded-full object-cover" />
+                    ) : (
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] text-xs font-bold text-[#8a8cd9]">
+                        {c.name.charAt(0)}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-medium text-[#1f2937]">{c.name}</p>
+                      <p className="truncate text-xs text-[#667388]">{c.email}</p>
                     </div>
-                  )}
+                  </div>
+
+                  {/* Position */}
                   <div className="min-w-0">
-                    <p className="truncate text-xs font-medium text-[#1f2937]">{c.name}</p>
-                    <p className="truncate text-xs text-[#667388]">{c.email}</p>
+                    <p className="truncate text-xs text-[#1f2937]">{c.position}</p>
+                    <p className="truncate text-xs text-[#8181a5]">{c.department}</p>
+                  </div>
+
+                  {/* Applied */}
+                  <span className="text-xs text-[#667388]">{c.appliedAt}</span>
+
+                  {/* AI Score */}
+                  <div>
+                    <AiScoreBadge score={c.aiScore} />
+                  </div>
+
+                  {/* Status */}
+                  <div>
+                    <StatusBadge status={c.status} />
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-1.5">
+                    <StatusDropdown
+                      value={c.status}
+                      onChange={(v) => updateStatus(c.id, v)}
+                    />
+                    <button
+                      onClick={() => handleView(c)}
+                      className="h-[28px] rounded border border-[#6e39cb] px-2.5 text-xs font-medium text-[#6e39cb] transition-colors hover:bg-[#6e39cb]/5"
+                    >
+                      View
+                    </button>
                   </div>
                 </div>
-
-                {/* Position */}
-                <div className="min-w-0">
-                  <p className="truncate text-xs text-[#1f2937]">{c.position}</p>
-                  <p className="truncate text-xs text-[#8181a5]">{c.department}</p>
+              )) : (
+                <div className="flex h-32 items-center justify-center text-xs text-[#8181a5]">
+                  No candidates match your search.
                 </div>
-
-                {/* Applied */}
-                <span className="text-xs text-[#667388]">{c.appliedAt}</span>
-
-                {/* AI Score */}
-                <div>
-                  <AiScoreBadge score={c.aiScore} />
-                </div>
-
-                {/* Status */}
-                <div>
-                  <StatusBadge status={c.status} />
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-end gap-1.5">
-                  <StatusDropdown
-                    value={c.status}
-                    onChange={(v) => updateStatus(c.id, v)}
-                  />
-                  <button
-                    onClick={() => handleView(c)}
-                    className="h-[28px] rounded border border-[#6e39cb] px-2.5 text-xs font-medium text-[#6e39cb] transition-colors hover:bg-[#6e39cb]/5"
-                  >
-                    View
-                  </button>
-                </div>
-              </div>
-            )) : (
-              <div className="flex h-32 items-center justify-center text-xs text-[#8181a5]">
-                No candidates match your search.
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Pagination */}
-        <div className="mt-3 flex items-center justify-end gap-1">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="flex size-8 items-center justify-center rounded-full text-[#4b5563] transition-colors hover:bg-muted disabled:opacity-40"
-          >
-            <ChevronLeft className="size-4" />
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={cn(
-                "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
-                p === page ? "bg-[#3b6feb] text-white" : "text-[#4b5563] hover:bg-muted"
               )}
+            </div>
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-3 flex items-center justify-end gap-1">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="flex size-8 items-center justify-center rounded-full text-[#4b5563] transition-colors hover:bg-muted disabled:opacity-40"
             >
-              {p}
+              <ChevronLeft className="size-4" />
             </button>
-          ))}
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-            className="flex size-8 items-center justify-center rounded-full text-[#4b5563] transition-colors hover:bg-muted disabled:opacity-40"
-          >
-            <ChevronRight className="size-4" />
-          </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
+                  p === page ? "bg-[#3b6feb] text-white" : "text-[#4b5563] hover:bg-muted"
+                )}
+              >
+                {p}
+              </button>
+            ))}
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="flex size-8 items-center justify-center rounded-full text-[#4b5563] transition-colors hover:bg-muted disabled:opacity-40"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
         </div>
       </main>
 

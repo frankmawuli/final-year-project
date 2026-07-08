@@ -101,7 +101,7 @@ const docs: Document[] = [
     issuedBy: "HR Department",
     issuedOn: "Jan 10, 2024",
     status:   "Verified",
-    preview:  "Formal offer of employment for the role of UI/UX Designer at a base salary of $4,500/month.",
+    preview:  "Formal offer of employment for the role of UI/UX Designer at a base salary of ₵4,500/month.",
   },
   {
     id: 3,
@@ -183,7 +183,7 @@ const docs: Document[] = [
     issuedBy: "Payroll Department",
     issuedOn: "Jan 31, 2026",
     status:   "Verified",
-    preview:  "End-of-year tax statement for the period April 2024 – March 2025. Total earnings: $51,600. Tax paid: $11,352.",
+    preview:  "End-of-year tax statement for the period April 2024 – March 2025. Total earnings: ₵51,600. Tax paid: ₵11,352.",
   },
   {
     id: 10,
@@ -216,7 +216,7 @@ const docs: Document[] = [
     issuedBy: "Figma Academy",
     issuedOn: "Feb 28, 2026",
     status:   "Pending",
-    preview:  "Receipt for training reimbursement claim. Amount: $149.",
+    preview:  "Receipt for training reimbursement claim. Amount: ₵149.",
   },
 ]
 

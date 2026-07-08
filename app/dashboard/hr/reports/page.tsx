@@ -110,7 +110,7 @@ const seed: EmployeeReport[] = [
     id: 4, name: "James Anderson",   photo: photos["James Anderson"],   email: "james.anderson@corecruiter.com",
     department: "Sales",       reportType: "Performance",  title: "Q1 2026 Sales Performance",
     period: "Jan – Mar 2026",  submittedOn: "Apr 03, 2026", status: "Under Review",
-    summary: "Achieved 112% of quarterly quota. Closed three enterprise accounts totalling $480k ARR. Pipeline entering Q2 is the strongest on record.",
+    summary: "Achieved 112% of quarterly quota. Closed three enterprise accounts totalling ₵480k ARR. Pipeline entering Q2 is the strongest on record.",
     score: 94,
   },
   {

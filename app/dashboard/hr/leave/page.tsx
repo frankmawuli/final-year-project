@@ -1,15 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, SlidersHorizontal } from "lucide-react"
+import { Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { useAuth } from "@/context/auth-context"
 import { ApiError } from "@/lib/api-client"
 import { leaveService, type ApiLeaveRequest, type ApiLeaveType, type ApiLeaveStatus } from "@/services/leave.service"
+import { FilterDropdown } from "@/components/filter-dropdown"
+import { Avatar } from "@/components/avatar"
 
 // ── Constants ─────────────────────────────────────────────────
-const DEFAULT_PHOTO = "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png"
 const PER_PAGE = 9
 
 // ── Types ─────────────────────────────────────────────────────
@@ -17,7 +18,7 @@ interface LeaveRequest {
   id:         number
   name:       string
   email:      string
-  photo:      string
+  photo:      string | null
   department: string
   type:       ApiLeaveType
   startDate:  string   // ISO
@@ -51,6 +52,14 @@ const statusBadge: Record<ApiLeaveStatus, string> = {
   REJECTED: "border-red-600 text-red-600",
 }
 
+const STATUS_LABELS: Record<ApiLeaveStatus, string> = {
+  PENDING:  "Pending",
+  APPROVED: "Approved",
+  REJECTED: "Rejected",
+}
+const TYPE_OPTIONS   = Object.values(TYPE_LABELS)
+const STATUS_OPTIONS = Object.values(STATUS_LABELS)
+
 // ── Helpers ────────────────────────────────────────────────────
 function formatDate(iso: string): string {
   if (!iso) return ""
@@ -66,7 +75,7 @@ function mapLeave(a: ApiLeaveRequest): LeaveRequest {
     id:         a.id,
     name:       a.employee.user.name,
     email:      a.employee.user.email,
-    photo:      a.employee.user.avatarUrl ?? DEFAULT_PHOTO,
+    photo:      a.employee.user.avatarUrl,
     department: a.employee.department?.name ?? "",
     type:       a.type,
     startDate:  a.startDate,
@@ -95,9 +104,16 @@ export default function LeavePage() {
   const [loading,       setLoading]       = useState(true)
   const [error,         setError]         = useState<string | null>(null)
   const [search,        setSearch]        = useState("")
+  const [typeFilter,    setTypeFilter]    = useState<string | "All">("All")
+  const [statusFilter,  setStatusFilter]  = useState<string | "All">("All")
   const [page,          setPage]          = useState(1)
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [actionError,   setActionError]   = useState<string | null>(null)
+
+  const hasFilters = search !== "" || typeFilter !== "All" || statusFilter !== "All"
+  const clearFilters = () => {
+    setSearch(""); setTypeFilter("All"); setStatusFilter("All"); setPage(1)
+  }
 
   // Debounce search
   const [debouncedSearch, setDebouncedSearch] = useState("")
@@ -106,6 +122,13 @@ export default function LeavePage() {
     return () => clearTimeout(t)
   }, [search])
 
+  const type   = typeFilter !== "All"
+    ? (Object.keys(TYPE_LABELS) as ApiLeaveType[]).find((k) => TYPE_LABELS[k] === typeFilter)
+    : undefined
+  const status = statusFilter !== "All"
+    ? (Object.keys(STATUS_LABELS) as ApiLeaveStatus[]).find((k) => STATUS_LABELS[k] === statusFilter)
+    : undefined
+
   // Fetch leave requests
   useEffect(() => {
     if (!accessToken) return
@@ -113,7 +136,7 @@ export default function LeavePage() {
     setLoading(true)
     setError(null)
     leaveService
-      .list({ search: debouncedSearch || undefined, page, limit: PER_PAGE }, accessToken)
+      .list({ search: debouncedSearch || undefined, type, status, page, limit: PER_PAGE }, accessToken)
       .then((res) => {
         if (cancelled) return
         setRequests(res.data.map(mapLeave))
@@ -125,7 +148,7 @@ export default function LeavePage() {
       })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [accessToken, debouncedSearch, page])
+  }, [accessToken, debouncedSearch, type, status, page])
 
   async function handleUpdateStatus(id: number, status: "APPROVED" | "REJECTED") {
     if (!accessToken) return
@@ -151,20 +174,37 @@ export default function LeavePage() {
 
       <main className="flex flex-1 flex-col overflow-hidden">
         {/* Toolbar */}
-        <div className="flex items-center gap-2.5 border-b border-border bg-card px-5 py-2.5">
-          <div className="flex flex-1 items-center gap-1.5 rounded-lg bg-muted px-3 py-2">
-            <Search className="size-4 shrink-0 text-muted-foreground" />
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-border bg-card px-5 py-2.5">
+          <div className="flex flex-1 items-center gap-1.5">
+            <Search className="size-5 shrink-0 text-muted-foreground" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by employee name…"
+              placeholder="Search ⌘K"
               className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <button className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted">
-            <SlidersHorizontal className="size-4" />
-          </button>
+          <FilterDropdown
+            label="Type"
+            value={typeFilter}
+            options={TYPE_OPTIONS}
+            onChange={(v) => { setTypeFilter(v); setPage(1) }}
+          />
+          <FilterDropdown
+            label="Status"
+            value={statusFilter}
+            options={STATUS_OPTIONS}
+            onChange={(v) => { setStatusFilter(v); setPage(1) }}
+          />
+          {hasFilters && (
+            <button
+              onClick={clearFilters}
+              className="whitespace-nowrap rounded-lg border border-border px-2.5 py-2 text-xs text-muted-foreground hover:bg-muted"
+            >
+              Clear
+            </button>
+          )}
         </div>
 
         {/* Action error banner */}
@@ -212,10 +252,10 @@ export default function LeavePage() {
                       {/* Employee */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          <img
+                          <Avatar
                             src={r.photo}
                             alt={r.name}
-                            className="size-9 shrink-0 rounded-full object-cover"
+                            className="size-9 shrink-0"
                           />
                           <div>
                             <p className="font-semibold text-foreground">{r.name}</p>

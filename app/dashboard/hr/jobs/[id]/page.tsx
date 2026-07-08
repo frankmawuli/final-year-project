@@ -20,7 +20,7 @@ const STATUS_LABEL   = { OPEN: "Open", CLOSED: "Closed", DRAFT: "Draft" } as con
 
 function formatSalary(min: number | null, max: number | null): string {
   if (!min && !max) return "Not specified"
-  const fmt = (n: number) => (n >= 1000 ? `$${Math.round(n / 1000)}k` : `$${n}`)
+  const fmt = (n: number) => (n >= 1000 ? `₵${Math.round(n / 1000)}k` : `₵${n}`)
   if (min && max) return `${fmt(min)} – ${fmt(max)}`
   if (min) return `From ${fmt(min)}`
   return `Up to ${fmt(max!)}`

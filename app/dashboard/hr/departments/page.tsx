@@ -14,9 +14,9 @@ import { useAuth } from "@/context/auth-context"
 import { ApiError } from "@/lib/api-client"
 import { departmentService, type ApiDeptEmployee } from "@/services/departments.service"
 import { employeeService, type ApiEmployee } from "@/services/employee.service"
+import { Avatar } from "@/components/avatar"
 
 // ── Constants ─────────────────────────────────────────────────
-const DEFAULT_PHOTO = "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png"
 const CARDS_PER_PAGE = 6
 
 // ── Types ─────────────────────────────────────────────────────
@@ -25,7 +25,7 @@ interface Member {
   name:   string
   role:   string
   email:  string
-  photo:  string
+  photo:  string | null
   deptId: number | null  // used to filter available vs already-assigned pool employees
 }
 
@@ -84,7 +84,7 @@ function mapDeptEmployee(e: ApiDeptEmployee, deptId: number): Member {
     name:   e.user.name,
     role:   "",
     email:  e.user.email,
-    photo:  e.user.avatarUrl ?? DEFAULT_PHOTO,
+    photo:  e.user.avatarUrl,
     deptId: deptId,
   }
 }
@@ -96,7 +96,7 @@ function mapPoolEmployee(e: ApiEmployee): Member {
     name:   e.user.name,
     role:   e.jobTitle ?? "",
     email:  e.user.email,
-    photo:  e.user.avatarUrl ?? DEFAULT_PHOTO,
+    photo:  e.user.avatarUrl,
     deptId: e.department?.id ?? null,
   }
 }
@@ -210,7 +210,7 @@ function AddMemberDropdown({
                 onClick={() => { onAdd(m); setOpen(false) }}
                 className="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-muted/50"
               >
-                <img src={m.photo} alt={m.name} className="size-8 shrink-0 rounded-full object-cover" />
+                <Avatar src={m.photo} alt={m.name} className="size-8 shrink-0" />
                 <div className="min-w-0">
                   <p className="truncate text-xs font-medium text-foreground">{m.name}</p>
                   <p className="truncate text-xs text-muted-foreground">{m.role}</p>
@@ -360,7 +360,7 @@ function MembersPanel({ dept, onClose, onMemberCountChange }: {
           ) : (
             displayed.map((m) => (
               <div key={m.id} className="flex items-center gap-2.5 px-5 py-3 hover:bg-muted/50">
-                <img src={m.photo} alt={m.name} className="size-10 shrink-0 rounded-full object-cover" />
+                <Avatar src={m.photo} alt={m.name} className="size-10 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-xs font-semibold text-foreground">{m.name}</p>
                   <p className="truncate text-xs text-muted-foreground">{m.role || m.email}</p>
@@ -552,107 +552,111 @@ export default function DepartmentsPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-hidden p-5">
+      <main className="flex flex-1 flex-col overflow-hidden">
         {/* Search */}
-        <div className="mb-3 flex items-center gap-2.5 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-          <Search className="size-5 shrink-0 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search ⌘K"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-            className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground/50"
-          />
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-border bg-card px-5 py-2.5">
+          <div className="flex flex-1 items-center gap-1.5">
+            <Search className="size-5 shrink-0 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search ⌘K"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+              className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
+            />
+          </div>
           <button className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <SlidersHorizontal className="size-5" />
           </button>
         </div>
 
-        {/* Delete error banner */}
-        {deleteError && (
-          <div className="mb-3 flex items-center justify-between rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
-            <span>{deleteError}</span>
-            <button onClick={() => setDeleteError(null)} className="ml-3 shrink-0 rounded p-0.5 hover:bg-rose-100 dark:hover:bg-rose-900/30">
-              <X className="size-4" />
-            </button>
-          </div>
-        )}
-
-        {/* Header */}
-        <div className="mb-4 flex items-center justify-between">
-          <div />
-          <button
-            onClick={() => setEditing(null)}
-            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
-          >
-            <Plus className="size-4" /> Add Department
-          </button>
-        </div>
-
-        {/* Content */}
-        {loading ? (
-          <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
-            Loading departments…
-          </div>
-        ) : error ? (
-          <div className="flex flex-1 items-center justify-center text-xs text-rose-500">
-            {error}
-          </div>
-        ) : paginated.length > 0 ? (
-          <div className="grid flex-1 auto-rows-min grid-cols-3 gap-3">
-            {paginated.map((dept) => (
-              <DepartmentCard
-                key={dept.id}
-                dept={dept}
-                onView={() => setViewing(dept)}
-                onEdit={() => setEditing(dept)}
-                onDelete={() => deleteDept(dept.id)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-1 items-center justify-center">
-            <div className="flex flex-col items-center gap-2.5 text-center">
-              <div className="flex size-14 items-center justify-center rounded-full bg-primary/10">
-                <Building2 className="size-7 text-primary" />
-              </div>
-              <p className="text-xs font-medium text-foreground">No departments found</p>
-              <p className="text-xs text-muted-foreground">Try a different search or create a new department.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {!loading && !error && totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-end gap-1">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
-            >
-              <ChevronLeft className="size-4" />
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={cn(
-                  "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
-                  p === page ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted",
-                )}
-              >
-                {p}
+        <div className="flex flex-1 flex-col overflow-auto p-5">
+          {/* Delete error banner */}
+          {deleteError && (
+            <div className="mb-3 flex items-center justify-between rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+              <span>{deleteError}</span>
+              <button onClick={() => setDeleteError(null)} className="ml-3 shrink-0 rounded p-0.5 hover:bg-rose-100 dark:hover:bg-rose-900/30">
+                <X className="size-4" />
               </button>
-            ))}
+            </div>
+          )}
+
+          {/* Header */}
+          <div className="mb-4 flex items-center justify-between">
+            <div />
             <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
+              onClick={() => setEditing(null)}
+              className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
             >
-              <ChevronRight className="size-4" />
+              <Plus className="size-4" /> Add Department
             </button>
           </div>
-        )}
+
+          {/* Content */}
+          {loading ? (
+            <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
+              Loading departments…
+            </div>
+          ) : error ? (
+            <div className="flex flex-1 items-center justify-center text-xs text-rose-500">
+              {error}
+            </div>
+          ) : paginated.length > 0 ? (
+            <div className="grid flex-1 auto-rows-min grid-cols-3 gap-3">
+              {paginated.map((dept) => (
+                <DepartmentCard
+                  key={dept.id}
+                  dept={dept}
+                  onView={() => setViewing(dept)}
+                  onEdit={() => setEditing(dept)}
+                  onDelete={() => deleteDept(dept.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-1 items-center justify-center">
+              <div className="flex flex-col items-center gap-2.5 text-center">
+                <div className="flex size-14 items-center justify-center rounded-full bg-primary/10">
+                  <Building2 className="size-7 text-primary" />
+                </div>
+                <p className="text-xs font-medium text-foreground">No departments found</p>
+                <p className="text-xs text-muted-foreground">Try a different search or create a new department.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && !error && totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-end gap-1">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={cn(
+                    "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
+                    p === page ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted",
+                  )}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </main>
 
       {viewing && (

@@ -3,8 +3,15 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { Avatar } from "@/components/avatar"
+import type { Role } from "@/services/auth.service"
 
-const adminPhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
+const ROLE_LABELS: Record<Role, string> = {
+  HR_ADMIN:   "HR Administrator",
+  HR_MANAGER: "HR Manager",
+  EMPLOYEE:   "Employee",
+}
 
 interface NavItem {
   label: string
@@ -17,6 +24,7 @@ interface HrNavigationPannelProps {
 
 export default function HrNavigationPannel({ navItems }: HrNavigationPannelProps) {
   const pathname = usePathname()
+  const { user } = useAuth()
 
   return (
     <aside className="flex w-[220px] shrink-0 flex-col justify-between bg-sidebar py-4 pl-4 pr-2.5 shadow-sm">
@@ -41,14 +49,14 @@ export default function HrNavigationPannel({ navItems }: HrNavigationPannelProps
       </nav>
 
       <div className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5">
-        <img
-          src={adminPhoto}
-          alt="Michael Smith"
-          className="size-9 shrink-0 rounded-full object-cover"
+        <Avatar
+          src={null}
+          alt={user?.name ?? "User"}
+          className="size-9 shrink-0"
         />
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium text-foreground">Michael Smith</p>
-          <p className="truncate text-xs text-muted-foreground">HR Administrator</p>
+          <p className="truncate text-xs font-medium text-foreground">{user?.name ?? "—"}</p>
+          <p className="truncate text-xs text-muted-foreground">{user ? ROLE_LABELS[user.role] : ""}</p>
         </div>
       </div>
     </aside>

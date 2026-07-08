@@ -193,6 +193,16 @@ export const applicantAuthService = {
     }>("/applicant/profile/cv", fd, { Authorization: `Bearer ${accessToken}` })
   },
 
+  /** Upload a profile photo — stored on B2 and saved as the candidate's avatarUrl. */
+  uploadPhoto: async (accessToken: string, file: File) => {
+    const fd = new FormData()
+    fd.append("image", file)
+    return api.upload<{
+      success: boolean
+      data: { url: string; publicId: string }
+    }>("/applicant/profile/photo", fd, { Authorization: `Bearer ${accessToken}` })
+  },
+
   /** Ask the backend to extract a profile suggestion from the saved CV text. */
   autofillFromCv: (accessToken: string) =>
     api.post<{ success: boolean; data: CvAutofillSuggestion }>(

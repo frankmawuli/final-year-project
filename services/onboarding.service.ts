@@ -49,6 +49,20 @@ interface BulkInviteResult {
   failed: { email: string; reason: string }[]
 }
 
+interface UpdateCompanyBody {
+  name?: string
+  industry?: string
+  size?: string
+  logoUrl?: string
+  website?: string
+  country?: string
+  city?: string
+  timezone?: string
+  address?: string
+  foundingYear?: number
+  registrationNo?: string
+}
+
 export const onboardingService = {
   createCompany: (
     accessToken: string,
@@ -67,6 +81,19 @@ export const onboardingService = {
     }
   ) =>
     api.post<{ success: boolean; data: Company }>(
+      "/onboarding/company",
+      body,
+      { Authorization: `Bearer ${accessToken}` }
+    ),
+
+  getCompany: (accessToken: string) =>
+    api.get<{ success: boolean; data: Company }>(
+      "/onboarding/company",
+      { Authorization: `Bearer ${accessToken}` }
+    ),
+
+  updateCompany: (accessToken: string, body: UpdateCompanyBody) =>
+    api.put<{ success: boolean; data: Company }>(
       "/onboarding/company",
       body,
       { Authorization: `Bearer ${accessToken}` }

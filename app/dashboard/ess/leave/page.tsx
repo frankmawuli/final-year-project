@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
 import { ApiError } from "@/lib/api-client"
 import { leaveService, type ApiLeaveRequest, type ApiLeaveType, type ApiLeaveStatus } from "@/services/leave.service"
+import { Avatar } from "@/components/avatar"
 
 // ── Constants ─────────────────────────────────────────────────
-const DEFAULT_PHOTO = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
 const PER_PAGE = 5
 
 // ── Types ─────────────────────────────────────────────────────
@@ -284,10 +284,10 @@ export default function EssLeavePage() {
 
           <div className="relative flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <img
-                src={DEFAULT_PHOTO}
+              <Avatar
+                src={null}
                 alt={user?.name ?? "Employee"}
-                className="size-14 shrink-0 rounded-full object-cover ring-2 ring-white/40"
+                className="size-14 shrink-0 ring-2 ring-white/40"
               />
               <div>
                 <p className="text-sm font-semibold">{user?.name ?? "—"}</p>
