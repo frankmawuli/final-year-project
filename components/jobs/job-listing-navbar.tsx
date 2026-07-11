@@ -29,7 +29,7 @@ export function JobListingNavbar() {
     .toUpperCase();
 
   return (
-    <header className="bg-white border-b border-[#E5E7EB]">
+    <header className="bg-card border-b border-border">
       <div className="max-w-[1340px] mx-auto px-3 sm:px-5 h-16 flex items-center justify-between gap-3">
         {/* Logo + nav links */}
         <div className="flex items-center gap-6">
@@ -47,7 +47,7 @@ export function JobListingNavbar() {
                 href={href}
                 className={cn(
                   "text-[13.5px] font-medium transition-colors",
-                  active ? "text-foreground font-semibold" : "text-[#6B7280] hover:text-foreground"
+                  active ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {label}
@@ -64,19 +64,19 @@ export function JobListingNavbar() {
                 {/* Notifications */}
                 <button
                   aria-label="Notifications"
-                  className="relative flex items-center justify-center w-9 h-9 rounded-full text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
+                  className="relative flex items-center justify-center w-9 h-9 rounded-full text-muted-foreground hover:bg-muted transition-colors"
                 >
                   <Bell className="w-[18px] h-[18px]" />
-                  <span className="absolute top-1.5 right-2 w-[7px] h-[7px] rounded-full bg-rose-500 ring-2 ring-white" />
+                  <span className="absolute top-1.5 right-2 w-[7px] h-[7px] rounded-full bg-rose-500 ring-2 ring-card" />
                 </button>
 
                 {/* Settings */}
                 <button
                   aria-label="Settings"
-                  className="relative hidden sm:flex items-center justify-center w-9 h-9 rounded-full text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
+                  className="relative hidden sm:flex items-center justify-center w-9 h-9 rounded-full text-muted-foreground hover:bg-muted transition-colors"
                 >
                   <Settings className="w-[18px] h-[18px]" />
-                  <span className="absolute top-1.5 right-2 w-[7px] h-[7px] rounded-full bg-rose-500 ring-2 ring-white" />
+                  <span className="absolute top-1.5 right-2 w-[7px] h-[7px] rounded-full bg-rose-500 ring-2 ring-card" />
                 </button>
 
                 {/* Profile */}

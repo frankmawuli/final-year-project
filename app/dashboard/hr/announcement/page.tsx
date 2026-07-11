@@ -119,7 +119,8 @@ export default function AnnouncementPage() {
     if (!accessToken) return
     employeeService
       .list({ limit: 100 }, accessToken)
-      .then((res) => setEmployees(res.data))
+      // employees without a linked user account have no email and can't receive an announcement
+      .then((res) => setEmployees(res.data.filter((e) => e.user !== null)))
       .catch(() => { /* non-critical — dropdown just stays empty */ })
   }, [accessToken])
 
@@ -145,7 +146,7 @@ export default function AnnouncementPage() {
   const filteredEmployees = employees.filter((e) => {
     const q = search.toLowerCase()
     return (
-      e.user.name.toLowerCase().includes(q) ||
+      (e.user?.name ?? "").toLowerCase().includes(q) ||
       (e.jobTitle ?? "").toLowerCase().includes(q)
     )
   })
@@ -166,7 +167,7 @@ export default function AnnouncementPage() {
           bodyText,
           recipientType: toMode,
           status: "SENT",
-          ...(toMode === "INDIVIDUAL" && { recipientEmployeeId: selected!.user.id }),
+          ...(toMode === "INDIVIDUAL" && selected?.user && { recipientEmployeeId: selected.user.id }),
         },
         accessToken,
       )
@@ -240,14 +241,14 @@ export default function AnnouncementPage() {
                     {selected ? (
                       <div className="flex h-[44px] items-center justify-between rounded-lg border border-primary bg-primary/5 px-2.5">
                         <div className="flex items-center gap-1.5">
-                          {selected.user.avatarUrl ? (
+                          {selected.user?.avatarUrl ? (
                             <img src={selected.user.avatarUrl} alt={selected.user.name} className="size-6 rounded-full object-cover" />
                           ) : (
                             <div className="flex size-6 items-center justify-center rounded-full bg-primary/20 text-[10px] font-semibold text-primary">
-                              {selected.user.name.charAt(0)}
+                              {selected.user?.name.charAt(0) ?? "?"}
                             </div>
                           )}
-                          <span className="text-[13px] font-medium text-foreground">{selected.user.name}</span>
+                          <span className="text-[13px] font-medium text-foreground">{selected.user?.name ?? selected.employeeId}</span>
                           {selected.jobTitle && (
                             <span className="text-[12px] text-muted-foreground">— {selected.jobTitle}</span>
                           )}
@@ -277,16 +278,16 @@ export default function AnnouncementPage() {
                                 onMouseDown={(e) => { e.preventDefault(); setSelected(emp); setDropdown(false); setSearch("") }}
                                 className="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-muted"
                               >
-                                {emp.user.avatarUrl ? (
+                                {emp.user?.avatarUrl ? (
                                   <img src={emp.user.avatarUrl} alt={emp.user.name} className="size-7 rounded-full object-cover" />
                                 ) : (
                                   <div className="flex size-7 items-center justify-center rounded-full bg-primary/20 text-[11px] font-semibold text-primary">
-                                    {emp.user.name.charAt(0)}
+                                    {emp.user?.name.charAt(0) ?? "?"}
                                   </div>
                                 )}
                                 <div>
-                                  <p className="text-[13px] font-medium text-foreground">{emp.user.name}</p>
-                                  <p className="text-[11px] text-muted-foreground">{emp.jobTitle ?? emp.user.email}</p>
+                                  <p className="text-[13px] font-medium text-foreground">{emp.user?.name ?? emp.employeeId}</p>
+                                  <p className="text-[11px] text-muted-foreground">{emp.jobTitle ?? emp.user?.email}</p>
                                 </div>
                               </button>
                             ))}
@@ -390,7 +391,7 @@ export default function AnnouncementPage() {
                       {toMode === "ALL"
                         ? "Will be sent to all employees"
                         : selected
-                          ? `Will be sent to ${selected.user.name}`
+                          ? `Will be sent to ${selected.user?.name ?? selected.employeeId}`
                           : "Select a recipient to continue"}
                     </span>
                   )}

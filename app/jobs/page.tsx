@@ -20,7 +20,7 @@ export default function JobsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white font-sans text-foreground antialiased">
+    <div className="min-h-screen bg-card font-sans text-foreground antialiased">
       <Navbar />
       <Hero popularJobs={popularJobs} />
       <TopCategories />

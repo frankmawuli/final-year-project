@@ -17,7 +17,7 @@ export function WorkExperienceSection() {
           type="checkbox"
           checked={noExperience}
           onChange={(e) => setNoExperience(e.target.checked)}
-          className="w-4 h-4 rounded border-[#D1D5DB] text-primary focus:ring-primary"
+          className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
         />
         I have no experience
       </label>

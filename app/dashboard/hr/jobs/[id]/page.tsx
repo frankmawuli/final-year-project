@@ -40,19 +40,19 @@ const sidebarNav = [
 ]
 
 const statusStyles: Record<ApiJobStatus, string> = {
-  OPEN:   "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
-  CLOSED: "bg-rose-50 text-rose-600 ring-1 ring-rose-200",
-  DRAFT:  "bg-gray-100 text-gray-500 ring-1 ring-gray-200",
+  OPEN:   "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:ring-emerald-500/30",
+  CLOSED: "bg-rose-50 text-rose-600 ring-1 ring-rose-200 dark:bg-rose-500/15 dark:text-rose-400 dark:ring-rose-500/30",
+  DRAFT:  "bg-muted text-muted-foreground ring-1 ring-border",
 }
 
 const deptColors: Record<string, string> = {
-  Design:      "bg-violet-100 text-violet-700",
-  Engineering: "bg-blue-100 text-blue-700",
-  Product:     "bg-amber-100 text-amber-700",
-  Analytics:   "bg-emerald-100 text-emerald-700",
-  Marketing:   "bg-pink-100 text-pink-700",
+  Design:      "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-400",
+  Engineering: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
+  Product:     "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
+  Analytics:   "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400",
+  Marketing:   "bg-pink-100 text-pink-700 dark:bg-pink-500/15 dark:text-pink-400",
   HR:          "bg-primary/10 text-primary",
-  Finance:     "bg-orange-100 text-orange-700",
+  Finance:     "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-400",
 }
 
 // ── Sub-components ─────────────────────────────────────────────
@@ -187,7 +187,7 @@ export default function JobDetailPage() {
 
               {/* Header */}
               <div className="flex items-start gap-3">
-                <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-border bg-white shadow-sm">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-border bg-card shadow-sm">
                   <Building2 className="size-7 text-primary" strokeWidth={1.5} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -212,7 +212,7 @@ export default function JobDetailPage() {
 
               {/* Description + responsibilities */}
               {(job.description || job.responsibilities.length > 0) && (
-                <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                   {job.description && (
                     <>
                       <SectionTitle>Job Description</SectionTitle>
@@ -237,7 +237,7 @@ export default function JobDetailPage() {
 
               {/* Requirements + skills */}
               {(job.requirements.length > 0 || job.skills.length > 0) && (
-                <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                   {job.requirements.length > 0 && (
                     <>
                       <SectionTitle>Requirements</SectionTitle>
@@ -267,7 +267,7 @@ export default function JobDetailPage() {
             <div className="flex flex-col gap-3">
 
               {/* Actions */}
-              <div className="flex flex-col gap-1.5 rounded-2xl border border-border bg-white p-3 shadow-sm">
+              <div className="flex flex-col gap-1.5 rounded-2xl border border-border bg-card p-3 shadow-sm">
                 <Link
                   href={`/dashboard/hr/applicants?jobId=${job.id}`}
                   className="flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
@@ -299,7 +299,7 @@ export default function JobDetailPage() {
               </div>
 
               {/* Overview */}
-              <div className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <p className="mb-3 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">
                   Job Overview
                 </p>

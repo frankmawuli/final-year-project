@@ -24,7 +24,7 @@ const CATEGORIES = [
 
 export function TopCategories() {
   return (
-    <section className="py-10 sm:py-12 bg-white lg:my-16">
+    <section className="py-10 sm:py-12 bg-card lg:my-16">
       <div className="max-w-7xl mx-auto px-3 sm:px-5">
         {/* Section title */}
         <div className="text-center mb-8">

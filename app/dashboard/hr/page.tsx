@@ -411,7 +411,7 @@ export default function HRDashboard() {
             )}
             {newEmployees.map((emp) => (
               <div key={emp.id} className="flex items-center gap-1.5 rounded-lg p-1.5 hover:bg-muted/50">
-                {emp.user.avatarUrl ? (
+                {emp.user?.avatarUrl ? (
                   <img
                     src={emp.user.avatarUrl}
                     alt={emp.user.name}
@@ -419,11 +419,11 @@ export default function HRDashboard() {
                   />
                 ) : (
                   <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
-                    {emp.user.name.charAt(0).toUpperCase()}
+                    {emp.user ? emp.user.name.charAt(0).toUpperCase() : <UserPlus className="size-3.5" />}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-[13px] font-medium text-foreground">{emp.user.name}</p>
+                  <p className="text-[13px] font-medium text-foreground">{emp.user?.name ?? emp.employeeId}</p>
                   <p className="text-xs text-muted-foreground">{emp.jobTitle ?? "—"}</p>
                 </div>
               </div>

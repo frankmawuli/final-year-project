@@ -25,7 +25,7 @@ export function ProfileTabs({
   onChange: (tab: ProfileTab) => void;
 }) {
   return (
-    <div className="bg-white rounded-t-xl border border-b-0 border-[#E5E7EB] flex items-center">
+    <div className="bg-card rounded-t-xl border border-b-0 border-border flex items-center">
       <nav className="scrollbar-hide flex flex-1 items-center gap-5 overflow-x-auto px-5">
         {PROFILE_TABS.map((tab) => (
           <button

@@ -81,7 +81,7 @@ function LocationsMultiSelect({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex h-10 w-full items-center justify-between rounded-lg border border-[#E5E7EB] bg-white px-3 text-[13.5px] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-card px-3 text-[13.5px] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
       >
         <span className={cn("truncate", value.length ? "text-foreground" : "text-muted-foreground")}>
           {value[0] ?? "Select locations"}
@@ -98,17 +98,17 @@ function LocationsMultiSelect({
         </span>
       </button>
       {open && (
-        <div className="absolute z-10 mt-1 w-full rounded-lg border border-[#E5E7EB] bg-white py-1 shadow-lg">
+        <div className="absolute z-10 mt-1 w-full rounded-lg border border-border bg-card py-1 shadow-lg">
           {LOCATIONS.map((location) => (
             <label
               key={location}
-              className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-[13.5px] text-foreground hover:bg-[#F5F6F8]"
+              className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-[13.5px] text-foreground hover:bg-muted"
             >
               <input
                 type="checkbox"
                 checked={value.includes(location)}
                 onChange={() => toggle(location)}
-                className="size-4 rounded border-[#D1D5DB] accent-primary"
+                className="size-4 rounded border-border accent-primary"
               />
               {location}
             </label>
@@ -263,7 +263,7 @@ export function EmploymentSection() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-[#F3F4F6] px-5 py-5 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-border px-5 py-5 sm:grid-cols-3">
         <div>
           <FormLabel>Professional Headline</FormLabel>
           <FormInput
@@ -409,7 +409,7 @@ export function EmploymentSection() {
         </div>
       </div>
 
-      <div className="border-t border-[#F3F4F6] px-5 py-5">
+      <div className="border-t border-border px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Preferences</h3>
         <div className="mt-3 space-y-2.5">
           <label className="flex w-fit cursor-pointer items-center gap-2 text-[13.5px] text-foreground">
@@ -417,7 +417,7 @@ export function EmploymentSection() {
               type="checkbox"
               checked={draft.activelyLooking}
               onChange={(e) => update("activelyLooking", e.target.checked)}
-              className="size-4 rounded border-[#D1D5DB] accent-primary"
+              className="size-4 rounded border-border accent-primary"
             />
             I am actively looking for a job
           </label>
@@ -426,7 +426,7 @@ export function EmploymentSection() {
               type="checkbox"
               checked={draft.displayProfile}
               onChange={(e) => update("displayProfile", e.target.checked)}
-              className="size-4 rounded border-[#D1D5DB] accent-primary"
+              className="size-4 rounded border-border accent-primary"
             />
             Display my profile to potential employers
           </label>
@@ -435,7 +435,7 @@ export function EmploymentSection() {
               type="checkbox"
               checked={draft.willingToRelocate}
               onChange={(e) => update("willingToRelocate", e.target.checked)}
-              className="size-4 rounded border-[#D1D5DB] accent-primary"
+              className="size-4 rounded border-border accent-primary"
             />
             Willing to relocate
           </label>
@@ -444,7 +444,7 @@ export function EmploymentSection() {
 
       {error && <p className="px-5 pb-1.5 text-[13px] text-destructive">{error}</p>}
 
-      <div className="flex justify-end gap-2.5 border-t border-[#F3F4F6] px-5 py-3">
+      <div className="flex justify-end gap-2.5 border-t border-border px-5 py-3">
         <Button
           variant="outline"
           className="border-primary text-primary hover:bg-primary/5"

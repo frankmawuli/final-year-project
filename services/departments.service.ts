@@ -12,7 +12,7 @@ export interface ApiDeptEmployee {
     name:      string
     email:     string
     avatarUrl: string | null
-  }
+  } | null
 }
 
 export interface ApiDepartment {

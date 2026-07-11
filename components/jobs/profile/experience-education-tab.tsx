@@ -103,7 +103,7 @@ export function ExperienceEducationTab() {
 
   if (addingExperience) {
     return (
-      <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
+      <div className="bg-card rounded-b-xl border border-border">
         <WorkExperienceForm onCancel={() => setAddingExperience(false)} onSave={handleSaveExperience} />
         {error && <p className="px-5 pb-3 text-[13px] text-destructive">{error}</p>}
       </div>
@@ -112,7 +112,7 @@ export function ExperienceEducationTab() {
 
   if (addingEducation) {
     return (
-      <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
+      <div className="bg-card rounded-b-xl border border-border">
         <EducationForm onCancel={() => setAddingEducation(false)} onSave={handleSaveEducation} />
         {error && <p className="px-5 pb-3 text-[13px] text-destructive">{error}</p>}
       </div>
@@ -120,7 +120,7 @@ export function ExperienceEducationTab() {
   }
 
   return (
-    <div className="bg-white rounded-b-xl border border-[#E5E7EB] divide-y divide-[#F3F4F6]">
+    <div className="bg-card rounded-b-xl border border-border divide-y divide-border">
       <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Experience & Education</h3>
         <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
@@ -141,7 +141,7 @@ export function ExperienceEducationTab() {
             {experience.map((item) => (
               <li
                 key={item.id}
-                className="flex items-start justify-between gap-2.5 rounded-xl border border-[#E5E7EB] px-3 py-2.5"
+                className="flex items-start justify-between gap-2.5 rounded-xl border border-border px-3 py-2.5"
               >
                 <div>
                   <p className="text-[13.5px] font-semibold text-foreground">{item.role}</p>
@@ -170,7 +170,7 @@ export function ExperienceEducationTab() {
               type="checkbox"
               checked={noExperience}
               onChange={(e) => setNoExperience(e.target.checked)}
-              className="w-4 h-4 rounded border-[#D1D5DB] accent-primary"
+              className="w-4 h-4 rounded border-input accent-primary"
             />
             I have no experience
           </label>
@@ -199,7 +199,7 @@ export function ExperienceEducationTab() {
             {education.map((item) => (
               <li
                 key={item.id}
-                className="flex items-start justify-between gap-2.5 rounded-xl border border-[#E5E7EB] px-3 py-2.5"
+                className="flex items-start justify-between gap-2.5 rounded-xl border border-border px-3 py-2.5"
               >
                 <div>
                   <p className="text-[13.5px] font-semibold text-foreground">{item.degree}</p>

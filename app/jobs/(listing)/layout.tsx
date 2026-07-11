@@ -3,7 +3,7 @@ import { JobListingNavbar } from "@/components/jobs/job-listing-navbar";
 
 export default function JobListingLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#F5F6F8]">
+    <div className="min-h-screen bg-background">
       <JobListingNavbar />
       {children}
     </div>

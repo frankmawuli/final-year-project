@@ -19,7 +19,7 @@ export interface ApiEmployee {
     status: string
     role: string
     lastLoginAt?: string
-  }
+  } | null
   department: { id: number; name: string } | null
   officeLocation: { id: number; name: string; city: string } | null
   skills: Array<string | { id?: number; name: string }>

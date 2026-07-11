@@ -23,7 +23,7 @@ export function ProfileSidebar({
 }) {
   return (
     <aside className="w-full shrink-0 md:w-[21.25rem]">
-      <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="p-5 text-center">
           <ProfileAvatar alt={data.name} src={data.avatarUrl} />
           <h2 className="mt-3 text-base font-semibold text-foreground">{data.name}</h2>

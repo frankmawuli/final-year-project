@@ -102,10 +102,10 @@ export function CertificateUploadForm({
         <h3 className="text-[15px] font-semibold text-foreground">Add Certificate</h3>
       </div>
 
-      <div className="border-t border-[#F3F4F6] px-5 py-5">
+      <div className="border-t border-border px-5 py-5">
         <FormLabel required>Certificate File</FormLabel>
         {file ? (
-          <div className="flex items-center justify-between rounded-xl border border-[#E5E7EB] px-3 py-2.5">
+          <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2.5">
             <div className="flex min-w-0 items-center gap-2.5">
               {file.type.startsWith("image/") && preview ? (
                 <img src={preview} alt={file.name} className="h-10 w-10 shrink-0 rounded-lg object-cover" />
@@ -136,7 +136,7 @@ export function CertificateUploadForm({
               e.preventDefault();
               handleFile(e.dataTransfer.files?.[0]);
             }}
-            className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#D1D5DB] px-3 py-6 text-center hover:border-primary"
+            className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-input px-3 py-6 text-center hover:border-primary"
           >
             <UploadCloud className="size-6 text-muted-foreground" />
             <span className="text-[13px] font-medium text-foreground">Click to upload or drag and drop</span>
@@ -153,7 +153,7 @@ export function CertificateUploadForm({
         {fileError && <p className="mt-1.5 text-[12.5px] text-destructive">{fileError}</p>}
       </div>
 
-      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-[#F3F4F6] px-5 py-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-border px-5 py-5 sm:grid-cols-2">
         <div>
           <FormLabel required>Certificate / Award Title</FormLabel>
           <FormInput
@@ -172,7 +172,7 @@ export function CertificateUploadForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-[#F3F4F6] px-5 py-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-border px-5 py-5 sm:grid-cols-2">
         <div>
           <FormLabel required>Issue date</FormLabel>
           <div className="flex gap-1.5">
@@ -235,14 +235,14 @@ export function CertificateUploadForm({
               type="checkbox"
               checked={doesNotExpire}
               onChange={(e) => setDoesNotExpire(e.target.checked)}
-              className="size-4 rounded border-[#D1D5DB] accent-primary"
+              className="size-4 rounded border-input accent-primary"
             />
             This credential does not expire
           </label>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-[#F3F4F6] px-5 py-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-border px-5 py-5 sm:grid-cols-2">
         <div>
           <FormLabel>Credential ID</FormLabel>
           <FormInput placeholder="Optional" value={credentialId} onChange={(e) => setCredentialId(e.target.value)} />
@@ -257,7 +257,7 @@ export function CertificateUploadForm({
         </div>
       </div>
 
-      <div className="flex justify-end gap-2.5 border-t border-[#F3F4F6] px-5 py-3">
+      <div className="flex justify-end gap-2.5 border-t border-border px-5 py-3">
         <Button
           variant="outline"
           className="border-primary text-primary hover:bg-primary/5"

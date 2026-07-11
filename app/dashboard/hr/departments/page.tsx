@@ -81,10 +81,10 @@ function mapDept(a: {
 function mapDeptEmployee(e: ApiDeptEmployee, deptId: number): Member {
   return {
     id:     e.id,
-    name:   e.user.name,
+    name:   e.user?.name ?? e.employeeId,
     role:   "",
-    email:  e.user.email,
-    photo:  e.user.avatarUrl,
+    email:  e.user?.email ?? "",
+    photo:  e.user?.avatarUrl ?? null,
     deptId: deptId,
   }
 }
@@ -93,10 +93,10 @@ function mapDeptEmployee(e: ApiDeptEmployee, deptId: number): Member {
 function mapPoolEmployee(e: ApiEmployee): Member {
   return {
     id:     String(e.id),
-    name:   e.user.name,
+    name:   e.user?.name ?? e.employeeId,
     role:   e.jobTitle ?? "",
-    email:  e.user.email,
-    photo:  e.user.avatarUrl,
+    email:  e.user?.email ?? "",
+    photo:  e.user?.avatarUrl ?? null,
     deptId: e.department?.id ?? null,
   }
 }

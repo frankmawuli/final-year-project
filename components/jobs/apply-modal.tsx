@@ -128,7 +128,7 @@ export function ApplyModal({
               </p>
 
               {profileIsThin && (
-                <div className="mt-2.5 flex items-start gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-[12.5px] text-amber-700">
+                <div className="mt-2.5 flex items-start gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-[12.5px] text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400">
                   <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
                   <span>
                     Your profile is nearly empty, which hurts how you&apos;re screened.{" "}

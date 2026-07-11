@@ -64,7 +64,7 @@ function DocumentDropzone({
 
   if (file) {
     return (
-      <div className="flex items-center justify-between rounded-xl border border-[#E5E7EB] px-3 py-2.5">
+      <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2.5">
         <div className="flex min-w-0 items-center gap-2.5">
           {preview ? (
             <img src={preview} alt={file.name} className="h-10 w-10 shrink-0 rounded-lg object-cover" />
@@ -99,7 +99,7 @@ function DocumentDropzone({
           e.preventDefault();
           handleFile(e.dataTransfer.files?.[0]);
         }}
-        className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#D1D5DB] px-3 py-6 text-center hover:border-primary"
+        className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-input px-3 py-6 text-center hover:border-primary"
       >
         <UploadCloud className="size-6 text-muted-foreground" />
         <span className="text-[13px] font-medium text-foreground">Click to upload or drag and drop</span>
@@ -141,7 +141,7 @@ function AutofillReview({
       </p>
 
       {suggestion.about && (
-        <p className="mt-2.5 rounded-lg bg-white px-2.5 py-1.5 text-[12.5px] leading-relaxed text-foreground">
+        <p className="mt-2.5 rounded-lg bg-card px-2.5 py-1.5 text-[12.5px] leading-relaxed text-foreground">
           {suggestion.about}
         </p>
       )}
@@ -162,7 +162,7 @@ function AutofillReview({
       {suggestion.experience.length > 0 && (
         <ul className="mt-2.5 space-y-1">
           {suggestion.experience.map((e, i) => (
-            <li key={i} className="rounded-lg bg-white px-2.5 py-1.5 text-[12.5px]">
+            <li key={i} className="rounded-lg bg-card px-2.5 py-1.5 text-[12.5px]">
               <span className="font-semibold text-foreground">{e.role}</span>
               <span className="text-muted-foreground">
                 {" "}
@@ -177,7 +177,7 @@ function AutofillReview({
       {suggestion.education.length > 0 && (
         <ul className="mt-1.5 space-y-1">
           {suggestion.education.map((e, i) => (
-            <li key={i} className="rounded-lg bg-white px-2.5 py-1.5 text-[12.5px]">
+            <li key={i} className="rounded-lg bg-card px-2.5 py-1.5 text-[12.5px]">
               <span className="font-semibold text-foreground">{e.degree}</span>
               <span className="text-muted-foreground">
                 {" "}
@@ -289,7 +289,7 @@ export function CvPortfolioCoverTab() {
   }
 
   return (
-    <div className="bg-white rounded-b-xl border border-[#E5E7EB] divide-y divide-[#F3F4F6]">
+    <div className="bg-card rounded-b-xl border border-border divide-y divide-border">
       <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">CV / Portfolio / Cover Letter</h3>
         <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
@@ -305,16 +305,16 @@ export function CvPortfolioCoverTab() {
         </p>
 
         {profile?.cvUrl && !cvFile && (
-          <div className="mb-2.5 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+          <div className="mb-2.5 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 dark:border-emerald-500/30 dark:bg-emerald-500/10">
             <div className="flex min-w-0 items-center gap-2.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-emerald-600">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-card text-emerald-600 dark:text-emerald-400">
                 <FileText className="size-5" />
               </div>
               <div className="min-w-0">
                 <p className="truncate text-[13.5px] font-medium text-foreground">
                   {profile.cvName ?? "CV on file"}
                 </p>
-                <p className="text-[12px] text-emerald-700">Saved on your profile</p>
+                <p className="text-[12px] text-emerald-700 dark:text-emerald-400">Saved on your profile</p>
               </div>
             </div>
             <a

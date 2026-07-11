@@ -93,9 +93,9 @@ const payslipStatusLabel: Record<ApiPayslip["paymentStatus"], PayrollEmployee["s
 function mapPayslip(slip: ApiPayslip): PayrollEmployee {
   return {
     id:         slip.id,
-    name:       slip.employee.user.name,
-    email:      slip.employee.user.email,
-    photo:      slip.employee.user.avatarUrl,
+    name:       slip.employee.user?.name ?? "Unknown Employee",
+    email:      slip.employee.user?.email ?? "",
+    photo:      slip.employee.user?.avatarUrl ?? null,
     department: slip.employee.department ?? "—",
     baseSalary: slip.baseSalary,
     bonus:      slip.bonus,

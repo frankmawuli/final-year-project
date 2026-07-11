@@ -70,7 +70,7 @@ export function LanguagesSkillsTab() {
   }
 
   return (
-    <div className="bg-white rounded-b-xl border border-[#E5E7EB] divide-y divide-[#F3F4F6]">
+    <div className="bg-card rounded-b-xl border border-border divide-y divide-border">
       <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Languages & Skills</h3>
         <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
@@ -89,7 +89,7 @@ export function LanguagesSkillsTab() {
             {languages.map((lang) => (
               <span
                 key={lang.id}
-                className="flex items-center gap-1.5 rounded-full border border-[#E5E7EB] py-1 pl-3 pr-1.5 text-[13px] text-foreground"
+                className="flex items-center gap-1.5 rounded-full border border-border py-1 pl-3 pr-1.5 text-[13px] text-foreground"
               >
                 <span className="font-medium">{lang.name}</span>
                 <span className="text-muted-foreground">· {lang.proficiency}</span>
@@ -107,7 +107,7 @@ export function LanguagesSkillsTab() {
         )}
 
         {addingLanguage ? (
-          <div className="mt-3 flex flex-col gap-2.5 rounded-xl border border-[#E5E7EB] p-3 sm:flex-row sm:items-end">
+          <div className="mt-3 flex flex-col gap-2.5 rounded-xl border border-border p-3 sm:flex-row sm:items-end">
             <div className="flex-1">
               <FormLabel>Language</FormLabel>
               <FormInput

@@ -17,6 +17,7 @@ import {
   Link as LinkIcon,
   Users,
   Copy,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/dialog"
 import { useAuth } from "@/context/auth-context"
 import { onboardingService } from "@/services/onboarding.service"
+import { uploadService } from "@/services/upload.service"
 import { ApiError } from "@/lib/api-client"
 
 // ── Step definitions ───────────────────────────────────────────
@@ -64,10 +66,7 @@ const INDUSTRIES = [
   "Retail & E-commerce", "Manufacturing", "Media & Entertainment",
   "Consulting", "Real Estate", "Transportation & Logistics",
   "Energy & Utilities", "Legal Services", "Non-profit", "Agriculture",
-  "Construction", "Hospitality & Tourism", "Telecommunications",
-  "Pharmaceuticals", "Automotive", "Aerospace & Defense",
-  "Fashion & Apparel", "Food & Beverage", "Sports & Recreation",
-  "Government & Public Sector", "Other",
+  "Construction",  "Other",
 ]
 
 const COMPANY_SIZES = [
@@ -77,9 +76,7 @@ const COMPANY_SIZES = [
 ]
 
 const COUNTRIES = [
-  "United States", "United Kingdom", "Canada", "Australia", "Germany",
-  "France", "Netherlands", "Singapore", "India", "Nigeria", "Kenya",
-  "South Africa", "Brazil", "Mexico", "UAE", "Saudi Arabia", "Other",
+  "United States", "United Kingdom", "Canada", "Australia", "Ghana","Nigeria", "Other",
 ]
 
 const TIMEZONES = [
@@ -166,53 +163,82 @@ function SelectInput({
 
 function LogoUpload({ preview, onChange }: {
   preview: string | null
-  onChange: (url: string | null, file: File | null) => void
+  onChange: (url: string | null) => void
 }) {
+  const { accessToken } = useAuth()
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
-  function handleFile(file: File) {
-    if (!file.type.startsWith("image/")) return
-    onChange(URL.createObjectURL(file), file)
+  async function handleFile(file: File) {
+    if (!file.type.match(/^image\/(jpeg|png)$/)) {
+      setUploadError("Only JPG or PNG images are accepted.")
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Image exceeds the 5 MB limit.")
+      return
+    }
+    onChange(URL.createObjectURL(file))
+    setUploadError(null)
+    setUploading(true)
+    try {
+      const result = await uploadService.image(file, accessToken ?? "")
+      onChange(result.url)
+    } catch {
+      setUploadError("Upload failed. Please try again.")
+    } finally {
+      setUploading(false)
+    }
   }
 
   return (
-    <div
-      onClick={() => inputRef.current?.click()}
-      onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={(e) => {
-        e.preventDefault(); setDragging(false)
-        const f = e.dataTransfer.files[0]; if (f) handleFile(f)
-      }}
-      className={cn(
-        "flex h-[100px] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed transition-colors",
-        dragging
-          ? "border-primary bg-primary/10"
-          : "border-border bg-muted hover:border-primary hover:bg-primary/5"
-      )}
-    >
-      <input ref={inputRef} type="file" accept="image/*" className="hidden"
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
-      {preview ? (
-        <div className="relative flex size-full items-center justify-center">
-          <img src={preview} alt="Logo" className="h-full max-h-[80px] w-auto rounded object-contain p-1.5" />
-          <button type="button" onClick={(e) => { e.stopPropagation(); onChange(null, null) }}
-            className="absolute right-2 top-2 rounded-full bg-card p-0.5 shadow">
-            <XIcon className="size-3 text-muted-foreground" />
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="flex size-8 items-center justify-center rounded-lg bg-card shadow-sm">
-            <Upload className="size-4 text-primary" />
+    <div>
+      <div
+        onClick={() => !uploading && inputRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault(); setDragging(false)
+          const f = e.dataTransfer.files[0]; if (f) handleFile(f)
+        }}
+        className={cn(
+          "flex h-[100px] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed transition-colors",
+          dragging
+            ? "border-primary bg-primary/10"
+            : "border-border bg-muted hover:border-primary hover:bg-primary/5",
+          uploading && "pointer-events-none opacity-70"
+        )}
+      >
+        <input ref={inputRef} type="file" accept="image/jpeg,image/png" className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
+        {preview ? (
+          <div className="relative flex size-full items-center justify-center">
+            <img src={preview} alt="Logo" className="h-full max-h-[80px] w-auto rounded object-contain p-1.5" />
+            {uploading && (
+              <div className="absolute inset-0 flex items-center justify-center rounded bg-black/40">
+                <Loader2 className="size-5 animate-spin text-white" />
+              </div>
+            )}
+            <button type="button" onClick={(e) => { e.stopPropagation(); onChange(null) }}
+              className="absolute right-2 top-2 rounded-full bg-card p-0.5 shadow">
+              <XIcon className="size-3 text-muted-foreground" />
+            </button>
           </div>
-          <p className="text-center text-[12px] text-muted-foreground">
-            <span className="font-medium text-primary">Click to upload</span> or drag & drop
-          </p>
-          <p className="text-[11px] text-muted-foreground">PNG, JPG or SVG (max 2 MB)</p>
-        </>
-      )}
+        ) : (
+          <>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-card shadow-sm">
+              <Upload className="size-4 text-primary" />
+            </div>
+            <p className="text-center text-[12px] text-muted-foreground">
+              <span className="font-medium text-primary">Click to upload</span> or drag & drop
+            </p>
+            <p className="text-[11px] text-muted-foreground">PNG or JPG (max 5 MB)</p>
+          </>
+        )}
+      </div>
+      {uploadError && <p className="mt-1 text-[11px] text-rose-500">{uploadError}</p>}
     </div>
   )
 }
@@ -320,7 +346,7 @@ function Step1({
   data: Step1Data; errors: Partial<Record<keyof Step1Data, string>>
   onChange: (f: keyof Step1Data, v: string) => void
   logoPreview: string | null
-  onLogoChange: (url: string | null, file: File | null) => void
+  onLogoChange: (url: string | null) => void
 }) {
   return (
     <div className="space-y-4">
@@ -701,6 +727,7 @@ export default function CompanyOnboardingPage() {
         name: step1.companyName,
         industry: step1.industry || undefined,
         size: step1.companySize || undefined,
+        logoUrl: logoPreview?.startsWith("blob:") ? undefined : logoPreview || undefined,
         website: step1.website || undefined,
         registrationNo: step1.registrationNumber || undefined,
         foundingYear: step1.yearFounded ? parseInt(step1.yearFounded) : undefined,

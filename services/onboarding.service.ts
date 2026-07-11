@@ -41,12 +41,26 @@ interface InviteLinkResult {
   role: string
 }
 
-interface BulkInviteResult {
+export interface BulkInviteResult {
   total: number
   invitedCount: number
   failedCount: number
   invited: { email: string; name: string }[]
   failed: { email: string; reason: string }[]
+}
+
+export type InviteLinkRole = "HR_ADMIN" | "HR_MANAGER" | "SUPER_ADMIN" | "EMPLOYEE"
+
+export interface CompanyInviteLink {
+  id: number
+  inviteUrl: string
+  role: InviteLinkRole
+  isActive: boolean
+  maxUses: number | null
+  useCount: number
+  expiresAt: string | null
+  createdAt: string
+  createdByName: string | null
 }
 
 interface UpdateCompanyBody {
@@ -120,11 +134,23 @@ export const onboardingService = {
 
   generateInviteLink: (
     accessToken: string,
-    opts?: { role?: "HR_ADMIN" | "HR_MANAGER" | "SUPER_ADMIN" | "EMPLOYEE"; maxUses?: number; expiresInDays?: number }
+    opts?: { role?: InviteLinkRole; maxUses?: number; expiresInDays?: number }
   ) =>
     api.post<{ success: boolean; data: InviteLinkResult }>(
       "/onboarding/invite-link",
       opts ?? {},
+      { Authorization: `Bearer ${accessToken}` }
+    ),
+
+  listInviteLinks: (accessToken: string) =>
+    api.get<{ success: boolean; data: CompanyInviteLink[] }>(
+      "/onboarding/invite-links",
+      { Authorization: `Bearer ${accessToken}` }
+    ),
+
+  revokeInviteLink: (accessToken: string, id: number) =>
+    api.delete<{ success: boolean; message: string }>(
+      `/onboarding/invite-link/${id}`,
       { Authorization: `Bearer ${accessToken}` }
     ),
 

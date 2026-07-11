@@ -19,7 +19,7 @@ export function FilterCheckbox({ label, count, checked, onChange }: Props) {
             "w-[15px] h-[15px] rounded-[3px] border flex items-center justify-center shrink-0 transition-colors",
             checked
               ? "bg-primary border-primary"
-              : "border-[#C9CDD3] bg-white group-hover:border-primary/60"
+              : "border-border bg-card group-hover:border-primary/60"
           )}
         >
           {checked && (
@@ -46,7 +46,7 @@ export function FilterCheckbox({ label, count, checked, onChange }: Props) {
       <span
         className={cn(
           "text-[10px] font-semibold px-[6px] py-[2px] rounded-[4px] leading-none",
-          checked ? "bg-primary text-white" : "bg-[#F0F1F3] text-muted-foreground"
+          checked ? "bg-primary text-white" : "bg-muted text-muted-foreground"
         )}
       >
         {count}

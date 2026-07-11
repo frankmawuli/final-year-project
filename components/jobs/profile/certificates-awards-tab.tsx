@@ -35,14 +35,14 @@ export function CertificatesAwardsTab() {
 
   if (adding) {
     return (
-      <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
+      <div className="bg-card rounded-b-xl border border-border">
         <CertificateUploadForm onCancel={() => setAdding(false)} onSave={handleSave} />
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
+    <div className="bg-card rounded-b-xl border border-border">
       <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Certificates & Awards</h3>
         <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
@@ -55,7 +55,7 @@ export function CertificatesAwardsTab() {
             {certificates.map((cert) => (
               <div
                 key={cert.id}
-                className="flex items-start gap-2.5 rounded-xl border border-[#E5E7EB] p-3"
+                className="flex items-start gap-2.5 rounded-xl border border-border p-3"
               >
                 {cert.file.type.startsWith("image/") ? (
                   <img

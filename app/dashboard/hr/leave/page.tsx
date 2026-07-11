@@ -73,9 +73,9 @@ function formatDate(iso: string): string {
 function mapLeave(a: ApiLeaveRequest): LeaveRequest {
   return {
     id:         a.id,
-    name:       a.employee.user.name,
-    email:      a.employee.user.email,
-    photo:      a.employee.user.avatarUrl,
+    name:       a.employee.user?.name ?? "Unknown Employee",
+    email:      a.employee.user?.email ?? "",
+    photo:      a.employee.user?.avatarUrl ?? null,
     department: a.employee.department?.name ?? "",
     type:       a.type,
     startDate:  a.startDate,

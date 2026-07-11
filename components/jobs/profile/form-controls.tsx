@@ -17,7 +17,7 @@ export function FormSelect({ className, children, value, ...props }: SelectHTMLA
       <select
         value={value}
         className={cn(
-          "h-10 w-full appearance-none rounded-lg border border-[#E5E7EB] bg-white px-3 pr-7 text-[13.5px] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20",
+          "h-10 w-full appearance-none rounded-lg border border-border bg-card px-3 pr-7 text-[13.5px] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20",
           value ? "text-foreground" : "text-muted-foreground",
           className
         )}
@@ -34,7 +34,7 @@ export function FormInput({ className, ...props }: InputHTMLAttributes<HTMLInput
   return (
     <input
       className={cn(
-        "h-10 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-[13.5px] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20",
+        "h-10 w-full rounded-lg border border-border bg-card px-3 text-[13.5px] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20",
         className
       )}
       {...props}
