@@ -137,6 +137,12 @@ export const applicantAuthService = {
       data: { id: string; email: string; name: string; accessToken: string; refreshToken: string }
     }>("/applicant/auth/login", { email, password }),
 
+  googleLogin: (idToken: string) =>
+    api.post<{
+      success: boolean
+      data: { id: string; email: string; name: string; accessToken: string; refreshToken: string }
+    }>("/applicant/auth/google", { idToken }),
+
   verifyEmail: (email: string, code: string) =>
     api.post<{ success: boolean; message: string }>("/applicant/auth/verify-email", {
       email,

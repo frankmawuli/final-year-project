@@ -10,7 +10,7 @@ import {
 } from "react"
 import { useRouter } from "next/navigation"
 
-import { authService, type User } from "@/services/auth.service"
+import { authService, type Role, type User } from "@/services/auth.service"
 
 const ACCESS_TOKEN_KEY = "access_token"
 const REFRESH_TOKEN_KEY = "refresh_token"
@@ -22,6 +22,7 @@ interface AuthContextValue {
   loading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
+  loginWithGoogle: (idToken: string) => Promise<void>
   register: (fullName: string, email: string, password: string) => Promise<void>
   logout: () => void
   requestResetPassword: (email: string) => Promise<void>
@@ -53,11 +54,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false)
   }, [])
 
-  const login = useCallback(
-    async (email: string, password: string) => {
-      const res = await authService.login(email, password)
-      const { id, name, email: userEmail, role, accessToken: at, refreshToken: rt, numberOfLogins, mustChangePassword } = res.data
-      const u: User = { id, name, email: userEmail, role, numberOfLogins, mustChangePassword }
+  const applySession = useCallback(
+    (data: {
+      id: string
+      name: string
+      email: string
+      role: Role
+      accessToken: string
+      refreshToken: string
+      numberOfLogins: number
+      mustChangePassword?: boolean
+    }) => {
+      const { id, name, email, role, accessToken: at, refreshToken: rt, numberOfLogins, mustChangePassword } = data
+      const u: User = { id, name, email, role, numberOfLogins, mustChangePassword }
       localStorage.setItem(ACCESS_TOKEN_KEY, at)
       localStorage.setItem(REFRESH_TOKEN_KEY, rt)
       localStorage.setItem(USER_KEY, JSON.stringify(u))
@@ -74,6 +83,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     },
     [router],
+  )
+
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const res = await authService.login(email, password)
+      applySession(res.data)
+    },
+    [applySession],
+  )
+
+  const loginWithGoogle = useCallback(
+    async (idToken: string) => {
+      const res = await authService.googleLogin(idToken)
+      applySession(res.data)
+    },
+    [applySession],
   )
 
   const register = useCallback(
@@ -129,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         isAuthenticated: !!user,
         login,
+        loginWithGoogle,
         register,
         logout,
         requestResetPassword,

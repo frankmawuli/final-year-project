@@ -24,6 +24,12 @@ export const authService = {
       data: { id: string; email: string; name: string; role: Role; accessToken: string; refreshToken: string; numberOfLogins: number; mustChangePassword?: boolean }
     }>("/auth/login", { email, password }),
 
+  googleLogin: (idToken: string) =>
+    api.post<{
+      success: boolean
+      data: { id: string; email: string; name: string; role: Role; accessToken: string; refreshToken: string; numberOfLogins: number; mustChangePassword?: boolean }
+    }>("/auth/google", { idToken }),
+
   verifyOtp: (email: string, code: string, purpose: "EMAIL_VERIFICATION" | "PASSWORD_RESET") =>
     api.post<{ success: boolean; message: string }>("/auth/verify-otp", { email, code, purpose }),
 
