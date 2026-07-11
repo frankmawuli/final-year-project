@@ -30,9 +30,9 @@ export function HRIconSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="flex w-[84px] shrink-0 flex-col items-center border-r border-border bg-sidebar py-6">
+    <aside className="flex w-[84px] shrink-0 flex-col items-center border-r border-border bg-sidebar py-5">
       {/* Logo */}
-      <Link href="/dashboard/hr" className="mb-6 flex size-[30px] items-center justify-center overflow-hidden">
+      <Link href="/dashboard/hr" className="mb-5 flex size-[30px] items-center justify-center overflow-hidden">
         <img src={logoSvg} alt="CoreRecruiter" className="size-full" />
       </Link>
 

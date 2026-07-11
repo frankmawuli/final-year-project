@@ -48,11 +48,11 @@ export function EducationForm({
 
   return (
     <div>
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Add Education</h3>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 border-t border-[#F3F4F6] px-6 py-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-border px-5 py-5 sm:grid-cols-2">
         <div>
           <FormLabel required>Institution</FormLabel>
           <FormInput
@@ -71,7 +71,7 @@ export function EducationForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 border-t border-[#F3F4F6] px-6 py-6 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-border px-5 py-5 sm:grid-cols-3">
         <div>
           <FormLabel required>Qualification</FormLabel>
           <FormSelect value={form.qualification} onChange={(e) => update("qualification", e.target.value)}>
@@ -104,10 +104,10 @@ export function EducationForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-5 border-t border-[#F3F4F6] px-6 py-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 border-t border-border px-5 py-5 sm:grid-cols-2">
         <div>
           <FormLabel required>Start date</FormLabel>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             <FormSelect value={form.startMonth} onChange={(e) => update("startMonth", e.target.value)}>
               <option value="" disabled>
                 Month
@@ -132,7 +132,7 @@ export function EducationForm({
         </div>
         <div>
           <FormLabel>End date</FormLabel>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             <FormSelect
               value={form.endMonth}
               disabled={form.currentlyStudying}
@@ -162,30 +162,30 @@ export function EducationForm({
               ))}
             </FormSelect>
           </div>
-          <label className="mt-3 flex w-fit cursor-pointer items-center gap-2.5 text-[13.5px] text-foreground">
+          <label className="mt-2.5 flex w-fit cursor-pointer items-center gap-2 text-[13.5px] text-foreground">
             <input
               type="checkbox"
               checked={form.currentlyStudying}
               onChange={(e) => update("currentlyStudying", e.target.checked)}
-              className="size-4 rounded border-[#D1D5DB] accent-primary"
+              className="size-4 rounded border-input accent-primary"
             />
             I am currently studying here
           </label>
         </div>
       </div>
 
-      <div className="border-t border-[#F3F4F6] px-6 py-6">
+      <div className="border-t border-border px-5 py-5">
         <FormLabel>Description</FormLabel>
         <textarea
           value={form.description}
           onChange={(e) => update("description", e.target.value)}
           placeholder="Add details about your achievements, activities, or coursework"
           rows={6}
-          className="w-full resize-y rounded-xl border border-[#E5E7EB] p-4 text-[13.5px] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="w-full resize-y rounded-xl border border-border p-3 text-[13.5px] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
-      <div className="flex justify-end gap-3 border-t border-[#F3F4F6] px-6 py-4">
+      <div className="flex justify-end gap-2.5 border-t border-border px-5 py-3">
         <Button
           variant="outline"
           className="border-primary text-primary hover:bg-primary/5"

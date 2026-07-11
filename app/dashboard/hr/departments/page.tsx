@@ -14,9 +14,9 @@ import { useAuth } from "@/context/auth-context"
 import { ApiError } from "@/lib/api-client"
 import { departmentService, type ApiDeptEmployee } from "@/services/departments.service"
 import { employeeService, type ApiEmployee } from "@/services/employee.service"
+import { Avatar } from "@/components/avatar"
 
 // ── Constants ─────────────────────────────────────────────────
-const DEFAULT_PHOTO = "/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png"
 const CARDS_PER_PAGE = 6
 
 // ── Types ─────────────────────────────────────────────────────
@@ -25,7 +25,7 @@ interface Member {
   name:   string
   role:   string
   email:  string
-  photo:  string
+  photo:  string | null
   deptId: number | null  // used to filter available vs already-assigned pool employees
 }
 
@@ -81,10 +81,10 @@ function mapDept(a: {
 function mapDeptEmployee(e: ApiDeptEmployee, deptId: number): Member {
   return {
     id:     e.id,
-    name:   e.user.name,
+    name:   e.user?.name ?? e.employeeId,
     role:   "",
-    email:  e.user.email,
-    photo:  e.user.avatarUrl ?? DEFAULT_PHOTO,
+    email:  e.user?.email ?? "",
+    photo:  e.user?.avatarUrl ?? null,
     deptId: deptId,
   }
 }
@@ -93,10 +93,10 @@ function mapDeptEmployee(e: ApiDeptEmployee, deptId: number): Member {
 function mapPoolEmployee(e: ApiEmployee): Member {
   return {
     id:     String(e.id),
-    name:   e.user.name,
+    name:   e.user?.name ?? e.employeeId,
     role:   e.jobTitle ?? "",
-    email:  e.user.email,
-    photo:  e.user.avatarUrl ?? DEFAULT_PHOTO,
+    email:  e.user?.email ?? "",
+    photo:  e.user?.avatarUrl ?? null,
     deptId: e.department?.id ?? null,
   }
 }
@@ -119,8 +119,8 @@ function DotMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => voi
       </button>
       {open && (
         <div className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-lg border border-border bg-card shadow-lg">
-          <button onClick={() => { onEdit(); setOpen(false) }} className="block w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted">Edit</button>
-          <button onClick={() => { onDelete(); setOpen(false) }} className="block w-full px-4 py-2 text-left text-sm text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20">Delete</button>
+          <button onClick={() => { onEdit(); setOpen(false) }} className="block w-full px-3 py-1.5 text-left text-xs text-foreground hover:bg-muted">Edit</button>
+          <button onClick={() => { onDelete(); setOpen(false) }} className="block w-full px-3 py-1.5 text-left text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20">Delete</button>
         </div>
       )}
     </div>
@@ -136,18 +136,18 @@ function DepartmentCard({
   const { lightCls, iconCls, icon: Icon } = colorMap[dept.colorKey]
 
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-      <div className="mb-4 flex items-start justify-between">
+    <div className="flex flex-col rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+      <div className="mb-3 flex items-start justify-between">
         <div className={cn("flex size-12 items-center justify-center rounded-xl", lightCls)}>
           <Icon className={cn("size-6", iconCls)} />
         </div>
         <DotMenu onEdit={onEdit} onDelete={onDelete} />
       </div>
 
-      <p className="mb-1 text-base font-bold text-foreground">{dept.name}</p>
-      <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{dept.description}</p>
+      <p className="mb-1 text-sm font-bold text-foreground">{dept.name}</p>
+      <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{dept.description}</p>
 
-      <div className="mb-4 space-y-2 text-sm">
+      <div className="mb-3 space-y-1.5 text-xs">
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground">Head</span>
           <span className="font-semibold text-foreground">{dept.head}</span>
@@ -160,7 +160,7 @@ function DepartmentCard({
 
       <button
         onClick={onView}
-        className={cn("mt-auto w-full rounded-lg py-2 text-sm font-semibold transition-colors", lightCls, iconCls)}
+        className={cn("mt-auto w-full rounded-lg py-1.5 text-xs font-semibold transition-colors", lightCls, iconCls)}
       >
         View Members
       </button>
@@ -193,14 +193,14 @@ function AddMemberDropdown({
       <button
         onClick={() => setOpen((o) => !o)}
         disabled={disabled}
-        className={cn("flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors disabled:opacity-50", lightCls, iconCls)}
+        className={cn("flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors disabled:opacity-50", lightCls, iconCls)}
       >
         <UserPlus className="size-4" /> Add Member
       </button>
 
       {open && (
         <div className="absolute left-0 top-full z-20 mt-1 w-64 overflow-hidden rounded-xl border border-border bg-card shadow-xl">
-          <p className="border-b border-border px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <p className="border-b border-border px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Select employee
           </p>
           <div className="max-h-56 overflow-y-auto">
@@ -208,11 +208,11 @@ function AddMemberDropdown({
               <button
                 key={m.id}
                 onClick={() => { onAdd(m); setOpen(false) }}
-                className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-muted/50"
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-muted/50"
               >
-                <img src={m.photo} alt={m.name} className="size-8 shrink-0 rounded-full object-cover" />
+                <Avatar src={m.photo} alt={m.name} className="size-8 shrink-0" />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-foreground">{m.name}</p>
+                  <p className="truncate text-xs font-medium text-foreground">{m.name}</p>
                   <p className="truncate text-xs text-muted-foreground">{m.role}</p>
                 </div>
               </button>
@@ -306,32 +306,32 @@ function MembersPanel({ dept, onClose, onMemberCountChange }: {
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
       <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+          <div className="flex items-center gap-2.5">
             <div className={cn("flex size-9 items-center justify-center rounded-lg", lightCls)}>
               <Icon className={cn("size-5", iconCls)} />
             </div>
             <div>
-              <p className="text-base font-bold text-foreground">{dept.name}</p>
+              <p className="text-sm font-bold text-foreground">{dept.name}</p>
               <p className="text-xs text-muted-foreground">
                 {loading ? "Loading…" : `${members.length} member${members.length !== 1 ? "s" : ""}`}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
         {/* Toolbar */}
-        <div className="flex items-center justify-between border-b border-border px-6 py-3">
-          <div className="mr-3 flex flex-1 items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-1.5">
+        <div className="flex items-center justify-between border-b border-border px-5 py-2.5">
+          <div className="mr-2.5 flex flex-1 items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-2.5 py-1">
             <Search className="size-3.5 text-muted-foreground" />
             <input
               value={memberSearch}
               onChange={(e) => setMemberSearch(e.target.value)}
               placeholder="Search members…"
-              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
           <AddMemberDropdown
@@ -344,7 +344,7 @@ function MembersPanel({ dept, onClose, onMemberCountChange }: {
 
         {/* Error */}
         {panelError && (
-          <div className="mx-4 mt-3 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+          <div className="mx-3 mt-2.5 rounded-lg bg-rose-50 px-2.5 py-1.5 text-xs text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
             {panelError}
           </div>
         )}
@@ -352,24 +352,24 @@ function MembersPanel({ dept, onClose, onMemberCountChange }: {
         {/* Member list */}
         <div className="flex-1 divide-y divide-border overflow-y-auto">
           {loading ? (
-            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">Loading…</div>
+            <div className="flex h-32 items-center justify-center text-xs text-muted-foreground">Loading…</div>
           ) : displayed.length === 0 ? (
-            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+            <div className="flex h-32 items-center justify-center text-xs text-muted-foreground">
               {members.length === 0 ? "No members yet. Add someone!" : "No matches found."}
             </div>
           ) : (
             displayed.map((m) => (
-              <div key={m.id} className="flex items-center gap-3 px-6 py-3.5 hover:bg-muted/50">
-                <img src={m.photo} alt={m.name} className="size-10 shrink-0 rounded-full object-cover" />
+              <div key={m.id} className="flex items-center gap-2.5 px-5 py-3 hover:bg-muted/50">
+                <Avatar src={m.photo} alt={m.name} className="size-10 shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-foreground">{m.name}</p>
+                  <p className="truncate text-xs font-semibold text-foreground">{m.name}</p>
                   <p className="truncate text-xs text-muted-foreground">{m.role || m.email}</p>
                 </div>
                 <button
                   onClick={() => handleRemove(m.id)}
                   disabled={savingId === m.id}
                   title="Remove from department"
-                  className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-rose-50 hover:text-rose-500 disabled:opacity-40 dark:hover:bg-rose-900/20 dark:hover:text-rose-400"
+                  className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-rose-50 hover:text-rose-500 disabled:opacity-40 dark:hover:bg-rose-900/20 dark:hover:text-rose-400"
                 >
                   {savingId === m.id ? (
                     <span className="text-xs">…</span>
@@ -400,7 +400,7 @@ function DeptFormModal({
   const [saving,      setSaving]      = useState(false)
   const [saveErr,     setSaveErr]     = useState<string | null>(null)
 
-  const inputCls = "w-full rounded-lg border border-border bg-muted/50 px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-transparent"
+  const inputCls = "w-full rounded-lg border border-border bg-muted/50 px-2.5 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-transparent"
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -422,15 +422,15 @@ function DeptFormModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl">
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">{isEdit ? "Edit Department" : "New Department"}</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+      <div className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-foreground">{isEdit ? "Edit Department" : "New Department"}</h2>
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-foreground">Department Name *</label>
             <input
@@ -453,19 +453,19 @@ function DeptFormModal({
           </div>
 
           {saveErr && (
-            <p className="rounded-lg bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+            <p className="rounded-lg bg-rose-50 px-2.5 py-1.5 text-xs font-medium text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
               {saveErr}
             </p>
           )}
 
-          <div className="flex justify-end gap-2 pt-1">
-            <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">
+          <div className="flex justify-end gap-1.5 pt-1">
+            <button type="button" onClick={onClose} className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+              className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
             >
               {saving ? "Saving…" : isEdit ? "Save Changes" : "Create Department"}
             </button>
@@ -552,107 +552,111 @@ export default function DepartmentsPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-hidden p-6">
+      <main className="flex flex-1 flex-col overflow-hidden">
         {/* Search */}
-        <div className="mb-4 flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 shadow-sm">
-          <Search className="size-5 shrink-0 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search ⌘K"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/50"
-          />
-          <button className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-border bg-card px-5 py-2.5">
+          <div className="flex flex-1 items-center gap-1.5">
+            <Search className="size-5 shrink-0 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search ⌘K"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+              className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
+            />
+          </div>
+          <button className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <SlidersHorizontal className="size-5" />
           </button>
         </div>
 
-        {/* Delete error banner */}
-        {deleteError && (
-          <div className="mb-4 flex items-center justify-between rounded-lg bg-rose-50 px-4 py-2.5 text-sm text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
-            <span>{deleteError}</span>
-            <button onClick={() => setDeleteError(null)} className="ml-4 shrink-0 rounded p-0.5 hover:bg-rose-100 dark:hover:bg-rose-900/30">
-              <X className="size-4" />
-            </button>
-          </div>
-        )}
-
-        {/* Header */}
-        <div className="mb-5 flex items-center justify-between">
-          <div />
-          <button
-            onClick={() => setEditing(null)}
-            className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
-          >
-            <Plus className="size-4" /> Add Department
-          </button>
-        </div>
-
-        {/* Content */}
-        {loading ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-            Loading departments…
-          </div>
-        ) : error ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-rose-500">
-            {error}
-          </div>
-        ) : paginated.length > 0 ? (
-          <div className="grid flex-1 auto-rows-min grid-cols-3 gap-4">
-            {paginated.map((dept) => (
-              <DepartmentCard
-                key={dept.id}
-                dept={dept}
-                onView={() => setViewing(dept)}
-                onEdit={() => setEditing(dept)}
-                onDelete={() => deleteDept(dept.id)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-1 items-center justify-center">
-            <div className="flex flex-col items-center gap-3 text-center">
-              <div className="flex size-14 items-center justify-center rounded-full bg-primary/10">
-                <Building2 className="size-7 text-primary" />
-              </div>
-              <p className="text-sm font-medium text-foreground">No departments found</p>
-              <p className="text-xs text-muted-foreground">Try a different search or create a new department.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {!loading && !error && totalPages > 1 && (
-          <div className="mt-5 flex items-center justify-end gap-1">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
-            >
-              <ChevronLeft className="size-4" />
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={cn(
-                  "flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
-                  p === page ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted",
-                )}
-              >
-                {p}
+        <div className="flex flex-1 flex-col overflow-auto p-5">
+          {/* Delete error banner */}
+          {deleteError && (
+            <div className="mb-3 flex items-center justify-between rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+              <span>{deleteError}</span>
+              <button onClick={() => setDeleteError(null)} className="ml-3 shrink-0 rounded p-0.5 hover:bg-rose-100 dark:hover:bg-rose-900/30">
+                <X className="size-4" />
               </button>
-            ))}
+            </div>
+          )}
+
+          {/* Header */}
+          <div className="mb-4 flex items-center justify-between">
+            <div />
             <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
+              onClick={() => setEditing(null)}
+              className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
             >
-              <ChevronRight className="size-4" />
+              <Plus className="size-4" /> Add Department
             </button>
           </div>
-        )}
+
+          {/* Content */}
+          {loading ? (
+            <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
+              Loading departments…
+            </div>
+          ) : error ? (
+            <div className="flex flex-1 items-center justify-center text-xs text-rose-500">
+              {error}
+            </div>
+          ) : paginated.length > 0 ? (
+            <div className="grid flex-1 auto-rows-min grid-cols-3 gap-3">
+              {paginated.map((dept) => (
+                <DepartmentCard
+                  key={dept.id}
+                  dept={dept}
+                  onView={() => setViewing(dept)}
+                  onEdit={() => setEditing(dept)}
+                  onDelete={() => deleteDept(dept.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-1 items-center justify-center">
+              <div className="flex flex-col items-center gap-2.5 text-center">
+                <div className="flex size-14 items-center justify-center rounded-full bg-primary/10">
+                  <Building2 className="size-7 text-primary" />
+                </div>
+                <p className="text-xs font-medium text-foreground">No departments found</p>
+                <p className="text-xs text-muted-foreground">Try a different search or create a new department.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && !error && totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-end gap-1">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={cn(
+                    "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
+                    p === page ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted",
+                  )}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="flex size-8 items-center justify-center rounded-full text-foreground hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </main>
 
       {viewing && (

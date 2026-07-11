@@ -30,8 +30,8 @@ export const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"]
 export const LOCATIONS  = ["Remote", "On-site", "Hybrid"]
 export const LEVELS     = ["Junior", "Mid-level", "Senior", "Lead", "Executive"]
 
-export const fieldCls = "h-10 w-full rounded-xl border border-border bg-muted/50 px-3 text-sm text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
-export const areaCls  = "w-full resize-none rounded-xl border border-border bg-muted/50 px-3 py-2.5 text-sm text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+export const fieldCls = "h-10 w-full rounded-xl border border-border bg-muted/50 px-2.5 text-xs text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+export const areaCls  = "w-full resize-none rounded-xl border border-border bg-muted/50 px-2.5 py-2 text-xs text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
 
 // ── Public API label maps ──────────────────────────────────────────────────────
 export const PUBLIC_TYPE_LABEL: Record<PublicJobType, string> = {
@@ -49,7 +49,7 @@ export const PUBLIC_STATUS_LABEL: Record<PublicJobStatus, string> = {
 
 export function formatSalary(min: number | null, max: number | null): string {
   if (!min && !max) return "Not specified"
-  const fmt = (n: number) => (n >= 1000 ? `$${Math.round(n / 1000)}k` : `$${n}`)
+  const fmt = (n: number) => (n >= 1000 ? `₵${Math.round(n / 1000)}k` : `₵${n}`)
   if (min && max) return `${fmt(min)}–${fmt(max)}`
   if (min) return `From ${fmt(min)}`
   return `Up to ${fmt(max!)}`

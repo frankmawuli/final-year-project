@@ -103,45 +103,45 @@ export function ExperienceEducationTab() {
 
   if (addingExperience) {
     return (
-      <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
+      <div className="bg-card rounded-b-xl border border-border">
         <WorkExperienceForm onCancel={() => setAddingExperience(false)} onSave={handleSaveExperience} />
-        {error && <p className="px-6 pb-4 text-[13px] text-destructive">{error}</p>}
+        {error && <p className="px-5 pb-3 text-[13px] text-destructive">{error}</p>}
       </div>
     );
   }
 
   if (addingEducation) {
     return (
-      <div className="bg-white rounded-b-xl border border-[#E5E7EB]">
+      <div className="bg-card rounded-b-xl border border-border">
         <EducationForm onCancel={() => setAddingEducation(false)} onSave={handleSaveEducation} />
-        {error && <p className="px-6 pb-4 text-[13px] text-destructive">{error}</p>}
+        {error && <p className="px-5 pb-3 text-[13px] text-destructive">{error}</p>}
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-b-xl border border-[#E5E7EB] divide-y divide-[#F3F4F6]">
-      <div className="px-6 py-6">
+    <div className="bg-card rounded-b-xl border border-border divide-y divide-border">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Experience & Education</h3>
-        <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
           Manage your work history and education
         </p>
-        {error && <p className="mt-2 text-[13px] text-destructive">{error}</p>}
+        {error && <p className="mt-1.5 text-[13px] text-destructive">{error}</p>}
       </div>
 
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Work Experience</h3>
-        <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
           Add your Work Experience. Such as an internship, part-time work or long term specialised
           experience.
         </p>
 
         {experience.length > 0 && (
-          <ul className="mt-4 space-y-3">
+          <ul className="mt-3 space-y-2.5">
             {experience.map((item) => (
               <li
                 key={item.id}
-                className="flex items-start justify-between gap-3 rounded-xl border border-[#E5E7EB] px-4 py-3"
+                className="flex items-start justify-between gap-2.5 rounded-xl border border-border px-3 py-2.5"
               >
                 <div>
                   <p className="text-[13.5px] font-semibold text-foreground">{item.role}</p>
@@ -165,20 +165,20 @@ export function ExperienceEducationTab() {
         )}
 
         {experience.length === 0 && (
-          <label className="mt-4 flex w-fit cursor-pointer items-center gap-2 text-[13px] text-foreground">
+          <label className="mt-3 flex w-fit cursor-pointer items-center gap-1.5 text-[13px] text-foreground">
             <input
               type="checkbox"
               checked={noExperience}
               onChange={(e) => setNoExperience(e.target.checked)}
-              className="w-4 h-4 rounded border-[#D1D5DB] accent-primary"
+              className="w-4 h-4 rounded border-input accent-primary"
             />
             I have no experience
           </label>
         )}
-        <div className="mt-6 flex justify-center">
+        <div className="mt-5 flex justify-center">
           <Button
             size="sm"
-            className="rounded-full px-4"
+            className="rounded-full px-3"
             onClick={() => setAddingExperience(true)}
             disabled={saving}
           >
@@ -188,18 +188,18 @@ export function ExperienceEducationTab() {
         </div>
       </div>
 
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Education</h3>
-        <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
           List your qualifications here.
         </p>
 
         {education.length > 0 && (
-          <ul className="mt-4 space-y-3">
+          <ul className="mt-3 space-y-2.5">
             {education.map((item) => (
               <li
                 key={item.id}
-                className="flex items-start justify-between gap-3 rounded-xl border border-[#E5E7EB] px-4 py-3"
+                className="flex items-start justify-between gap-2.5 rounded-xl border border-border px-3 py-2.5"
               >
                 <div>
                   <p className="text-[13.5px] font-semibold text-foreground">{item.degree}</p>
@@ -222,10 +222,10 @@ export function ExperienceEducationTab() {
           </ul>
         )}
 
-        <div className="mt-6 flex justify-center">
+        <div className="mt-5 flex justify-center">
           <Button
             size="sm"
-            className="rounded-full px-4"
+            className="rounded-full px-3"
             onClick={() => setAddingEducation(true)}
             disabled={saving}
           >

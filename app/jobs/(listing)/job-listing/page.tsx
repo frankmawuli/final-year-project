@@ -132,7 +132,7 @@ export default function JobListingPage() {
         jobTypes={uniqueJobTypes}
       />
 
-      <div className="max-w-[1340px] mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row gap-6">
+      <div className="max-w-[1340px] mx-auto px-3 sm:px-5 py-5 flex flex-col md:flex-row gap-5">
         {/* Sidebar – hidden on mobile unless filter toggle is active */}
         <div
           className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-52.5 md:shrink-0 md:sticky md:top-6 md:self-start md:max-h-[calc(100vh-3rem)] md:overflow-y-auto`}
@@ -159,21 +159,21 @@ export default function JobListingPage() {
         </div>
 
         <main className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4">
             <h1 className="text-[22px] font-bold text-foreground leading-tight">
               {loading ? "Loading…" : `${total} ${total === 1 ? "Job" : "Jobs"} Found`}
             </h1>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {/* Mobile filter toggle */}
               <button
                 onClick={() => setShowFilters((o) => !o)}
-                className="md:hidden flex items-center gap-1.5 text-[12.5px] font-medium text-foreground border border-[#E5E7EB] bg-white px-3 py-1.5 rounded-lg"
+                className="md:hidden flex items-center gap-1 text-[12.5px] font-medium text-foreground border border-border bg-card px-2.5 py-1 rounded-lg"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Filters
               </button>
-              <div className="flex items-center gap-1.5 text-[12.5px]">
-                <span className="text-[#9CA3AF] hidden sm:inline">Sort by:</span>
+              <div className="flex items-center gap-1 text-[12.5px]">
+                <span className="text-muted-foreground hidden sm:inline">Sort by:</span>
                 <button className="flex items-center gap-1 text-foreground font-semibold hover:text-primary transition-colors">
                   Newest Post
                   <ChevronDown className="w-3.5 h-3.5" />
@@ -183,44 +183,44 @@ export default function JobListingPage() {
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-20">
+            <div className="flex items-center justify-center py-16">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           ) : error ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="flex flex-col items-center justify-center py-16 text-center">
               <p className="text-[15px] font-semibold text-rose-600 mb-1">Failed to load jobs</p>
-              <p className="text-[13px] text-[#9CA3AF]">{error}</p>
+              <p className="text-[13px] text-muted-foreground">{error}</p>
             </div>
           ) : filteredJobs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Search className="w-10 h-10 text-[#D1D5DB] mb-3" />
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Search className="w-10 h-10 text-muted-foreground mb-2.5" />
               <p className="text-[15px] font-semibold text-foreground mb-1">No jobs match your filters</p>
-              <p className="text-[13px] text-[#9CA3AF]">Try adjusting your search or clearing some filters.</p>
+              <p className="text-[13px] text-muted-foreground">Try adjusting your search or clearing some filters.</p>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {filteredJobs.map((job) => (
                   <JobCard key={job.id} job={job} />
                 ))}
               </div>
 
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-8">
+                <div className="flex items-center justify-center gap-1.5 mt-6">
                   <button
                     onClick={() => fetchJobs(Math.max(1, page - 1))}
                     disabled={page === 1}
-                    className="flex size-8 items-center justify-center rounded-full text-[#9CA3AF] hover:bg-white border border-[#E5E7EB] disabled:opacity-40 transition-colors"
+                    className="flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-card border border-border disabled:opacity-40 transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <span className="text-[12.5px] text-[#9CA3AF] px-2">
+                  <span className="text-[12.5px] text-muted-foreground px-1.5">
                     Page {page} of {totalPages}
                   </span>
                   <button
                     onClick={() => fetchJobs(Math.min(totalPages, page + 1))}
                     disabled={page === totalPages}
-                    className="flex size-8 items-center justify-center rounded-full text-[#9CA3AF] hover:bg-white border border-[#E5E7EB] disabled:opacity-40 transition-colors"
+                    className="flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-card border border-border disabled:opacity-40 transition-colors"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>

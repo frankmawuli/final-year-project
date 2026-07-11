@@ -123,22 +123,22 @@ function ReportCard({ r }: { r: Report }) {
     )}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-start gap-4 px-5 py-4 text-left"
+        className="flex w-full items-start gap-3 px-4 py-3 text-left"
       >
         <div className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", typeBadge[r.type].split(" ")[0])}>
           <Icon className={cn("size-5", typeBadge[r.type].split(" ")[1])} />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-semibold text-foreground">{r.title}</p>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <p className="text-xs font-semibold text-foreground">{r.title}</p>
             {r.score !== undefined && (
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
+              <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[11px] font-bold text-primary">
                 {r.score}/100
               </span>
             )}
           </div>
-          <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", typeBadge[r.type])}>
+          <div className="mt-1 flex flex-wrap items-center gap-2.5 text-xs text-muted-foreground">
+            <span className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-semibold", typeBadge[r.type])}>
               {r.type}
             </span>
             <span className="flex items-center gap-1">
@@ -147,8 +147,8 @@ function ReportCard({ r }: { r: Report }) {
             <span>Submitted {r.submittedOn}</span>
           </div>
         </div>
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <span className={cn("flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold", statusBadge[r.status])}>
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <span className={cn("flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold", statusBadge[r.status])}>
             {statusIcon[r.status]}{r.status}
           </span>
           <ChevronRight className={cn("size-4 text-muted-foreground transition-transform", open && "rotate-90")} />
@@ -156,8 +156,8 @@ function ReportCard({ r }: { r: Report }) {
       </button>
 
       {open && (
-        <div className="border-t border-border px-5 pb-4 pt-3">
-          <p className="text-sm leading-relaxed text-muted-foreground">{r.summary}</p>
+        <div className="border-t border-border px-4 pb-3 pt-2.5">
+          <p className="text-xs leading-relaxed text-muted-foreground">{r.summary}</p>
         </div>
       )}
     </div>
@@ -173,46 +173,46 @@ export default function ReportsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-border bg-white px-4 py-3 lg:hidden">
-        <h1 className="text-base font-semibold text-foreground">My Reports</h1>
+      <div className="border-b border-border bg-white px-3 py-2.5 lg:hidden">
+        <h1 className="text-sm font-semibold text-foreground">My Reports</h1>
         <p className="mt-0.5 text-xs text-muted-foreground">Report › Overview</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+      <div className="flex-1 overflow-y-auto p-3 md:p-5 lg:p-6">
 
         {/* ── Stats ── */}
-        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mb-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
           {[
             { label: "Total Reports",  value: reports.length,                                        icon: FileBarChart2, bg: "bg-[#eef2ff]", color: "#5e81f4" },
             { label: "Under Review",   value: reports.filter((r) => r.status === "Under Review").length, icon: Clock,         bg: "bg-[#fffbeb]", color: "#d97706" },
             { label: "Resolved",       value: reports.filter((r) => r.status === "Resolved").length,  icon: CheckCircle2,  bg: "bg-[#f0fdf4]", color: "#16a34a" },
             { label: "Avg Score",      value: `${avgScore}`,                                          icon: Award,         bg: "bg-[#f5f3ff]", color: "#8b5cf6" },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-border bg-white p-4 shadow-sm">
-              <div className={cn("mb-2 flex size-8 items-center justify-center rounded-lg", s.bg)}>
+            <div key={s.label} className="rounded-2xl border border-border bg-white p-3 shadow-sm">
+              <div className={cn("mb-1.5 flex size-8 items-center justify-center rounded-lg", s.bg)}>
                 <s.icon className="size-4" style={{ color: s.color }} />
               </div>
-              <p className="text-2xl font-bold text-foreground">{s.value}</p>
+              <p className="text-xl font-bold text-foreground">{s.value}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* ── H1 goals progress ── */}
-        <div className="mb-6 rounded-2xl border border-border bg-white p-5 shadow-sm md:p-6">
-          <div className="mb-4 flex items-center justify-between">
+        <div className="mb-5 rounded-2xl border border-border bg-white p-4 shadow-sm md:p-5">
+          <div className="mb-3 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-semibold text-foreground">H1 2026 Goal Progress</h2>
+              <h2 className="text-sm font-semibold text-foreground">H1 2026 Goal Progress</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">Tracking against your performance objectives</p>
             </div>
-            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">On Track</span>
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">On Track</span>
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {goals.map((g) => {
               const pct = Math.min(100, Math.round((g.current / g.target) * 100))
               return (
                 <div key={g.label}>
-                  <div className="mb-1.5 flex items-center justify-between text-sm">
+                  <div className="mb-1 flex items-center justify-between text-xs">
                     <span className="font-medium text-foreground">{g.label}</span>
                     <span className="text-xs text-muted-foreground">
                       {g.current} / {g.target} {g.unit}
@@ -232,18 +232,18 @@ export default function ReportsPage() {
         </div>
 
         {/* ── Reports list ── */}
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">Submitted Reports</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-foreground">Submitted Reports</h2>
           <Link
             href="/dashboard/ess/report/complaints"
-            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-muted"
+            className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
           >
             <Plus className="size-3.5" />
             File a Complaint
           </Link>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2.5">
           {reports.map((r) => <ReportCard key={r.id} r={r} />)}
         </div>
 

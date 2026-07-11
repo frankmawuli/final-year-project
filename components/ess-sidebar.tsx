@@ -114,8 +114,8 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <aside className="flex h-full w-[220px] shrink-0 flex-col bg-sidebar py-5 pl-4 pr-3 shadow-sm">
-      <p className="mb-3 px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+    <aside className="flex h-full w-[220px] shrink-0 flex-col bg-sidebar py-4 pl-3 pr-2.5 shadow-sm">
+      <p className="mb-2.5 px-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
         Menu
       </p>
 
@@ -137,7 +137,7 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
               <button
                 onClick={() => toggleSection(section.label)}
                 className={cn(
-                  "flex w-full items-center gap-2.5 rounded-lg px-2 py-2.5 text-left text-sm font-medium transition-colors",
+                  "flex w-full items-center gap-2 rounded-lg px-1.5 py-2 text-left text-xs font-medium transition-colors",
                   sectionActive
                     ? "text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -166,7 +166,7 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
 
               {/* Sub-items */}
               {isOpen && (
-                <div className="ml-3 flex flex-col gap-0.5 border-l border-border pl-3">
+                <div className="ml-2.5 flex flex-col gap-0.5 border-l border-border pl-2.5">
                   {section.children.map((sub) => {
                     if (sub.children) {
                       // Sub-section with its own children (e.g., "Attendance")
@@ -177,7 +177,7 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
                           <button
                             onClick={() => toggleSub(sub.label)}
                             className={cn(
-                              "flex w-full items-center justify-between rounded px-2 py-2 text-left text-sm transition-colors",
+                              "flex w-full items-center justify-between rounded px-1.5 py-1.5 text-left text-xs transition-colors",
                               subActive
                                 ? "font-medium text-primary"
                                 : "text-muted-foreground hover:text-foreground"
@@ -191,7 +191,7 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
                             )}
                           </button>
                           {subOpen && (
-                            <div className="ml-2 flex flex-col gap-0.5 border-l border-border pl-2">
+                            <div className="ml-1.5 flex flex-col gap-0.5 border-l border-border pl-1.5">
                               {sub.children.map((leaf) => {
                                 const isActive = pathname === leaf.href
                                 return (
@@ -199,7 +199,7 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
                                     key={leaf.href}
                                     href={leaf.href}
                                     className={cn(
-                                      "block rounded px-2 py-1.5 text-[13px] transition-colors",
+                                      "block rounded px-1.5 py-1 text-[13px] transition-colors",
                                       isActive
                                         ? "font-medium text-primary"
                                         : "text-muted-foreground hover:text-foreground"
@@ -222,7 +222,7 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
                         <Link
                           href={sub.href ?? "#"}
                           className={cn(
-                            "flex-1 rounded px-2 py-2 text-sm transition-colors",
+                            "flex-1 rounded px-1.5 py-1.5 text-xs transition-colors",
                             isActive
                               ? "font-medium text-primary"
                               : "text-muted-foreground hover:text-foreground"
@@ -244,10 +244,10 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
       </nav>
 
       {/* User profile at bottom */}
-      <div className="mt-auto pt-4">
+      <div className="mt-auto pt-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-muted">
+            <button className="flex w-full items-center gap-2.5 rounded-lg px-1.5 py-2 text-left transition-colors hover:bg-muted">
               <div className="size-8 shrink-0 overflow-hidden rounded-full bg-muted">
                 <img
                   src="https://i.pravatar.cc/32?img=11"
@@ -256,14 +256,14 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
                 />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">Michael Smith</p>
+                <p className="truncate text-xs font-medium text-foreground">Michael Smith</p>
                 <p className="truncate text-[11px] text-muted-foreground">HR Administrator</p>
               </div>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" align="start" className="w-48">
             <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
-              <LogOut className="mr-2 size-4" />
+              <LogOut className="mr-1.5 size-4" />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -20,7 +20,7 @@ const STATUS_LABEL   = { OPEN: "Open", CLOSED: "Closed", DRAFT: "Draft" } as con
 
 function formatSalary(min: number | null, max: number | null): string {
   if (!min && !max) return "Not specified"
-  const fmt = (n: number) => (n >= 1000 ? `$${Math.round(n / 1000)}k` : `$${n}`)
+  const fmt = (n: number) => (n >= 1000 ? `₵${Math.round(n / 1000)}k` : `₵${n}`)
   if (min && max) return `${fmt(min)} – ${fmt(max)}`
   if (min) return `From ${fmt(min)}`
   return `Up to ${fmt(max!)}`
@@ -40,32 +40,32 @@ const sidebarNav = [
 ]
 
 const statusStyles: Record<ApiJobStatus, string> = {
-  OPEN:   "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
-  CLOSED: "bg-rose-50 text-rose-600 ring-1 ring-rose-200",
-  DRAFT:  "bg-gray-100 text-gray-500 ring-1 ring-gray-200",
+  OPEN:   "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:ring-emerald-500/30",
+  CLOSED: "bg-rose-50 text-rose-600 ring-1 ring-rose-200 dark:bg-rose-500/15 dark:text-rose-400 dark:ring-rose-500/30",
+  DRAFT:  "bg-muted text-muted-foreground ring-1 ring-border",
 }
 
 const deptColors: Record<string, string> = {
-  Design:      "bg-violet-100 text-violet-700",
-  Engineering: "bg-blue-100 text-blue-700",
-  Product:     "bg-amber-100 text-amber-700",
-  Analytics:   "bg-emerald-100 text-emerald-700",
-  Marketing:   "bg-pink-100 text-pink-700",
+  Design:      "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-400",
+  Engineering: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
+  Product:     "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
+  Analytics:   "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400",
+  Marketing:   "bg-pink-100 text-pink-700 dark:bg-pink-500/15 dark:text-pink-400",
   HR:          "bg-primary/10 text-primary",
-  Finance:     "bg-orange-100 text-orange-700",
+  Finance:     "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-400",
 }
 
 // ── Sub-components ─────────────────────────────────────────────
 function SkillChip({ label }: { label: string }) {
   return (
-    <span className="rounded-lg border border-border bg-muted px-3 py-1.5 text-[13px] font-medium text-foreground">
+    <span className="rounded-lg border border-border bg-muted px-2.5 py-1 text-[13px] font-medium text-foreground">
       {label}
     </span>
   )
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="mb-3 text-[15px] font-bold text-foreground">{children}</h3>
+  return <h3 className="mb-2.5 text-[15px] font-bold text-foreground">{children}</h3>
 }
 
 function InfoRow({
@@ -78,7 +78,7 @@ function InfoRow({
   value: string
 }) {
   return (
-    <div className="flex items-start gap-3">
+    <div className="flex items-start gap-2.5">
       <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
         <Icon className="size-4 text-primary" />
       </div>
@@ -139,7 +139,7 @@ export default function JobDetailPage() {
     return (
       <>
         <HrNavigationPannel navItems={sidebarNav} />
-        <main className="flex flex-1 items-center justify-center text-sm text-rose-600">
+        <main className="flex flex-1 items-center justify-center text-xs text-rose-600">
           {error ?? "Job not found"}
         </main>
       </>
@@ -158,11 +158,11 @@ export default function JobDetailPage() {
       <HrNavigationPannel navItems={sidebarNav} />
 
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-7xl p-6">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
+        <div className="mx-auto max-w-7xl p-5">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_300px]">
 
             {/* ── Left ─────────────────────────────────────── */}
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4">
 
               {/* Banner */}
               <div
@@ -173,37 +173,37 @@ export default function JobDetailPage() {
                 <span className="absolute -bottom-12 right-32 size-32 rounded-full bg-white/10" />
                 <span className="absolute -left-6 bottom-0 size-24 rounded-full bg-white/8" />
                 <span className="absolute right-16 top-6 size-16 rounded-full bg-white/15" />
-                <div className="absolute bottom-5 right-8 flex gap-1.5 opacity-30">
+                <div className="absolute bottom-5 right-8 flex gap-1 opacity-30">
                   {[20, 36, 24, 40, 28].map((h, i) => (
                     <div key={i} className="w-2 rounded-sm bg-white" style={{ height: h }} />
                   ))}
                 </div>
                 <div className="absolute left-5 top-5">
-                  <span className={cn("rounded-full px-3 py-1 text-xs font-bold", statusStyles[job.status])}>
+                  <span className={cn("rounded-full px-2.5 py-1 text-xs font-bold", statusStyles[job.status])}>
                     {STATUS_LABEL[job.status]}
                   </span>
                 </div>
               </div>
 
               {/* Header */}
-              <div className="flex items-start gap-4">
-                <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-border bg-white shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-border bg-card shadow-sm">
                   <Building2 className="size-7 text-primary" strokeWidth={1.5} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <h1 className="text-xl font-bold text-foreground">{job.title}</h1>
-                    <span className={cn("rounded-full px-2.5 py-0.5 text-[11px] font-semibold", deptColors[deptName] ?? "bg-muted text-muted-foreground")}>
+                  <div className="mb-1 flex flex-wrap items-center gap-1.5">
+                    <h1 className="text-lg font-bold text-foreground">{job.title}</h1>
+                    <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold", deptColors[deptName] ?? "bg-muted text-muted-foreground")}>
                       {deptName}
                     </span>
-                    <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                    <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                       {TYPE_LABEL[job.type]}
                     </span>
-                    <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                    <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                       {LEVEL_LABEL[job.level]}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <MapPin className="size-3.5" />
                     <span>{LOCATION_LABEL[job.workLocation]}</span>
                   </div>
@@ -212,7 +212,7 @@ export default function JobDetailPage() {
 
               {/* Description + responsibilities */}
               {(job.description || job.responsibilities.length > 0) && (
-                <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                   {job.description && (
                     <>
                       <SectionTitle>Job Description</SectionTitle>
@@ -220,12 +220,12 @@ export default function JobDetailPage() {
                     </>
                   )}
                   {job.responsibilities.length > 0 && (
-                    <div className={job.description ? "pt-6" : ""}>
+                    <div className={job.description ? "pt-5" : ""}>
                       <SectionTitle>Key Responsibilities</SectionTitle>
-                      <ul className="flex flex-col gap-2.5">
+                      <ul className="flex flex-col gap-2">
                         {sorted(job.responsibilities).map((r, i) => (
-                          <li key={i} className="flex items-start gap-2.5">
-                            <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
                             <span className="text-[14px] leading-relaxed text-muted-foreground">{r.text}</span>
                           </li>
                         ))}
@@ -237,13 +237,13 @@ export default function JobDetailPage() {
 
               {/* Requirements + skills */}
               {(job.requirements.length > 0 || job.skills.length > 0) && (
-                <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                   {job.requirements.length > 0 && (
                     <>
                       <SectionTitle>Requirements</SectionTitle>
-                      <ul className="flex flex-col gap-2.5">
+                      <ul className="flex flex-col gap-2">
                         {sorted(job.requirements).map((r, i) => (
-                          <li key={i} className="flex items-start gap-2.5">
+                          <li key={i} className="flex items-start gap-2">
                             <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
                             <span className="text-[14px] leading-relaxed text-muted-foreground">{r.text}</span>
                           </li>
@@ -252,9 +252,9 @@ export default function JobDetailPage() {
                     </>
                   )}
                   {job.skills.length > 0 && (
-                    <div className={job.requirements.length > 0 ? "pt-6" : ""}>
+                    <div className={job.requirements.length > 0 ? "pt-5" : ""}>
                       <SectionTitle>Required Skills</SectionTitle>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {job.skills.map((s) => <SkillChip key={s.name} label={s.name} />)}
                       </div>
                     </div>
@@ -264,24 +264,24 @@ export default function JobDetailPage() {
             </div>
 
             {/* ── Right ────────────────────────────────────── */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
 
               {/* Actions */}
-              <div className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-1.5 rounded-2xl border border-border bg-card p-3 shadow-sm">
                 <Link
                   href={`/dashboard/hr/applicants?jobId=${job.id}`}
-                  className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
                 >
                   <Eye className="size-4" />
                   View Applications
-                  <span className="ml-1 rounded-full bg-white/20 px-2 py-0 text-xs font-bold">
+                  <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0 text-xs font-bold">
                     {applicants}
                   </span>
                 </Link>
                 <Link
                   href={`/dashboard/hr/jobs?edit=${job.id}`}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-border py-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
                 >
                   <Pencil className="size-3.5" />
                   Edit Listing
@@ -290,7 +290,7 @@ export default function JobDetailPage() {
                   <button
                     onClick={handleClose}
                     disabled={closing}
-                    className="flex items-center justify-center gap-2 rounded-xl border border-rose-200 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-60"
+                    className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-60"
                   >
                     <XCircle className="size-3.5" />
                     {closing ? "Closing…" : "Close Listing"}
@@ -299,11 +299,11 @@ export default function JobDetailPage() {
               </div>
 
               {/* Overview */}
-              <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
-                <p className="mb-4 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <p className="mb-3 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">
                   Job Overview
                 </p>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   <InfoRow icon={DollarSign}  label="Salary Range" value={formatSalary(job.salaryMin, job.salaryMax)} />
                   <InfoRow icon={Briefcase}   label="Job Type"     value={TYPE_LABEL[job.type]} />
                   <InfoRow icon={MapPin}      label="Location"     value={LOCATION_LABEL[job.workLocation]} />
@@ -313,8 +313,8 @@ export default function JobDetailPage() {
                   <InfoRow icon={Users}       label="Openings"     value={`${job.openings} position${job.openings > 1 ? "s" : ""}`} />
                 </div>
 
-                <div className="mt-5 rounded-xl border border-border bg-background p-3">
-                  <div className="mb-1.5 flex items-center justify-between text-[12px]">
+                <div className="mt-4 rounded-xl border border-border bg-background p-2.5">
+                  <div className="mb-1 flex items-center justify-between text-[12px]">
                     <span className="font-medium text-foreground">{applicants} applicants</span>
                     <span className="text-muted-foreground">{applicantPct}% filled</span>
                   </div>

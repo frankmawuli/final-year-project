@@ -13,7 +13,7 @@ export interface ApiLeaveRequest {
   createdAt?: string
   employee: {
     id:   number
-    user: { name: string; email: string; avatarUrl: string | null }
+    user: { name: string; email: string; avatarUrl: string | null } | null
     department: { id: number; name: string } | null
   }
 }

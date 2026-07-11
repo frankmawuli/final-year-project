@@ -31,15 +31,15 @@ export default function EssShell({ children }: { children: React.ReactNode }) {
       {/* Main area */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Mobile top bar */}
-        <div className="flex items-center gap-3 border-b border-border bg-white px-4 py-3 lg:hidden">
+        <div className="flex items-center gap-2.5 border-b border-border bg-white px-3 py-2.5 lg:hidden">
           <button
             onClick={() => setOpen(true)}
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted"
+            className="rounded-lg p-1 text-muted-foreground hover:bg-muted"
             aria-label="Open menu"
           >
             <Menu className="size-5" />
           </button>
-          <span className="text-sm font-semibold text-foreground">ESS Portal</span>
+          <span className="text-xs font-semibold text-foreground">ESS Portal</span>
         </div>
 
         <main className="flex-1 overflow-y-auto">{children}</main>

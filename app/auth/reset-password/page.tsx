@@ -64,62 +64,62 @@ export default function ResetPasswordPage() {
   return (
     <div className="auth-layout">
       {/* ── Left: Branding panel ── */}
-      <div className="gradient-primary relative hidden flex-col items-start justify-between overflow-hidden p-12 text-white lg:flex">
+      <div className="gradient-primary relative hidden flex-col items-start justify-between overflow-hidden p-10 text-white lg:flex">
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-white/10" />
         <div className="absolute -bottom-32 -left-32 h-112 w-md rounded-full bg-white/10" />
 
-        <div className="relative flex items-center gap-2">
+        <div className="relative flex items-center gap-1.5">
           <Logo width={52} height={52} />
-          <span className="text-lg font-semibold tracking-tight">CoreRecruiter</span>
+          <span className="text-base font-semibold tracking-tight">CoreRecruiter</span>
         </div>
 
-        <div className="relative space-y-4">
-          <h1 className="text-4xl leading-tight font-bold tracking-tight">
+        <div className="relative space-y-3">
+          <h1 className="text-3xl leading-tight font-bold tracking-tight">
             Streamline your<br />hiring process
           </h1>
-          <p className="max-w-xs text-base text-white/75">
+          <p className="max-w-xs text-sm text-white/75">
             Manage candidates, schedule interviews, and collaborate with your team — all in one place.
           </p>
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="flex flex-wrap gap-1.5 pt-1.5">
             {["AI Screening", "Smart Pipelines", "Team Collaboration"].map((f) => (
-              <span key={f} className="rounded-full bg-white/15 px-3 py-1 text-sm font-medium backdrop-blur-sm">
+              <span key={f} className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
                 {f}
               </span>
             ))}
           </div>
         </div>
 
-        <p className="relative text-sm text-white/50">Trusted by 500+ companies worldwide</p>
+        <p className="relative text-xs text-white/50">Trusted by 500+ companies worldwide</p>
       </div>
 
       {/* ── Right: Form panel ── */}
-      <div className="flex items-center justify-center bg-background px-6 py-12">
-        <div className="w-full max-w-sm space-y-8">
+      <div className="flex items-center justify-center bg-background px-5 py-10">
+        <div className="w-full max-w-sm space-y-6">
           {/* Mobile logo */}
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-1.5 lg:hidden">
             <Logo width={52} height={52} />
-            <span className="text-lg font-semibold">CoreRecruiter</span>
+            <span className="text-base font-semibold">CoreRecruiter</span>
           </div>
 
           {/* Step: request OTP */}
           {step === "request" && (
             <>
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">Reset password</h2>
-                <p className="text-sm text-muted-foreground">
+              <div className="space-y-1.5">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">Reset password</h2>
+                <p className="text-xs text-muted-foreground">
                   Enter your registered email and we&apos;ll send a verification code.
                 </p>
               </div>
 
-              <form className="space-y-4" onSubmit={handleRequest}>
+              <form className="space-y-3" onSubmit={handleRequest}>
                 {error && (
-                  <p className="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+                  <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
                     {error}
                   </p>
                 )}
 
-                <div className="space-y-1.5">
-                  <label htmlFor="email" className="text-sm font-medium text-foreground">
+                <div className="space-y-1">
+                  <label htmlFor="email" className="text-xs font-medium text-foreground">
                     Email address
                   </label>
                   <Input
@@ -129,7 +129,7 @@ export default function ResetPasswordPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                    className="h-11 rounded-xl border-border bg-card px-3 text-xs placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
                   />
                 </div>
 
@@ -137,7 +137,7 @@ export default function ResetPasswordPage() {
                   type="submit"
                   size="lg"
                   disabled={loading}
-                  className="gradient-primary h-11 w-full rounded-xl border-0 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
+                  className="gradient-primary h-11 w-full rounded-xl border-0 text-xs font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
                 >
                   {loading ? "Sending code…" : "Send verification code"}
                 </Button>
@@ -148,22 +148,22 @@ export default function ResetPasswordPage() {
           {/* Step: enter OTP + new password */}
           {step === "reset" && (
             <>
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">Set new password</h2>
-                <p className="text-sm text-muted-foreground">
+              <div className="space-y-1.5">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">Set new password</h2>
+                <p className="text-xs text-muted-foreground">
                   Enter the code sent to your email and choose a new password.
                 </p>
               </div>
 
-              <form className="space-y-4" onSubmit={handleReset}>
+              <form className="space-y-3" onSubmit={handleReset}>
                 {error && (
-                  <p className="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+                  <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
                     {error}
                   </p>
                 )}
 
-                <div className="space-y-1.5">
-                  <label htmlFor="otp" className="text-sm font-medium text-foreground">
+                <div className="space-y-1">
+                  <label htmlFor="otp" className="text-xs font-medium text-foreground">
                     Verification code
                   </label>
                   <Input
@@ -175,12 +175,12 @@ export default function ResetPasswordPage() {
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                     placeholder="000000"
-                    className="h-11 rounded-xl border-border bg-card px-4 text-center text-lg tracking-[0.5em] placeholder:tracking-normal placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                    className="h-11 rounded-xl border-border bg-card px-3 text-center text-base tracking-[0.5em] placeholder:tracking-normal placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="oldPassword" className="text-sm font-medium text-foreground">
+                <div className="space-y-1">
+                  <label htmlFor="oldPassword" className="text-xs font-medium text-foreground">
                     Current password
                   </label>
                   <Input
@@ -190,12 +190,12 @@ export default function ResetPasswordPage() {
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                    className="h-11 rounded-xl border-border bg-card px-3 text-xs placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="newPassword" className="text-sm font-medium text-foreground">
+                <div className="space-y-1">
+                  <label htmlFor="newPassword" className="text-xs font-medium text-foreground">
                     New password
                   </label>
                   <Input
@@ -205,12 +205,12 @@ export default function ResetPasswordPage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                    className="h-11 rounded-xl border-border bg-card px-3 text-xs placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+                <div className="space-y-1">
+                  <label htmlFor="confirmPassword" className="text-xs font-medium text-foreground">
                     Confirm new password
                   </label>
                   <Input
@@ -220,7 +220,7 @@ export default function ResetPasswordPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="h-11 rounded-xl border-border bg-card px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                    className="h-11 rounded-xl border-border bg-card px-3 text-xs placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
                   />
                 </div>
 
@@ -228,7 +228,7 @@ export default function ResetPasswordPage() {
                   type="submit"
                   size="lg"
                   disabled={loading}
-                  className="gradient-primary h-11 w-full rounded-xl border-0 text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
+                  className="gradient-primary h-11 w-full rounded-xl border-0 text-xs font-semibold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60"
                 >
                   {loading ? "Updating…" : "Update password"}
                 </Button>
@@ -238,19 +238,19 @@ export default function ResetPasswordPage() {
 
           {/* Step: success */}
           {step === "done" && (
-            <div className="space-y-6 text-center">
+            <div className="space-y-5 text-center">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
                 <svg className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">Password updated</h2>
-                <p className="text-sm text-muted-foreground">Your password has been changed successfully.</p>
+              <div className="space-y-1.5">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">Password updated</h2>
+                <p className="text-xs text-muted-foreground">Your password has been changed successfully.</p>
               </div>
               <Link
                 href="/auth/login"
-                className="gradient-primary inline-flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold text-white shadow-md transition-opacity hover:opacity-90"
+                className="gradient-primary inline-flex h-11 w-full items-center justify-center rounded-xl text-xs font-semibold text-white shadow-md transition-opacity hover:opacity-90"
               >
                 Back to sign in
               </Link>
@@ -258,7 +258,7 @@ export default function ResetPasswordPage() {
           )}
 
           {step !== "done" && (
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-xs text-muted-foreground">
               <Link href="/auth/login" className="font-medium text-primary hover:underline">
                 Back to sign in
               </Link>

@@ -70,26 +70,26 @@ export function LanguagesSkillsTab() {
   }
 
   return (
-    <div className="bg-white rounded-b-xl border border-[#E5E7EB] divide-y divide-[#F3F4F6]">
-      <div className="px-6 py-6">
+    <div className="bg-card rounded-b-xl border border-border divide-y divide-border">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Languages & Skills</h3>
-        <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
           Showcase the languages you speak and the skills that set you apart.
         </p>
       </div>
 
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Languages</h3>
-        <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
           Add the languages you speak and your proficiency level.
         </p>
 
         {languages.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-1.5">
             {languages.map((lang) => (
               <span
                 key={lang.id}
-                className="flex items-center gap-2 rounded-full border border-[#E5E7EB] py-1.5 pl-3.5 pr-2 text-[13px] text-foreground"
+                className="flex items-center gap-1.5 rounded-full border border-border py-1 pl-3 pr-1.5 text-[13px] text-foreground"
               >
                 <span className="font-medium">{lang.name}</span>
                 <span className="text-muted-foreground">· {lang.proficiency}</span>
@@ -107,7 +107,7 @@ export function LanguagesSkillsTab() {
         )}
 
         {addingLanguage ? (
-          <div className="mt-4 flex flex-col gap-3 rounded-xl border border-[#E5E7EB] p-4 sm:flex-row sm:items-end">
+          <div className="mt-3 flex flex-col gap-2.5 rounded-xl border border-border p-3 sm:flex-row sm:items-end">
             <div className="flex-1">
               <FormLabel>Language</FormLabel>
               <FormInput
@@ -127,7 +127,7 @@ export function LanguagesSkillsTab() {
                 ))}
               </FormSelect>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               <Button
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary/5"
@@ -142,8 +142,8 @@ export function LanguagesSkillsTab() {
             </div>
           </div>
         ) : (
-          <div className="mt-4 flex justify-center">
-            <Button size="sm" className="rounded-full px-4" onClick={() => setAddingLanguage(true)}>
+          <div className="mt-3 flex justify-center">
+            <Button size="sm" className="rounded-full px-3" onClick={() => setAddingLanguage(true)}>
               <Plus className="size-3.5" />
               Add
             </Button>
@@ -151,18 +151,18 @@ export function LanguagesSkillsTab() {
         )}
       </div>
 
-      <div className="px-6 py-6">
+      <div className="px-5 py-5">
         <h3 className="text-[15px] font-semibold text-foreground">Skills</h3>
-        <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+        <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
           Add skills that showcase your expertise to employers.
         </p>
 
         {skills.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-1.5">
             {skills.map((skill) => (
               <span
                 key={skill.id}
-                className="flex items-center gap-2 rounded-full bg-primary/10 py-1.5 pl-3.5 pr-2 text-[13px] font-medium text-primary"
+                className="flex items-center gap-1.5 rounded-full bg-primary/10 py-1 pl-3 pr-1.5 text-[13px] font-medium text-primary"
               >
                 {skill.name}
                 <button
@@ -179,7 +179,7 @@ export function LanguagesSkillsTab() {
           </div>
         )}
 
-        <div className="mt-4 flex gap-2">
+        <div className="mt-3 flex gap-1.5">
           <FormInput
             placeholder="e.g. React, Project Management"
             value={skillInput}
@@ -195,7 +195,7 @@ export function LanguagesSkillsTab() {
             {saving ? "Saving…" : "Add"}
           </Button>
         </div>
-        {error && <p className="mt-2 text-[13px] text-destructive">{error}</p>}
+        {error && <p className="mt-1.5 text-[13px] text-destructive">{error}</p>}
       </div>
     </div>
   );

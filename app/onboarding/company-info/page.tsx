@@ -17,6 +17,7 @@ import {
   Link as LinkIcon,
   Users,
   Copy,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/dialog"
 import { useAuth } from "@/context/auth-context"
 import { onboardingService } from "@/services/onboarding.service"
+import { uploadService } from "@/services/upload.service"
 import { ApiError } from "@/lib/api-client"
 
 // ── Step definitions ───────────────────────────────────────────
@@ -64,10 +66,7 @@ const INDUSTRIES = [
   "Retail & E-commerce", "Manufacturing", "Media & Entertainment",
   "Consulting", "Real Estate", "Transportation & Logistics",
   "Energy & Utilities", "Legal Services", "Non-profit", "Agriculture",
-  "Construction", "Hospitality & Tourism", "Telecommunications",
-  "Pharmaceuticals", "Automotive", "Aerospace & Defense",
-  "Fashion & Apparel", "Food & Beverage", "Sports & Recreation",
-  "Government & Public Sector", "Other",
+  "Construction",  "Other",
 ]
 
 const COMPANY_SIZES = [
@@ -77,9 +76,7 @@ const COMPANY_SIZES = [
 ]
 
 const COUNTRIES = [
-  "United States", "United Kingdom", "Canada", "Australia", "Germany",
-  "France", "Netherlands", "Singapore", "India", "Nigeria", "Kenya",
-  "South Africa", "Brazil", "Mexico", "UAE", "Saudi Arabia", "Other",
+  "United States", "United Kingdom", "Canada", "Australia", "Ghana","Nigeria", "Other",
 ]
 
 const TIMEZONES = [
@@ -95,7 +92,7 @@ const TIMEZONES = [
 // ── Shared field components ────────────────────────────────────
 function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <label className="mb-1.5 block text-[13px] font-medium text-foreground">
+    <label className="mb-1 block text-[13px] font-medium text-foreground">
       {children}
       {required && <span className="ml-0.5 text-rose-500">*</span>}
     </label>
@@ -117,7 +114,7 @@ function TextInput({
           : "border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
       )}>
         {prefix && (
-          <div className="flex shrink-0 items-center border-r border-border px-3 text-muted-foreground">
+          <div className="flex shrink-0 items-center border-r border-border px-2.5 text-muted-foreground">
             {prefix}
           </div>
         )}
@@ -126,7 +123,7 @@ function TextInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="h-full flex-1 bg-transparent px-3.5 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+          className="h-full flex-1 bg-transparent px-3 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
         />
       </div>
       {error && <p className="mt-1 text-[11px] text-rose-500">{error}</p>}
@@ -151,7 +148,7 @@ function SelectInput({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-full w-full appearance-none bg-transparent px-3.5 text-[13px] text-foreground outline-none"
+          className="h-full w-full appearance-none bg-transparent px-3 text-[13px] text-foreground outline-none"
           style={{ color: value ? "var(--foreground)" : "var(--muted-foreground)" }}
         >
           <option value="" disabled hidden>{placeholder}</option>
@@ -166,53 +163,82 @@ function SelectInput({
 
 function LogoUpload({ preview, onChange }: {
   preview: string | null
-  onChange: (url: string | null, file: File | null) => void
+  onChange: (url: string | null) => void
 }) {
+  const { accessToken } = useAuth()
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
-  function handleFile(file: File) {
-    if (!file.type.startsWith("image/")) return
-    onChange(URL.createObjectURL(file), file)
+  async function handleFile(file: File) {
+    if (!file.type.match(/^image\/(jpeg|png)$/)) {
+      setUploadError("Only JPG or PNG images are accepted.")
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Image exceeds the 5 MB limit.")
+      return
+    }
+    onChange(URL.createObjectURL(file))
+    setUploadError(null)
+    setUploading(true)
+    try {
+      const result = await uploadService.image(file, accessToken ?? "")
+      onChange(result.url)
+    } catch {
+      setUploadError("Upload failed. Please try again.")
+    } finally {
+      setUploading(false)
+    }
   }
 
   return (
-    <div
-      onClick={() => inputRef.current?.click()}
-      onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={(e) => {
-        e.preventDefault(); setDragging(false)
-        const f = e.dataTransfer.files[0]; if (f) handleFile(f)
-      }}
-      className={cn(
-        "flex h-[100px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed transition-colors",
-        dragging
-          ? "border-primary bg-primary/10"
-          : "border-border bg-muted hover:border-primary hover:bg-primary/5"
-      )}
-    >
-      <input ref={inputRef} type="file" accept="image/*" className="hidden"
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
-      {preview ? (
-        <div className="relative flex size-full items-center justify-center">
-          <img src={preview} alt="Logo" className="h-full max-h-[80px] w-auto rounded object-contain p-2" />
-          <button type="button" onClick={(e) => { e.stopPropagation(); onChange(null, null) }}
-            className="absolute right-2 top-2 rounded-full bg-card p-0.5 shadow">
-            <XIcon className="size-3 text-muted-foreground" />
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="flex size-8 items-center justify-center rounded-lg bg-card shadow-sm">
-            <Upload className="size-4 text-primary" />
+    <div>
+      <div
+        onClick={() => !uploading && inputRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault(); setDragging(false)
+          const f = e.dataTransfer.files[0]; if (f) handleFile(f)
+        }}
+        className={cn(
+          "flex h-[100px] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed transition-colors",
+          dragging
+            ? "border-primary bg-primary/10"
+            : "border-border bg-muted hover:border-primary hover:bg-primary/5",
+          uploading && "pointer-events-none opacity-70"
+        )}
+      >
+        <input ref={inputRef} type="file" accept="image/jpeg,image/png" className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
+        {preview ? (
+          <div className="relative flex size-full items-center justify-center">
+            <img src={preview} alt="Logo" className="h-full max-h-[80px] w-auto rounded object-contain p-1.5" />
+            {uploading && (
+              <div className="absolute inset-0 flex items-center justify-center rounded bg-black/40">
+                <Loader2 className="size-5 animate-spin text-white" />
+              </div>
+            )}
+            <button type="button" onClick={(e) => { e.stopPropagation(); onChange(null) }}
+              className="absolute right-2 top-2 rounded-full bg-card p-0.5 shadow">
+              <XIcon className="size-3 text-muted-foreground" />
+            </button>
           </div>
-          <p className="text-center text-[12px] text-muted-foreground">
-            <span className="font-medium text-primary">Click to upload</span> or drag & drop
-          </p>
-          <p className="text-[11px] text-muted-foreground">PNG, JPG or SVG (max 2 MB)</p>
-        </>
-      )}
+        ) : (
+          <>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-card shadow-sm">
+              <Upload className="size-4 text-primary" />
+            </div>
+            <p className="text-center text-[12px] text-muted-foreground">
+              <span className="font-medium text-primary">Click to upload</span> or drag & drop
+            </p>
+            <p className="text-[11px] text-muted-foreground">PNG or JPG (max 5 MB)</p>
+          </>
+        )}
+      </div>
+      {uploadError && <p className="mt-1 text-[11px] text-rose-500">{uploadError}</p>}
     </div>
   )
 }
@@ -230,10 +256,10 @@ function TagList({
     if (v && !items.includes(v)) { onAdd(v); setInput("") }
   }
   return (
-    <div className="rounded-lg border border-border bg-muted p-3">
-      <div className="flex flex-wrap gap-1.5 mb-2">
+    <div className="rounded-lg border border-border bg-muted p-2.5">
+      <div className="flex flex-wrap gap-1 mb-1.5">
         {items.map((item, i) => (
-          <span key={i} className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-[12px] font-medium text-primary">
+          <span key={i} className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[12px] font-medium text-primary">
             {item}
             <button type="button" onClick={() => onRemove(i)}>
               <XIcon className="size-3" />
@@ -241,7 +267,7 @@ function TagList({
           </span>
         ))}
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-1.5">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -276,17 +302,17 @@ function InviteTable({
   function addRow() { onChange([...rows, { name: "", email: "", department: "", role: "", startDate: "" }]) }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       {rows.map((row, i) => (
-        <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-2 items-center">
+        <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-1.5 items-center">
           <input value={row.name} onChange={(e) => update(i, "name", e.target.value)}
             placeholder="Full name"
-            className="h-[38px] rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary" />
+            className="h-[38px] rounded-lg border border-border bg-muted px-2.5 text-[12px] text-foreground outline-none focus:border-primary" />
           <input value={row.email} onChange={(e) => update(i, "email", e.target.value)}
             placeholder="Email address"
-            className="h-[38px] rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary" />
+            className="h-[38px] rounded-lg border border-border bg-muted px-2.5 text-[12px] text-foreground outline-none focus:border-primary" />
           <select value={row.department} onChange={(e) => update(i, "department", e.target.value)}
-            className="h-[38px] rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary"
+            className="h-[38px] rounded-lg border border-border bg-muted px-2.5 text-[12px] text-foreground outline-none focus:border-primary"
             style={{ color: row.department ? "var(--foreground)" : "var(--muted-foreground)" }}>
             <option value="" disabled hidden>Department</option>
             {departments.length > 0
@@ -296,9 +322,9 @@ function InviteTable({
           </select>
           <input value={row.role} onChange={(e) => update(i, "role", e.target.value)}
             placeholder="Role / Title"
-            className="h-[38px] rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary" />
+            className="h-[38px] rounded-lg border border-border bg-muted px-2.5 text-[12px] text-foreground outline-none focus:border-primary" />
           <input type="date" value={row.startDate} onChange={(e) => update(i, "startDate", e.target.value)}
-            className="h-[38px] rounded-lg border border-border bg-muted px-3 text-[12px] text-foreground outline-none focus:border-primary" />
+            className="h-[38px] rounded-lg border border-border bg-muted px-2.5 text-[12px] text-foreground outline-none focus:border-primary" />
           <button type="button" onClick={() => remove(i)}
             className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-rose-50 hover:text-rose-500">
             <Trash2 className="size-4" />
@@ -306,7 +332,7 @@ function InviteTable({
         </div>
       ))}
       <button type="button" onClick={addRow}
-        className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2.5 text-[12px] font-medium text-primary hover:border-primary hover:bg-primary/5 w-full justify-center">
+        className="flex items-center gap-1.5 rounded-lg border border-dashed border-border px-3 py-2 text-[12px] font-medium text-primary hover:border-primary hover:bg-primary/5 w-full justify-center">
         <Plus className="size-3.5" /> Add employee
       </button>
     </div>
@@ -320,11 +346,11 @@ function Step1({
   data: Step1Data; errors: Partial<Record<keyof Step1Data, string>>
   onChange: (f: keyof Step1Data, v: string) => void
   logoPreview: string | null
-  onLogoChange: (url: string | null, file: File | null) => void
+  onLogoChange: (url: string | null) => void
 }) {
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <FieldLabel required>Company Name</FieldLabel>
           <TextInput value={data.companyName} onChange={(v) => onChange("companyName", v)}
@@ -337,7 +363,7 @@ function Step1({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <FieldLabel required>Industry</FieldLabel>
           <SelectInput value={data.industry} onChange={(v) => onChange("industry", v)}
@@ -350,7 +376,7 @@ function Step1({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <FieldLabel>Year Founded</FieldLabel>
           <TextInput value={data.yearFounded} onChange={(v) => onChange("yearFounded", v)}
@@ -377,8 +403,8 @@ function Step2({ data, errors, onChange }: {
   onChange: (f: keyof Step2Data, v: string) => void
 }) {
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <FieldLabel required>Country</FieldLabel>
           <SelectInput value={data.country} onChange={(v) => onChange("country", v)}
@@ -391,7 +417,7 @@ function Step2({ data, errors, onChange }: {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <FieldLabel required>City</FieldLabel>
           <TextInput value={data.city} onChange={(v) => onChange("city", v)}
@@ -422,10 +448,10 @@ function Step2({ data, errors, onChange }: {
 
 function Step3({ data, onChange }: { data: Step3Data; onChange: (next: Step3Data) => void }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div>
         <FieldLabel>Departments</FieldLabel>
-        <p className="mb-2 text-[12px] text-muted-foreground">Type a department name and press Enter or click +</p>
+        <p className="mb-1.5 text-[12px] text-muted-foreground">Type a department name and press Enter or click +</p>
         <TagList items={data.departments}
           onRemove={(i) => onChange({ ...data, departments: data.departments.filter((_, idx) => idx !== i) })}
           onAdd={(v) => onChange({ ...data, departments: [...data.departments, v] })}
@@ -434,21 +460,21 @@ function Step3({ data, onChange }: { data: Step3Data; onChange: (next: Step3Data
 
       <div>
         <FieldLabel>Office Locations</FieldLabel>
-        <p className="mb-2 text-[12px] text-muted-foreground">Add branch/office locations if you have multiple sites</p>
+        <p className="mb-1.5 text-[12px] text-muted-foreground">Add branch/office locations if you have multiple sites</p>
         <TagList items={data.officeLocations}
           onRemove={(i) => onChange({ ...data, officeLocations: data.officeLocations.filter((_, idx) => idx !== i) })}
           onAdd={(v) => onChange({ ...data, officeLocations: [...data.officeLocations, v] })}
           placeholder="e.g. New York HQ, London Office…" />
       </div>
 
-      <div className="rounded-lg border border-border bg-muted p-4">
+      <div className="rounded-lg border border-border bg-muted p-3">
         <FieldLabel>Reporting Structure</FieldLabel>
         <textarea
           value={data.reportingStructure}
           onChange={(e) => onChange({ ...data, reportingStructure: e.target.value })}
           placeholder="Briefly describe your hierarchy or reporting lines (optional)…"
           rows={3}
-          className="mt-1.5 w-full resize-none bg-transparent text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+          className="mt-1 w-full resize-none bg-transparent text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
         />
       </div>
     </div>
@@ -463,18 +489,18 @@ function Step4({ data, onChange, departments, csvFile, onCsvFileChange, inviteMe
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <div className="space-y-5 w-full">
+    <div className="space-y-4 w-full">
       {/* Method selector */}
       <div>
         <FieldLabel>Invitation Method</FieldLabel>
-        <div className="mt-2 flex gap-2">
+        <div className="mt-1.5 flex gap-1.5">
           {([
             { id: "csv",  label: "Bulk Upload (CSV)", icon: Users },
             { id: "link", label: "Generate Link",     icon: LinkIcon },
           ] as const).map(({ id, label, icon: Icon }) => (
             <button key={id} type="button" onClick={() => onInviteMethodChange(id)}
               className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg border py-2.5 text-[12px] font-medium transition-colors",
+                "flex flex-1 items-center justify-center gap-1.5 rounded-lg border py-2 text-[12px] font-medium transition-colors",
                 inviteMethod === id
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border bg-muted text-foreground hover:border-primary/50"
@@ -488,7 +514,7 @@ function Step4({ data, onChange, departments, csvFile, onCsvFileChange, inviteMe
       {inviteMethod === "csv" && (
         <div
           className={cn(
-            "flex h-35 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors",
+            "flex h-35 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed transition-colors",
             csvFile
               ? "border-primary bg-primary/5"
               : "border-border bg-muted hover:border-primary hover:bg-primary/5"
@@ -529,7 +555,7 @@ function Step4({ data, onChange, departments, csvFile, onCsvFileChange, inviteMe
                 <span className="font-medium text-primary">Upload CSV file</span> with employee details
               </p>
               <p className="text-[11px] text-muted-foreground">Required columns: name, email, role</p>
-              <button type="button" className="mt-1 rounded-lg bg-primary px-4 py-1.5 text-[12px] font-medium text-primary-foreground hover:bg-primary/90">
+              <button type="button" className="mt-1 rounded-lg bg-primary px-3 py-1 text-[12px] font-medium text-primary-foreground hover:bg-primary/90">
                 Choose File
               </button>
             </>
@@ -538,11 +564,11 @@ function Step4({ data, onChange, departments, csvFile, onCsvFileChange, inviteMe
       )}
 
       {inviteMethod === "link" && (
-        <div className="rounded-lg border border-border bg-muted p-4">
-          <p className="mb-3 text-[13px] text-foreground">
+        <div className="rounded-lg border border-border bg-muted p-3">
+          <p className="mb-2.5 text-[13px] text-foreground">
             Share a link with your team. Anyone with the link can create their account and join your workspace.
           </p>
-          <div className="flex items-center gap-2 rounded-lg border border-dashed border-border bg-card px-3 py-2.5">
+          <div className="flex items-center gap-1.5 rounded-lg border border-dashed border-border bg-card px-2.5 py-2">
             <LinkIcon className="size-4 shrink-0 text-muted-foreground" />
             <span className="flex-1 truncate text-[12px] text-muted-foreground">
               Your invite link will be generated when you complete setup.
@@ -551,7 +577,7 @@ function Step4({ data, onChange, departments, csvFile, onCsvFileChange, inviteMe
         </div>
       )}
 
-      <div className="flex items-center gap-2 rounded-lg border border-border bg-amber-50 p-3">
+      <div className="flex items-center gap-1.5 rounded-lg border border-border bg-amber-50 p-2.5">
         <span className="text-[12px] text-amber-800">
           💡 You can always invite more employees later from the Employees section.
         </span>
@@ -578,12 +604,12 @@ interface Step4Data {
 // ── Left sidebar step list ─────────────────────────────────────
 function SidebarStepList({ current }: { current: number }) {
   return (
-    <aside className="flex w-[260px] shrink-0 flex-col bg-primary/5 p-6">
-      <div className="mb-8">
+    <aside className="flex w-[260px] shrink-0 flex-col bg-primary/5 p-5">
+      <div className="mb-6">
         <div className="flex size-9 items-center justify-center rounded-xl bg-primary">
           <Building2 className="size-5 text-primary-foreground" />
         </div>
-        <h2 className="mt-3 text-[15px] font-bold text-foreground">Company Setup</h2>
+        <h2 className="mt-2.5 text-[15px] font-bold text-foreground">Company Setup</h2>
         <p className="mt-0.5 text-[12px] text-muted-foreground">Complete all steps to get started</p>
       </div>
 
@@ -593,7 +619,7 @@ function SidebarStepList({ current }: { current: number }) {
           const isActive    = id === current
           return (
             <div key={id} className={cn(
-              "flex items-start gap-3 rounded-xl p-3 transition-colors",
+              "flex items-start gap-2.5 rounded-xl p-2.5 transition-colors",
               isActive ? "bg-card shadow-sm" : isCompleted ? "opacity-80" : "opacity-50"
             )}>
               <div className={cn(
@@ -618,8 +644,8 @@ function SidebarStepList({ current }: { current: number }) {
       </div>
 
       {/* Progress bar */}
-      <div className="mt-auto pt-8">
-        <div className="mb-1.5 flex justify-between text-[11px] text-muted-foreground">
+      <div className="mt-auto pt-6">
+        <div className="mb-1 flex justify-between text-[11px] text-muted-foreground">
           <span>Progress</span>
           <span>{Math.round(((current - 1) / STEPS.length) * 100)}%</span>
         </div>
@@ -701,6 +727,7 @@ export default function CompanyOnboardingPage() {
         name: step1.companyName,
         industry: step1.industry || undefined,
         size: step1.companySize || undefined,
+        logoUrl: logoPreview?.startsWith("blob:") ? undefined : logoPreview || undefined,
         website: step1.website || undefined,
         registrationNo: step1.registrationNumber || undefined,
         foundingYear: step1.yearFounded ? parseInt(step1.yearFounded) : undefined,
@@ -756,14 +783,14 @@ export default function CompanyOnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+    <div className="flex min-h-screen items-center justify-center bg-background p-5">
       <div className="flex w-full max-w-[920px] overflow-hidden rounded-2xl bg-card shadow-xl">
 
         {/* Left sidebar */}
         <SidebarStepList current={step} />
 
         {/* Right form area */}
-        <div className="flex flex-1 flex-col p-8">
+        <div className="flex flex-1 flex-col p-6">
           {/* Step label */}
           <p className="mb-1 text-[12px] font-semibold uppercase tracking-widest text-primary">
             STEP {step} OF {STEPS.length}
@@ -771,7 +798,7 @@ export default function CompanyOnboardingPage() {
           <h1 className="mb-1 text-[26px] font-bold leading-tight tracking-tight text-foreground">
             {stepLabels[step]}
           </h1>
-          <p className="mb-6 text-[13px] text-muted-foreground">{stepSubtitles[step]}</p>
+          <p className="mb-5 text-[13px] text-muted-foreground">{stepSubtitles[step]}</p>
 
           {/* Form content */}
           <div className="flex-1 overflow-y-auto">
@@ -785,7 +812,7 @@ export default function CompanyOnboardingPage() {
             {step === 3 && (
               <>
                 <Step3 data={step3} onChange={setStep3} />
-                <div className="mt-4 flex items-center gap-2">
+                <div className="mt-3 flex items-center gap-1.5">
                   <button type="button" onClick={handleNext}
                     className="text-[12px] font-medium text-muted-foreground underline hover:text-foreground">
                     Skip and set later
@@ -808,18 +835,18 @@ export default function CompanyOnboardingPage() {
 
           {/* Submit error */}
           {submitError && (
-            <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-2.5 text-[13px] text-destructive">
+            <p className="mt-3 rounded-lg bg-destructive/10 px-3 py-2 text-[13px] text-destructive">
               {submitError}
             </p>
           )}
 
           {/* Navigation */}
-          <div className="mt-6 flex items-center justify-between border-t border-border pt-5">
+          <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
             <button
               type="button"
               onClick={() => step > 1 ? setStep((s) => s - 1) : router.back()}
               disabled={submitting}
-              className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
+              className="flex items-center gap-1 text-[13px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
               ← Back
             </button>
@@ -828,7 +855,7 @@ export default function CompanyOnboardingPage() {
               type="button"
               onClick={handleNext}
               disabled={submitting}
-              className="rounded-xl bg-primary px-7 py-2.5 text-[13px] font-semibold text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors disabled:opacity-60"
+              className="rounded-xl bg-primary px-6 py-2 text-[13px] font-semibold text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors disabled:opacity-60"
             >
               {submitting
                 ? "Setting up…"
@@ -853,7 +880,7 @@ export default function CompanyOnboardingPage() {
               Share this link with your team. Anyone with the link can create their account and join your workspace.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted px-3 py-2.5">
+          <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted px-2.5 py-2">
             <LinkIcon className="size-4 shrink-0 text-muted-foreground" />
             <span className="flex-1 truncate text-[12px] text-foreground">{inviteLink}</span>
             <button
@@ -864,7 +891,7 @@ export default function CompanyOnboardingPage() {
                 setLinkCopied(true)
                 setTimeout(() => setLinkCopied(false), 2000)
               }}
-              className="flex shrink-0 items-center gap-1 rounded-md bg-primary px-3 py-1 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+              className="flex shrink-0 items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
             >
               {linkCopied ? <Check className="size-3" /> : <Copy className="size-3" />}
               {linkCopied ? "Copied" : "Copy"}
@@ -874,7 +901,7 @@ export default function CompanyOnboardingPage() {
             <button
               type="button"
               onClick={() => router.push("/dashboard/hr")}
-              className="rounded-xl bg-primary px-5 py-2 text-[13px] font-semibold text-primary-foreground hover:bg-primary/90"
+              className="rounded-xl bg-primary px-4 py-1.5 text-[13px] font-semibold text-primary-foreground hover:bg-primary/90"
             >
               Go to Dashboard →
             </button>

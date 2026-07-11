@@ -110,8 +110,8 @@ export interface Job {
   location:         JobLocation
   type:             JobType
   level:            JobLevel
-  salaryMin:        string        // "$70k"
-  salaryMax:        string        // "$90k"
+  salaryMin:        string        // "₵70k"
+  salaryMax:        string        // "₵90k"
   experience:       string        // "3+ years"
   openings:         number
   deadline:         LocaleDateString

@@ -13,7 +13,7 @@ export function ProfileAvatar({ src, alt }: { src?: string; alt: string }) {
       <button
         type="button"
         aria-label="Edit photo"
-        className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-primary border-2 border-white flex items-center justify-center text-primary-foreground"
+        className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-primary border-2 border-card flex items-center justify-center text-primary-foreground"
       >
         <Pencil className="w-3.5 h-3.5" />
       </button>

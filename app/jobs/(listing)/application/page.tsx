@@ -33,12 +33,12 @@ const STATUS_LABELS: Record<MyApplicationStatus, string> = {
 };
 
 const STATUS_STYLES: Record<MyApplicationStatus, string> = {
-  PENDING_REVIEW: "bg-amber-100 text-amber-700",
-  SHORTLISTED: "bg-blue-100 text-blue-700",
-  INTERVIEW: "bg-violet-100 text-violet-700",
-  ACCEPTED: "bg-emerald-100 text-emerald-700",
-  APPROVED: "bg-emerald-100 text-emerald-700",
-  REJECTED: "bg-rose-100 text-rose-600",
+  PENDING_REVIEW: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
+  SHORTLISTED: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
+  INTERVIEW: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-400",
+  ACCEPTED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400",
+  APPROVED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400",
+  REJECTED: "bg-rose-100 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400",
 };
 
 const JOB_TYPE_LABELS: Record<MyApplication["job"]["type"], string> = {
@@ -106,9 +106,9 @@ export default function ApplicationPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F5F6F8]">
-      <div className="max-w-[1340px] mx-auto px-4 sm:px-6 py-6">
-        <div className="flex items-center justify-between gap-4 mb-5">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-[1340px] mx-auto px-3 sm:px-5 py-5">
+        <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <h1 className="text-[22px] font-bold text-foreground leading-tight">My Applications</h1>
             <p className="text-[13px] text-muted-foreground mt-0.5">
@@ -123,18 +123,18 @@ export default function ApplicationPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search job or company"
-              className="h-10 w-full rounded-lg border border-[#E5E7EB] bg-white pl-9 pr-3 text-[13px] text-foreground outline-none transition-colors focus:border-primary"
+              className="h-10 w-full rounded-lg border border-border bg-card pl-7 pr-2.5 text-[13px] text-foreground outline-none transition-colors focus:border-primary"
             />
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
           {loading ? (
-            <div className="flex items-center justify-center gap-2 py-16 text-[13px] text-muted-foreground">
+            <div className="flex items-center justify-center gap-1.5 py-12 text-[13px] text-muted-foreground">
               <Loader2 className="size-4 animate-spin" /> Loading your applications…
             </div>
           ) : error ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="flex flex-col items-center justify-center py-12 text-center">
               <p className="text-[14px] font-semibold text-foreground mb-1">
                 Could not load applications
               </p>
@@ -145,56 +145,56 @@ export default function ApplicationPage() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left">
                   <thead>
-                    <tr className="border-b border-[#E5E7EB]">
-                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    <tr className="border-b border-border">
+                      <th className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Job
                       </th>
-                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <th className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Company
                       </th>
-                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <th className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Job Type
                       </th>
-                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <th className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Location
                       </th>
-                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <th className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Date Applied
                       </th>
-                      <th className="px-6 py-3.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <th className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
                         Status
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#F3F4F6]">
+                  <tbody className="divide-y divide-border">
                     {filtered.map((app) => {
                       const initials = companyInitials(app.job.company.name);
                       return (
-                        <tr key={app.id} className="hover:bg-[#F9FAFB] transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
+                        <tr key={app.id} className="hover:bg-muted transition-colors">
+                          <td className="px-5 py-3">
+                            <div className="flex items-center gap-2.5">
                               <CompanyLogo initials={initials} />
                               <span className="text-[13.5px] font-medium text-foreground">
                                 {app.job.title}
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-[13px] text-muted-foreground">
+                          <td className="px-5 py-3 text-[13px] text-muted-foreground">
                             {app.job.company.name}
                           </td>
-                          <td className="px-6 py-4 text-[13px] text-muted-foreground">
+                          <td className="px-5 py-3 text-[13px] text-muted-foreground">
                             {JOB_TYPE_LABELS[app.job.type]}
                           </td>
-                          <td className="px-6 py-4 text-[13px] text-muted-foreground">
+                          <td className="px-5 py-3 text-[13px] text-muted-foreground">
                             {WORK_LOCATION_LABELS[app.job.workLocation]}
                           </td>
-                          <td className="px-6 py-4 text-[13px] text-muted-foreground">
+                          <td className="px-5 py-3 text-[13px] text-muted-foreground">
                             {formatDate(app.appliedAt)}
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-5 py-3">
                             <span
                               className={cn(
-                                "inline-flex rounded-full px-2.5 py-1 text-[11.5px] font-semibold",
+                                "inline-flex rounded-full px-2 py-1 text-[11.5px] font-semibold",
                                 STATUS_STYLES[app.status]
                               )}
                             >
@@ -209,8 +209,8 @@ export default function ApplicationPage() {
               </div>
 
               {filtered.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <Search className="w-8 h-8 text-[#D1D5DB] mb-3" />
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <Search className="w-8 h-8 text-muted-foreground mb-2.5" />
                   <p className="text-[14px] font-semibold text-foreground mb-1">
                     {applications.length === 0 ? "No applications yet" : "No applications found"}
                   </p>

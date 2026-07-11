@@ -65,11 +65,11 @@ export function OverviewTab() {
   const sections = buildSummaries(profile);
 
   return (
-    <div className="bg-white rounded-b-xl border border-[#E5E7EB] divide-y divide-[#F3F4F6]">
+    <div className="bg-card rounded-b-xl border border-border divide-y divide-border">
       {sections.map((section) => (
-        <div key={section.title} className="px-6 py-6">
+        <div key={section.title} className="px-5 py-5">
           <h3 className="text-[15px] font-semibold text-foreground">{section.title}</h3>
-          <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">{section.summary}</p>
+          <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">{section.summary}</p>
         </div>
       ))}
     </div>

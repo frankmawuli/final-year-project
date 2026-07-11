@@ -21,26 +21,26 @@ export function SignupForm({
   return (
     <div className={cn(className)} {...props}>
       <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Create an account</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Create an account</CardTitle>
           <CardDescription>Join CoreRecruiter to find your next opportunity</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-5">
-          <form className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
+        <CardContent className="flex flex-col gap-4">
+          <form className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
               <Label htmlFor="name">Full Name</Label>
               <Input id="name" type="text" placeholder="John Doe" required />
             </div>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="you@example.com" required />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5">
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="flex flex-col gap-1">
                 <Label htmlFor="password">Password</Label>
                 <Input id="password" type="password" required />
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1">
                 <Label htmlFor="confirm-password">Confirm</Label>
                 <Input id="confirm-password" type="password" required />
               </div>
@@ -49,7 +49,7 @@ export function SignupForm({
             <Button type="submit" className="w-full mt-1">Create Account</Button>
           </form>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <Separator className="flex-1" />
             <span className="text-xs text-muted-foreground">or</span>
             <Separator className="flex-1" />
@@ -59,7 +59,7 @@ export function SignupForm({
             Continue with Google
           </Button>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-xs text-muted-foreground">
             Already have an account?{" "}
             <Link href="/login" className="text-foreground font-medium underline-offset-4 hover:underline">
               Sign in

@@ -50,23 +50,23 @@ export function AboutMeSection({
   if (editing) {
     return (
       <div>
-        <div className="px-6 py-6">
+        <div className="px-5 py-5">
           <h3 className="text-[15px] font-semibold text-foreground">About Me</h3>
-          <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+          <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
             Give a short overview of your career history and skills.
           </p>
         </div>
-        <div className="border-t border-[#F3F4F6] px-6 py-6">
+        <div className="border-t border-border px-5 py-5">
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value.slice(0, MAX_LENGTH))}
             placeholder="Max. 2000 characters"
             rows={8}
-            className="w-full resize-none rounded-xl border border-[#E5E7EB] p-4 text-[13.5px] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full resize-none rounded-xl border border-border p-3 text-[13.5px] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
-          {error && <p className="mt-2 text-[13px] text-destructive">{error}</p>}
+          {error && <p className="mt-1.5 text-[13px] text-destructive">{error}</p>}
         </div>
-        <div className="flex justify-end gap-3 border-t border-[#F3F4F6] px-6 py-4">
+        <div className="flex justify-end gap-2.5 border-t border-border px-5 py-3">
           <Button
             variant="outline"
             className="border-primary text-primary hover:bg-primary/5"
@@ -84,13 +84,13 @@ export function AboutMeSection({
   }
 
   return (
-    <div className="px-6 py-6">
+    <div className="px-5 py-5">
       <h3 className="text-[15px] font-semibold text-foreground">About Me</h3>
-      <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">
+      <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
         {value || DESCRIPTION}
       </p>
-      <div className="mt-4 flex justify-center">
-        <Button variant="outline" size="sm" className="rounded-full px-4" onClick={handleEdit}>
+      <div className="mt-3 flex justify-center">
+        <Button variant="outline" size="sm" className="rounded-full px-3" onClick={handleEdit}>
           <Pencil className="size-3.5" />
           {value ? "Edit" : "Add"}
         </Button>

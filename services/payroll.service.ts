@@ -65,7 +65,7 @@ export interface ApiPayslip {
       name:      string
       email:     string
       avatarUrl: string | null
-    }
+    } | null
   }
 }
 

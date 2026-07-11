@@ -75,14 +75,14 @@ export function ApplyModal({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         {state === "success" ? (
-          <div className="flex flex-col items-center py-6 text-center">
+          <div className="flex flex-col items-center py-5 text-center">
             <CheckCircle2 className="size-12 text-emerald-500" />
-            <h2 className="mt-4 text-lg font-semibold text-foreground">Application submitted</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground">
+            <h2 className="mt-3 text-base font-semibold text-foreground">Application submitted</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
               You applied{jobTitle ? ` for ${jobTitle}` : ""} using your profile. You can track it
               on your applications page.
             </p>
-            <div className="mt-6 flex gap-3">
+            <div className="mt-5 flex gap-2.5">
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
                 Close
               </Button>
@@ -92,13 +92,13 @@ export function ApplyModal({
             </div>
           </div>
         ) : state === "already-applied" ? (
-          <div className="flex flex-col items-center py-6 text-center">
+          <div className="flex flex-col items-center py-5 text-center">
             <BadgeCheck className="size-12 text-primary" />
-            <h2 className="mt-4 text-lg font-semibold text-foreground">You already applied</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground">
+            <h2 className="mt-3 text-base font-semibold text-foreground">You already applied</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
               You have an application on file{jobTitle ? ` for ${jobTitle}` : " for this job"}.
             </p>
-            <div className="mt-6 flex gap-3">
+            <div className="mt-5 flex gap-2.5">
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
                 Close
               </Button>
@@ -117,10 +117,10 @@ export function ApplyModal({
             </DialogHeader>
 
             {/* Option 1: quick apply with profile */}
-            <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
-              <div className="flex items-center gap-2">
+            <div className="rounded-xl border border-primary/30 bg-primary/5 p-3">
+              <div className="flex items-center gap-1.5">
                 <Sparkles className="size-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">Apply with your profile</h3>
+                <h3 className="text-xs font-semibold text-foreground">Apply with your profile</h3>
               </div>
               <p className="mt-1 text-[13px] text-muted-foreground">
                 One click — uses the profile saved on your account
@@ -128,7 +128,7 @@ export function ApplyModal({
               </p>
 
               {profileIsThin && (
-                <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[12.5px] text-amber-700">
+                <div className="mt-2.5 flex items-start gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-[12.5px] text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400">
                   <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
                   <span>
                     Your profile is nearly empty, which hurts how you&apos;re screened.{" "}
@@ -140,9 +140,9 @@ export function ApplyModal({
                 </div>
               )}
 
-              {error && <p className="mt-2 text-[13px] text-destructive">{error}</p>}
+              {error && <p className="mt-1.5 text-[13px] text-destructive">{error}</p>}
 
-              <Button className="mt-3 w-full" onClick={handleQuickApply} disabled={submitting}>
+              <Button className="mt-2.5 w-full" onClick={handleQuickApply} disabled={submitting}>
                 {submitting ? (
                   <>
                     <Loader2 className="size-4 animate-spin" /> Submitting…
@@ -156,13 +156,13 @@ export function ApplyModal({
             {/* Option 2: full form */}
             <Link
               href={`/apply/apply?jobId=${jobId}`}
-              className="flex items-start gap-3 rounded-xl border border-border p-4 transition-colors hover:bg-muted"
+              className="flex items-start gap-2.5 rounded-xl border border-border p-3 transition-colors hover:bg-muted"
             >
               <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
                 <ClipboardList className="size-4 text-foreground" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-foreground">Fill out an application</h3>
+                <h3 className="text-xs font-semibold text-foreground">Fill out an application</h3>
                 <p className="mt-0.5 text-[13px] text-muted-foreground">
                   Upload a CV tailored to this job and complete the standard form.
                 </p>

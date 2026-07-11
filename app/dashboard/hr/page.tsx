@@ -87,15 +87,15 @@ function StatCard({
   icon: React.ElementType
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="flex flex-col gap-2.5 rounded-xl border border-border bg-card p-4 shadow-sm">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
         <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
           <Icon className="size-4 text-primary" />
         </div>
       </div>
-      <div className="flex items-end justify-between gap-2">
-        <p className="text-2xl font-bold tracking-tight text-foreground">{value}</p>
+      <div className="flex items-end justify-between gap-1.5">
+        <p className="text-xl font-bold tracking-tight text-foreground">{value}</p>
         <span
           className={`mb-0.5 flex items-center gap-1 text-xs font-medium ${
             positive ? "text-emerald-600" : "text-rose-500"
@@ -194,16 +194,16 @@ export default function HRDashboard() {
 
       {/* ── Main content ── */}
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-[1280px] p-6">
+        <div className="mx-auto max-w-[1280px] p-5">
         {/* Error banner */}
         {error && (
-          <div className="mb-4 rounded-lg bg-rose-50 px-4 py-2.5 text-sm text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
+          <div className="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600 dark:bg-rose-950/30 dark:text-rose-400">
             {error}
           </div>
         )}
 
         {/* Stat cards */}
-        <div className="mb-6 grid grid-cols-3 gap-4">
+        <div className="mb-5 grid grid-cols-3 gap-3">
           <StatCard
             label="Total Employees"
             value={totalEmployeesValue}
@@ -228,10 +228,10 @@ export default function HRDashboard() {
         </div>
 
         {/* HR Workforce Analytics */}
-        <div className="mb-6 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
+        <div className="mb-5 rounded-xl border border-border bg-card p-5 shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
             <div>
-              <p className="text-base font-semibold text-foreground">HR Workforce Analytics</p>
+              <p className="text-sm font-semibold text-foreground">HR Workforce Analytics</p>
               <p className="text-xs text-muted-foreground">Monthly attendance rate (%)</p>
             </div>
           </div>
@@ -269,10 +269,10 @@ export default function HRDashboard() {
         </div>
 
         {/* Bottom charts row */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {/* Employees by Department */}
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-            <p className="mb-4 text-base font-semibold text-foreground">Employees by Department</p>
+          <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+            <p className="mb-3 text-sm font-semibold text-foreground">Employees by Department</p>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={departmentData} barSize={28} margin={{ left: -20 }}>
                 <CartesianGrid vertical={false} stroke="var(--color-border)" />
@@ -299,9 +299,9 @@ export default function HRDashboard() {
           </div>
 
           {/* Employees by Role */}
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-            <p className="mb-4 text-base font-semibold text-foreground">Employees by Role</p>
-            <div className="flex items-center gap-4">
+          <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+            <p className="mb-3 text-sm font-semibold text-foreground">Employees by Role</p>
+            <div className="flex items-center gap-3">
               <ResponsiveContainer width={140} height={140}>
                 <PieChart>
                   <Pie
@@ -323,17 +323,17 @@ export default function HRDashboard() {
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 {roleData.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2">
+                  <div key={item.name} className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-1.5">
                       <span
                         className="size-2.5 shrink-0 rounded-full"
                         style={{ backgroundColor: item.color }}
                       />
-                      <span className="text-sm text-muted-foreground">{item.name}</span>
+                      <span className="text-xs text-muted-foreground">{item.name}</span>
                     </div>
-                    <span className="text-sm font-medium text-foreground">{item.value}</span>
+                    <span className="text-xs font-medium text-foreground">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -344,18 +344,18 @@ export default function HRDashboard() {
       </main>
 
       {/* ── Right sidebar ── */}
-      <aside className="flex w-[260px] shrink-0 flex-col gap-6 overflow-y-auto border-l border-border bg-card p-4">
+      <aside className="flex w-[260px] shrink-0 flex-col gap-5 overflow-y-auto border-l border-border bg-card p-3">
         {/* HR Activities */}
         <section>
-          <p className="mb-2 px-1 py-2 text-sm font-semibold text-foreground">HR Activities</p>
+          <p className="mb-1.5 px-1 py-1.5 text-xs font-semibold text-foreground">HR Activities</p>
           <div className="flex flex-col gap-1">
             {hrActivities.length === 0 && (
-              <p className="px-2 py-1 text-xs text-muted-foreground">No recent activity</p>
+              <p className="px-1.5 py-1 text-xs text-muted-foreground">No recent activity</p>
             )}
             {hrActivities.map((item) => {
               const Icon = ACTIVITY_ICONS[item.icon] ?? FileText
               return (
-                <div key={item.id} className="flex items-start gap-2 rounded-lg p-2 hover:bg-muted/50">
+                <div key={item.id} className="flex items-start gap-1.5 rounded-lg p-1.5 hover:bg-muted/50">
                   <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                     <Icon className="size-3.5 text-primary" />
                   </div>
@@ -371,16 +371,16 @@ export default function HRDashboard() {
 
         {/* Recruitment Activity */}
         <section>
-          <p className="mb-2 px-1 py-2 text-sm font-semibold text-foreground">Recruitment Activity</p>
+          <p className="mb-1.5 px-1 py-1.5 text-xs font-semibold text-foreground">Recruitment Activity</p>
           <div className="relative flex flex-col gap-1">
             <div className="absolute bottom-[10%] left-[19px] top-[10%] w-px bg-border" />
             {recruitmentActivity.length === 0 && (
-              <p className="px-2 py-1 text-xs text-muted-foreground">No recent activity</p>
+              <p className="px-1.5 py-1 text-xs text-muted-foreground">No recent activity</p>
             )}
             {recruitmentActivity.map((item) => {
               const Icon = ACTIVITY_ICONS[item.icon] ?? FileText
               return (
-                <div key={item.id} className="relative flex items-start gap-2 rounded-lg p-2">
+                <div key={item.id} className="relative flex items-start gap-1.5 rounded-lg p-1.5">
                   {item.avatarUrl ? (
                     <img
                       src={item.avatarUrl}
@@ -404,14 +404,14 @@ export default function HRDashboard() {
 
         {/* New Employees */}
         <section>
-          <p className="mb-2 px-1 py-2 text-sm font-semibold text-foreground">New Employees</p>
+          <p className="mb-1.5 px-1 py-1.5 text-xs font-semibold text-foreground">New Employees</p>
           <div className="flex flex-col gap-1">
             {newEmployees.length === 0 && (
-              <p className="px-2 py-1 text-xs text-muted-foreground">No employees yet</p>
+              <p className="px-1.5 py-1 text-xs text-muted-foreground">No employees yet</p>
             )}
             {newEmployees.map((emp) => (
-              <div key={emp.id} className="flex items-center gap-2 rounded-lg p-2 hover:bg-muted/50">
-                {emp.user.avatarUrl ? (
+              <div key={emp.id} className="flex items-center gap-1.5 rounded-lg p-1.5 hover:bg-muted/50">
+                {emp.user?.avatarUrl ? (
                   <img
                     src={emp.user.avatarUrl}
                     alt={emp.user.name}
@@ -419,11 +419,11 @@ export default function HRDashboard() {
                   />
                 ) : (
                   <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
-                    {emp.user.name.charAt(0).toUpperCase()}
+                    {emp.user ? emp.user.name.charAt(0).toUpperCase() : <UserPlus className="size-3.5" />}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-[13px] font-medium text-foreground">{emp.user.name}</p>
+                  <p className="text-[13px] font-medium text-foreground">{emp.user?.name ?? emp.employeeId}</p>
                   <p className="text-xs text-muted-foreground">{emp.jobTitle ?? "—"}</p>
                 </div>
               </div>

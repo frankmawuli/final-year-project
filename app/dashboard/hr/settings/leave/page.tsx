@@ -20,13 +20,13 @@ function Card({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-      <div className="mb-5 flex items-center gap-3">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div className="mb-4 flex items-center gap-2.5">
         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
           <Icon className="size-4 text-muted-foreground" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground">{title}</p>
+          <p className="text-xs font-semibold text-foreground">{title}</p>
           <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
@@ -70,9 +70,9 @@ function Row({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex items-center justify-between gap-3">
       <div>
-        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs font-medium text-foreground">{label}</p>
         {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       </div>
       {children}
@@ -82,10 +82,10 @@ function Row({
 
 function SaveRow({ onSave }: { onSave: () => void }) {
   return (
-    <div className="flex justify-end pt-2">
+    <div className="flex justify-end pt-1.5">
       <button
         onClick={onSave}
-        className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+        className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
       >
         Save changes
       </button>
@@ -95,10 +95,10 @@ function SaveRow({ onSave }: { onSave: () => void }) {
 
 // ── Shared style strings ──────────────────────────────────────
 const inputCls =
-  "w-full rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
+  "w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 const selectCls =
-  "w-full appearance-none rounded-xl border border-border bg-muted/50 px-3.5 py-2.5 pr-9 text-sm text-foreground outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
+  "w-full appearance-none rounded-xl border border-border bg-muted/50 px-3 py-2 pr-7 text-xs text-foreground outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 bg-transparent"
 
 // ── Page ──────────────────────────────────────────────────────
 export default function LeavePage() {
@@ -121,16 +121,16 @@ export default function LeavePage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <Card title="Leave Types & Entitlements" subtitle="Categories of leave and annual day allocations" icon={CalendarDays}>
-        <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-[1fr_80px_64px] gap-3 px-1">
+        <div className="flex flex-col gap-2.5">
+          <div className="grid grid-cols-[1fr_80px_64px] gap-2.5 px-1">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Leave Type</span>
             <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Days / yr</span>
             <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Paid</span>
           </div>
           {leaveTypes.map((lt, i) => (
-            <div key={lt.id} className="grid grid-cols-[1fr_80px_64px] items-center gap-3">
+            <div key={lt.id} className="grid grid-cols-[1fr_80px_64px] items-center gap-2.5">
               <input
                 value={lt.name}
                 onChange={e => setLeaveTypes(p => p.map((x, j) => j === i ? { ...x, name: e.target.value } : x))}
@@ -153,7 +153,7 @@ export default function LeavePage() {
           ))}
           <button
             onClick={() => setLeaveTypes(p => [...p, { id: Date.now(), name: "", days: "0", paid: true }])}
-            className="flex w-fit items-center gap-1.5 rounded-xl border border-dashed border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary hover:text-primary"
+            className="flex w-fit items-center gap-1 rounded-xl border border-dashed border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:border-primary hover:text-primary"
           >
             <Plus className="size-3.5" /> Add Leave Type
           </button>
@@ -161,7 +161,7 @@ export default function LeavePage() {
       </Card>
 
       <Card title="Leave Policies" subtitle="Rules around carry-forward and half-day requests" icon={CalendarDays}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <Row label="Allow carry-forward" hint="Employees can roll unused days to the next year">
             <Toggle checked={carryForward} onChange={setCarryForward} />
           </Row>
@@ -169,7 +169,7 @@ export default function LeavePage() {
             <>
               <Divider />
               <Row label="Max carry-forward days">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <input
                     type="number"
                     min="0"
@@ -191,9 +191,9 @@ export default function LeavePage() {
       </Card>
 
       <Card title="Approval & Tracking" subtitle="Who approves leave and how attendance is recorded" icon={CalendarDays}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground">Approval Chain</label>
+            <label className="mb-1 block text-xs font-medium text-foreground">Approval Chain</label>
             <div className="relative max-w-xs">
               <select value={approvalChain} onChange={e => setApprovalChain(e.target.value)} className={selectCls}>
                 {["Direct Manager Only", "HR Only", "Manager then HR", "Auto-approve"].map(v => (
@@ -204,7 +204,7 @@ export default function LeavePage() {
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground">Attendance Tracking Method</label>
+            <label className="mb-1 block text-xs font-medium text-foreground">Attendance Tracking Method</label>
             <div className="relative max-w-xs">
               <select value={trackingMethod} onChange={e => setTrackingMethod(e.target.value)} className={selectCls}>
                 {["App Check-in", "Biometric Scanner", "Manual Entry", "IP-based", "QR Code"].map(v => (
@@ -218,10 +218,10 @@ export default function LeavePage() {
       </Card>
 
       <Card title="Overtime Policy" subtitle="Rules for hours worked beyond the standard schedule" icon={CalendarDays}>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground">Overtime Multiplier</label>
-            <div className="flex items-center gap-2">
+            <label className="mb-1 block text-xs font-medium text-foreground">Overtime Multiplier</label>
+            <div className="flex items-center gap-1.5">
               <input
                 type="number"
                 min="1"
@@ -235,8 +235,8 @@ export default function LeavePage() {
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground">Max Overtime / Month</label>
-            <div className="flex items-center gap-2">
+            <label className="mb-1 block text-xs font-medium text-foreground">Max Overtime / Month</label>
+            <div className="flex items-center gap-1.5">
               <input
                 type="number"
                 min="0"

@@ -200,7 +200,7 @@ const seed: Complaint[] = [
     title: "Lack of remote work equipment support",
     category: "Policy Violation", priority: "Low",
     submittedOn: "Jan 15, 2026", status: "Closed",
-    description: "My request for a second monitor for home office use was denied despite the company policy stating remote employees are eligible for up to $500 in equipment annually. My manager approved the request but IT purchasing declined without explanation.",
+    description: "My request for a second monitor for home office use was denied despite the company policy stating remote employees are eligible for up to ₵500 in equipment annually. My manager approved the request but IT purchasing declined without explanation.",
     updates: [
       { date: "Jan 16, 2026", text: "Procurement team contacted for clarification on the policy." },
       { date: "Jan 20, 2026", text: "Equipment approved. Budget code issue resolved. Monitor delivered Feb 3." },
@@ -267,7 +267,7 @@ function StatusDropdown({ value, onChange }: { value: ComplaintStatus; onChange:
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(o => !o)}
-        className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80", badge)}
+        className={cn("flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80", badge)}
       >
         {value}
         <ChevronDown className="size-3" />
@@ -278,7 +278,7 @@ function StatusDropdown({ value, onChange }: { value: ComplaintStatus; onChange:
             <button
               key={s}
               onClick={() => { onChange(s); setOpen(false) }}
-              className={cn("flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-medium hover:bg-muted", s === value && "bg-muted/60")}
+              className={cn("flex w-full items-center gap-1.5 px-2.5 py-2 text-left text-xs font-medium hover:bg-muted", s === value && "bg-muted/60")}
             >
               <span className={cn("size-2 shrink-0 rounded-full", statusStyle[s].dot)} />
               {s}
@@ -311,7 +311,7 @@ function FilterDropdown<T extends string>({
       <button
         onClick={() => setOpen(o => !o)}
         className={cn(
-          "flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
+          "flex items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-colors",
           active
             ? "border-primary bg-primary/10 text-primary"
             : "border-border text-muted-foreground hover:bg-muted"
@@ -325,7 +325,7 @@ function FilterDropdown<T extends string>({
         <div className="absolute right-0 top-full z-30 mt-1 min-w-[180px] overflow-hidden rounded-xl border border-border bg-card shadow-lg">
           <button
             onClick={() => { onChange("All"); setOpen(false) }}
-            className={cn("flex w-full px-4 py-2.5 text-left text-sm hover:bg-muted", value === "All" && "bg-muted/60 font-medium")}
+            className={cn("flex w-full px-3 py-2 text-left text-xs hover:bg-muted", value === "All" && "bg-muted/60 font-medium")}
           >
             All {label}s
           </button>
@@ -333,7 +333,7 @@ function FilterDropdown<T extends string>({
             <button
               key={o}
               onClick={() => { onChange(o); setOpen(false) }}
-              className={cn("flex w-full px-4 py-2.5 text-left text-sm hover:bg-muted", value === o && "bg-muted/60 font-medium")}
+              className={cn("flex w-full px-3 py-2 text-left text-xs hover:bg-muted", value === o && "bg-muted/60 font-medium")}
             >
               {o}
             </button>
@@ -359,19 +359,19 @@ function DetailPanel({ c, onClose, onStatusChange }: {
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
       <aside className="fixed right-0 top-0 z-40 flex h-full w-[440px] flex-col bg-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{c.ref}</p>
-            <h2 className="mt-0.5 text-sm font-bold text-foreground">{c.title}</h2>
+            <h2 className="mt-0.5 text-xs font-bold text-foreground">{c.title}</h2>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-5 px-6 py-5">
+        <div className="flex-1 overflow-y-auto space-y-4 px-5 py-4">
           {/* Employee row */}
-          <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3">
+          <div className="flex items-center gap-2.5 rounded-xl border border-border bg-muted/50 px-3 py-2.5">
             <div className="relative">
               <img
                 src={c.photo}
@@ -394,7 +394,7 @@ function DetailPanel({ c, onClose, onStatusChange }: {
                 <p className="text-xs text-muted-foreground">{c.email}</p>
               )}
               {c.department && (
-                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[11px] text-primary">
                   <Building2 className="size-3" />{c.department}
                 </span>
               )}
@@ -402,20 +402,20 @@ function DetailPanel({ c, onClose, onStatusChange }: {
           </div>
 
           {/* Badges row */}
-          <div className="flex flex-wrap gap-2">
-            <span className={cn("rounded-full px-3 py-1 text-[11px] font-semibold", catStyle.bg, catStyle.text)}>
+          <div className="flex flex-wrap gap-1.5">
+            <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", catStyle.bg, catStyle.text)}>
               {c.category}
             </span>
-            <span className={cn("rounded-full px-3 py-1 text-[11px] font-semibold", prioBadge)}>
+            <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", prioBadge)}>
               {c.priority} Priority
             </span>
-            <span className={cn("flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-semibold", statBadge)}>
+            <span className={cn("flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold", statBadge)}>
               {c.status}
             </span>
           </div>
 
           {/* Meta */}
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <CalendarDays className="size-3.5" /> Submitted {c.submittedOn}
             </span>
@@ -426,30 +426,30 @@ function DetailPanel({ c, onClose, onStatusChange }: {
 
           {/* Description */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</p>
-            <p className="text-sm leading-relaxed text-foreground">{c.description}</p>
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Description</p>
+            <p className="text-xs leading-relaxed text-foreground">{c.description}</p>
           </div>
 
           {/* Timeline */}
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Activity Timeline</p>
+            <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Activity Timeline</p>
             <div className="flex flex-col">
               {c.updates.map((u, i) => (
-                <div key={i} className="flex gap-3">
+                <div key={i} className="flex gap-2.5">
                   <div className="flex flex-col items-center">
                     <div className="mt-1 size-2.5 shrink-0 rounded-full bg-primary ring-2 ring-primary/20" />
                     {i < c.updates.length - 1 && <div className="my-0.5 w-px flex-1 bg-border" />}
                   </div>
-                  <div className="pb-4">
+                  <div className="pb-3">
                     <p className="text-[11px] text-muted-foreground">{u.date}</p>
-                    <p className="mt-0.5 text-sm text-foreground">{u.text}</p>
+                    <p className="mt-0.5 text-xs text-foreground">{u.text}</p>
                   </div>
                 </div>
               ))}
               {c.status !== "Resolved" && c.status !== "Closed" && (
-                <div className="flex gap-3">
+                <div className="flex gap-2.5">
                   <div className="mt-1 size-2.5 shrink-0 rounded-full border-2 border-border bg-card" />
-                  <p className="text-sm text-muted-foreground/60">Awaiting next update…</p>
+                  <p className="text-xs text-muted-foreground/60">Awaiting next update…</p>
                 </div>
               )}
             </div>
@@ -457,8 +457,8 @@ function DetailPanel({ c, onClose, onStatusChange }: {
 
           {/* Status update */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Update Status</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Update Status</p>
+            <div className="flex flex-wrap gap-1.5">
               {STATUSES.map(s => {
                 const active = s === c.status
                 return (
@@ -466,7 +466,7 @@ function DetailPanel({ c, onClose, onStatusChange }: {
                     key={s}
                     onClick={() => onStatusChange(s)}
                     className={cn(
-                      "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all",
+                      "flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all",
                       active
                         ? statusStyle[s].badge
                         : "border-border text-muted-foreground hover:border-primary hover:text-primary"
@@ -529,16 +529,16 @@ export default function HRComplaintsPage() {
 
       <main className="flex flex-1 flex-col overflow-hidden">
         {/* ── Toolbar ── */}
-        <div className="flex shrink-0 items-center gap-3 border-b border-border bg-card px-6 py-3">
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-border bg-card px-5 py-2.5">
           {/* Search */}
-          <div className="flex flex-1 items-center gap-2 rounded-lg bg-muted px-4 py-2.5">
+          <div className="flex flex-1 items-center gap-1.5 rounded-lg bg-muted px-3 py-2">
             <Search className="size-4 shrink-0 text-muted-foreground" />
             <input
               type="text"
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1) }}
               placeholder="Search by name, title, category, ref…"
-              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
             />
             {search && (
               <button onClick={() => setSearch("")} className="text-muted-foreground hover:text-foreground">
@@ -554,7 +554,7 @@ export default function HRComplaintsPage() {
           {hasFilters && (
             <button
               onClick={clearFilters}
-              className="rounded-lg border border-border px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted"
+              className="rounded-lg border border-border px-2.5 py-2 text-xs text-muted-foreground hover:bg-muted"
             >
               Clear
             </button>
@@ -562,15 +562,15 @@ export default function HRComplaintsPage() {
         </div>
 
         {/* ── Table ── */}
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-5">
           <div className="rounded-xl border border-border bg-card shadow-sm">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border">
                   {["Ref", "Employee", "Category", "Title", "Priority", "Submitted", "Status", ""].map(col => (
                     <th
                       key={col}
-                      className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                      className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                     >
                       {col}
                     </th>
@@ -590,13 +590,13 @@ export default function HRComplaintsPage() {
                       className="cursor-pointer hover:bg-muted/50"
                     >
                       {/* Ref */}
-                      <td className="whitespace-nowrap px-5 py-4">
+                      <td className="whitespace-nowrap px-4 py-3">
                         <span className="font-mono text-xs font-semibold text-primary">{c.ref}</span>
                       </td>
 
                       {/* Employee */}
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2.5">
                           <div className="relative">
                             <img
                               src={c.photo}
@@ -621,14 +621,14 @@ export default function HRComplaintsPage() {
                       </td>
 
                       {/* Category */}
-                      <td className="px-5 py-4">
-                        <span className={cn("whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold", catSty.bg, catSty.text)}>
+                      <td className="px-4 py-3">
+                        <span className={cn("whitespace-nowrap rounded-full px-2 py-1 text-[11px] font-semibold", catSty.bg, catSty.text)}>
                           {c.category}
                         </span>
                       </td>
 
                       {/* Title */}
-                      <td className="max-w-[220px] px-5 py-4">
+                      <td className="max-w-[220px] px-4 py-3">
                         <p className="truncate font-medium text-foreground">{c.title}</p>
                         <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
                           <MessageSquare className="size-3" />
@@ -637,23 +637,23 @@ export default function HRComplaintsPage() {
                       </td>
 
                       {/* Priority */}
-                      <td className="px-5 py-4">
-                        <span className={cn("flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold", prioSty.badge)}>
+                      <td className="px-4 py-3">
+                        <span className={cn("flex w-fit items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold", prioSty.badge)}>
                           <span className={cn("size-1.5 rounded-full", prioSty.dot)} />
                           {c.priority}
                         </span>
                       </td>
 
                       {/* Submitted */}
-                      <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">{c.submittedOn}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{c.submittedOn}</td>
 
                       {/* Status dropdown */}
-                      <td className="px-5 py-4" onClick={e => e.stopPropagation()}>
+                      <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                         <StatusDropdown value={c.status} onChange={s => updateStatus(c.id, s)} />
                       </td>
 
                       {/* View */}
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-3">
                         <button
                           onClick={e => { e.stopPropagation(); setDetail(c) }}
                           className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
@@ -668,9 +668,9 @@ export default function HRComplaintsPage() {
 
                 {paginated.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-6 py-20 text-center">
-                      <ShieldAlert className="mx-auto mb-3 size-10 text-muted-foreground/30" />
-                      <p className="text-sm text-muted-foreground">
+                    <td colSpan={8} className="px-5 py-16 text-center">
+                      <ShieldAlert className="mx-auto mb-2.5 size-10 text-muted-foreground/30" />
+                      <p className="text-xs text-muted-foreground">
                         {hasFilters ? "No complaints match your filters." : "No complaints have been filed yet."}
                       </p>
                     </td>
@@ -680,7 +680,7 @@ export default function HRComplaintsPage() {
             </table>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-border px-5 py-3">
+            <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
               <p className="text-xs text-muted-foreground">
                 {filtered.length === 0
                   ? "No results"
@@ -699,7 +699,7 @@ export default function HRComplaintsPage() {
                     key={p}
                     onClick={() => setPage(p)}
                     className={cn(
-                      "flex size-8 items-center justify-center rounded-lg text-sm font-medium transition-colors",
+                      "flex size-8 items-center justify-center rounded-lg text-xs font-medium transition-colors",
                       p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
                     )}
                   >

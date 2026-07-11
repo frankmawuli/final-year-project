@@ -32,17 +32,17 @@ export function DashboardMockup() {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-gray-100 bg-white px-4 py-2.5">
-        <div className="flex items-center gap-1.5">
+      <div className="flex items-center justify-between border-b border-gray-100 bg-white px-3 py-2">
+        <div className="flex items-center gap-1">
           <Logo width={29} height={29} />
           <span className="text-xs font-bold text-gray-800">CoreRecruiter</span>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex gap-1.5">
+        <div className="flex items-center gap-2.5">
+          <div className="flex gap-1">
             <div className="h-4 w-4 rounded-full bg-gray-100" />
             <div className="h-4 w-4 rounded-full bg-gray-100" />
           </div>
-          <div className="flex items-center gap-1.5 border-l border-gray-100 pl-2">
+          <div className="flex items-center gap-1 border-l border-gray-100 pl-1.5">
             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-[9px] font-bold text-primary">
               SJ
             </div>
@@ -58,12 +58,12 @@ export function DashboardMockup() {
       {/* Body */}
       <div className="flex h-[300px] md:h-[340px]">
         {/* Sidebar */}
-        <div className="w-[92px] flex-shrink-0 border-r border-gray-100 bg-white py-2">
+        <div className="w-[92px] flex-shrink-0 border-r border-gray-100 bg-white py-1.5">
           {sidebarItems.map((item, i) => (
             <div
               key={item}
               className={cn(
-                "cursor-pointer px-3 py-1.5 text-[9px]",
+                "cursor-pointer px-2.5 py-1 text-[9px]",
                 i === 0
                   ? "border-r-2 border-primary bg-primary/10 font-semibold text-primary"
                   : "text-gray-400"
@@ -75,8 +75,8 @@ export function DashboardMockup() {
         </div>
 
         {/* Main content */}
-        <div className="flex-1 overflow-hidden bg-gray-50/60 p-3">
-          <div className="mb-2.5">
+        <div className="flex-1 overflow-hidden bg-gray-50/60 p-2.5">
+          <div className="mb-2">
             <div className="text-[11px] font-bold text-gray-800">Welcome back, Sarah! 👋</div>
             <div className="text-[8px] text-gray-400">
               Here&apos;s what&apos;s happening with your organization today.
@@ -84,9 +84,9 @@ export function DashboardMockup() {
           </div>
 
           {/* KPI cards */}
-          <div className="mb-2.5 grid grid-cols-4 gap-1.5">
+          <div className="mb-2 grid grid-cols-4 gap-1">
             {kpis.map((kpi) => (
-              <div key={kpi.label} className="rounded-lg border border-gray-100 bg-white p-2">
+              <div key={kpi.label} className="rounded-lg border border-gray-100 bg-white p-1.5">
                 <div className="text-[7.5px] text-gray-400">{kpi.label}</div>
                 <div className="text-[14px] font-bold text-gray-800">{kpi.val}</div>
                 <div className="text-[7px] font-medium text-green-500">{kpi.change}</div>
@@ -95,9 +95,9 @@ export function DashboardMockup() {
           </div>
 
           {/* Chart + Activity row */}
-          <div className="grid grid-cols-5 gap-1.5">
+          <div className="grid grid-cols-5 gap-1">
             {/* Line chart */}
-            <div className="col-span-3 rounded-lg border border-gray-100 bg-white p-2">
+            <div className="col-span-3 rounded-lg border border-gray-100 bg-white p-1.5">
               <div className="mb-1 flex items-center justify-between">
                 <div className="text-[9px] font-semibold text-gray-700">Hiring Overview</div>
                 <div className="text-[7.5px] text-gray-400">This Month ▾</div>
@@ -149,13 +149,13 @@ export function DashboardMockup() {
             </div>
 
             {/* Recent activity */}
-            <div className="col-span-2 rounded-lg border border-gray-100 bg-white p-2">
-              <div className="mb-1.5 flex items-center justify-between">
+            <div className="col-span-2 rounded-lg border border-gray-100 bg-white p-1.5">
+              <div className="mb-1 flex items-center justify-between">
                 <div className="text-[9px] font-semibold text-gray-700">Recent Activity</div>
                 <div className="cursor-pointer text-[7.5px] font-medium text-primary">View all</div>
               </div>
               {recentActivity.map((activity, i) => (
-                <div key={i} className="flex gap-1.5 border-b border-gray-50 py-1 last:border-0">
+                <div key={i} className="flex gap-1 border-b border-gray-50 py-1 last:border-0">
                   <div className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
                   <div className="text-[7.5px] leading-tight text-gray-500">{activity}</div>
                 </div>

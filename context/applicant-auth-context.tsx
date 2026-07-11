@@ -29,6 +29,7 @@ interface ApplicantAuthContextValue {
   loading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
+  loginWithGoogle: (idToken: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => void
   requestResetPassword: (email: string) => Promise<void>
@@ -105,11 +106,10 @@ export function ApplicantAuthProvider({ children }: { children: ReactNode }) {
     hydrate()
   }, [])
 
-  const login = useCallback(
-    async (email: string, password: string) => {
-      const res = await applicantAuthService.login(email, password)
-      const { id, name, email: applicantEmail, accessToken: at, refreshToken: rt } = res.data
-      const a: Applicant = { id, name, email: applicantEmail }
+  const applySession = useCallback(
+    (data: { id: string; name: string; email: string; accessToken: string; refreshToken: string }) => {
+      const { id, name, email, accessToken: at, refreshToken: rt } = data
+      const a: Applicant = { id, name, email }
       localStorage.setItem(ACCESS_TOKEN_KEY, at)
       localStorage.setItem(REFRESH_TOKEN_KEY, rt)
       localStorage.setItem(APPLICANT_KEY, JSON.stringify(a))
@@ -122,6 +122,22 @@ export function ApplicantAuthProvider({ children }: { children: ReactNode }) {
       router.push("/jobs/job-listing")
     },
     [router],
+  )
+
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const res = await applicantAuthService.login(email, password)
+      applySession(res.data)
+    },
+    [applySession],
+  )
+
+  const loginWithGoogle = useCallback(
+    async (idToken: string) => {
+      const res = await applicantAuthService.googleLogin(idToken)
+      applySession(res.data)
+    },
+    [applySession],
   )
 
   const register = useCallback(
@@ -182,6 +198,7 @@ export function ApplicantAuthProvider({ children }: { children: ReactNode }) {
         loading,
         isAuthenticated: !!applicant,
         login,
+        loginWithGoogle,
         register,
         logout,
         requestResetPassword,

@@ -1,24 +1,15 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, Loader2, CalendarPlus } from "lucide-react"
+import { Search, ChevronLeft, ChevronRight, Loader2, CalendarPlus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { useAuth } from "@/context/auth-context"
 import { jobsService, type ApiApplicant, type ApiApplicantStatus } from "@/services/jobs.service"
+import { FilterDropdown } from "@/components/filter-dropdown"
 
 // ── Status config ─────────────────────────────────────────────
-const STATUS_OPTIONS: { value: ApiApplicantStatus | ""; label: string }[] = [
-  { value: "",               label: "All"           },
-  { value: "PENDING_REVIEW", label: "Pending Review"},
-  { value: "SHORTLISTED",    label: "Shortlisted"   },
-  { value: "INTERVIEW",      label: "Interview"     },
-  { value: "ACCEPTED",       label: "Accepted"      },
-  { value: "APPROVED",       label: "Approved"      },
-  { value: "REJECTED",       label: "Rejected"      },
-]
-
 const STATUS_STYLE: Record<ApiApplicantStatus, string> = {
   PENDING_REVIEW: "bg-amber-100 text-amber-700",
   SHORTLISTED:    "bg-indigo-100 text-indigo-700",
@@ -118,8 +109,8 @@ function SocialLinks({ linkedin, twitter, facebook }: {
 
 function fmtSalary(amount: number | null): string {
   if (amount === null) return "—"
-  if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`
-  return `$${amount}`
+  if (amount >= 1000) return `₵${(amount / 1000).toFixed(0)}K`
+  return `₵${amount}`
 }
 
 // ── Layout ────────────────────────────────────────────────────
@@ -139,7 +130,9 @@ export default function ApplicantsPage() {
   const [total,      setTotal]      = useState(0)
   const [loading,    setLoading]    = useState(false)
   const [error,      setError]      = useState<string | null>(null)
-  const [showFilter, setShowFilter] = useState(false)
+
+  const hasFilters = search !== "" || status !== ""
+  const statusLabel = status ? STATUS_LABEL[status] : "All"
 
   const fetchApplicants = useCallback(
     async (searchVal = search, statusVal = status, pageVal = page) => {
@@ -182,6 +175,18 @@ export default function ApplicantsPage() {
     fetchApplicants(search, val, 1)
   }
 
+  const handleStatusFilter = (label: string | "All") => {
+    const val = label === "All"
+      ? ""
+      : (Object.keys(STATUS_LABEL) as ApiApplicantStatus[]).find((k) => STATUS_LABEL[k] === label) ?? ""
+    handleStatus(val)
+  }
+
+  const clearFilters = () => {
+    setSearch("")
+    handleStatus("")
+  }
+
   const handlePage = (p: number) => {
     setPage(p)
     fetchApplicants(search, status, p)
@@ -191,175 +196,165 @@ export default function ApplicantsPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex flex-1 flex-col overflow-hidden p-6">
+      <main className="flex flex-1 flex-col overflow-hidden">
         {/* Search bar */}
-        <div className="mb-3 flex items-center gap-3 rounded-lg bg-card px-4 py-3 shadow-sm">
-          <Search className="size-5 shrink-0 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search by name or email…"
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-border bg-card px-5 py-2.5">
+          <div className="flex flex-1 items-center gap-1.5">
+            <Search className="size-5 shrink-0 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search by name or email…"
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
+            />
+          </div>
+          <FilterDropdown
+            label="Status"
+            value={statusLabel}
+            options={Object.values(STATUS_LABEL)}
+            onChange={handleStatusFilter}
           />
-          <button
-            onClick={() => setShowFilter((f) => !f)}
-            className={cn(
-              "rounded-lg p-1.5 transition-colors",
-              showFilter ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted",
-            )}
-          >
-            <SlidersHorizontal className="size-5" />
-          </button>
+          {hasFilters && (
+            <button
+              onClick={clearFilters}
+              className="whitespace-nowrap rounded-lg border border-border px-2.5 py-2 text-xs text-muted-foreground hover:bg-muted"
+            >
+              Clear
+            </button>
+          )}
         </div>
 
-        {/* Status filter pills */}
-        {showFilter && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {STATUS_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => handleStatus(opt.value as ApiApplicantStatus | "")}
-                className={cn(
-                  "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                  status === opt.value
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground",
-                )}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-1 flex-col overflow-hidden p-5">
 
-        {/* Table card */}
-        <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-          {/* Header */}
-          <div className={cn("grid items-center gap-x-4 border-b border-border px-6 py-3", TABLE_COLUMNS)}>
-            {["Candidate", "Email", "Social", "Location", "Salary", "Status", ""].map((col) => (
-              <span key={col} className="text-sm font-medium text-foreground">{col}</span>
-            ))}
-          </div>
-
-          {/* Body */}
-          <div className="flex-1 overflow-y-auto divide-y divide-border">
-            {loading ? (
-              <div className="flex h-32 items-center justify-center">
-                <Loader2 className="size-6 animate-spin text-primary" />
-              </div>
-            ) : error ? (
-              <div className="flex h-32 items-center justify-center text-sm text-rose-600">{error}</div>
-            ) : applicants.length === 0 ? (
-              <div className="flex h-32 items-center justify-center text-sm text-muted-foreground/40">
-                No applicants found.
-              </div>
-            ) : (
-              applicants.map((app) => (
-                <div
-                  key={app.id}
-                  className={cn(
-                    "grid items-center gap-x-4 px-6 py-3.5 transition-colors hover:bg-muted/50",
-                    TABLE_COLUMNS,
-                  )}
-                >
-                  {/* Candidate */}
-                  <div className="flex min-w-0 items-center gap-3">
-                    <CandidateAvatar name={app.candidate.name} avatarUrl={app.candidate.avatarUrl} />
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">{app.candidate.name}</p>
-                      <p className="truncate text-[11px] text-muted-foreground">{app.job.title}</p>
-                    </div>
-                  </div>
-
-                  {/* Email */}
-                  <span className="truncate text-sm text-muted-foreground">{app.candidate.email}</span>
-
-                  {/* Social */}
-                  <SocialLinks
-                    linkedin={app.candidate.linkedin}
-                    twitter={app.candidate.twitter}
-                    facebook={app.candidate.facebook}
-                  />
-
-                  {/* Location */}
-                  <span className="truncate text-sm text-muted-foreground">
-                    {app.candidate.location ?? "—"}
-                  </span>
-
-                  {/* Salary */}
-                  <span className="text-sm text-muted-foreground">
-                    {fmtSalary(app.expectedSalary)}
-                  </span>
-
-                  {/* Status */}
-                  <span className={cn(
-                    "w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold",
-                    STATUS_STYLE[app.status] ?? "bg-muted text-muted-foreground",
-                  )}>
-                    {STATUS_LABEL[app.status] ?? app.status}
-                  </span>
-
-                  {/* Schedule interview */}
-                  <button
-                    title="Schedule Interview"
-                    onClick={() => {
-                      const params = new URLSearchParams({
-                        jobId:           app.jobId,
-                        jobTitle:        app.job.title,
-                        candidateId:     app.candidate.id,
-                        candidateName:   app.candidate.name,
-                        candidateEmail:  app.candidate.email,
-                        candidateAvatar: app.candidate.avatarUrl ?? "",
-                      })
-                      router.push(`/dashboard/hr/interviews?${params.toString()}`)
-                    }}
-                    className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
-                  >
-                    <CalendarPlus className="size-4" />
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Pagination */}
-        {total > 0 && (
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">
-              {total} applicant{total !== 1 ? "s" : ""}
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => handlePage(Math.max(1, page - 1))}
-                disabled={page === 1}
-                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
-              >
-                <ChevronLeft className="size-4" />
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => handlePage(p)}
-                  className={cn(
-                    "flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
-                    p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
-                  )}
-                >
-                  {p}
-                </button>
+          {/* Table card */}
+          <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            {/* Header */}
+            <div className={cn("grid items-center gap-x-3 border-b border-border px-5 py-2.5", TABLE_COLUMNS)}>
+              {["Candidate", "Email", "Social", "Location", "Salary", "Status", ""].map((col) => (
+                <span key={col} className="text-xs font-medium text-foreground">{col}</span>
               ))}
-              <button
-                onClick={() => handlePage(Math.min(totalPages, page + 1))}
-                disabled={page === totalPages}
-                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
-              >
-                <ChevronRight className="size-4" />
-              </button>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto divide-y divide-border">
+              {loading ? (
+                <div className="flex h-32 items-center justify-center">
+                  <Loader2 className="size-6 animate-spin text-primary" />
+                </div>
+              ) : error ? (
+                <div className="flex h-32 items-center justify-center text-xs text-rose-600">{error}</div>
+              ) : applicants.length === 0 ? (
+                <div className="flex h-32 items-center justify-center text-xs text-muted-foreground/40">
+                  No applicants found.
+                </div>
+              ) : (
+                applicants.map((app) => (
+                  <div
+                    key={app.id}
+                    className={cn(
+                      "grid items-center gap-x-3 px-5 py-3 transition-colors hover:bg-muted/50",
+                      TABLE_COLUMNS,
+                    )}
+                  >
+                    {/* Candidate */}
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <CandidateAvatar name={app.candidate.name} avatarUrl={app.candidate.avatarUrl} />
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-medium text-foreground">{app.candidate.name}</p>
+                        <p className="truncate text-[11px] text-muted-foreground">{app.job.title}</p>
+                      </div>
+                    </div>
+
+                    {/* Email */}
+                    <span className="truncate text-xs text-muted-foreground">{app.candidate.email}</span>
+
+                    {/* Social */}
+                    <SocialLinks
+                      linkedin={app.candidate.linkedin}
+                      twitter={app.candidate.twitter}
+                      facebook={app.candidate.facebook}
+                    />
+
+                    {/* Location */}
+                    <span className="truncate text-xs text-muted-foreground">
+                      {app.candidate.location ?? "—"}
+                    </span>
+
+                    {/* Salary */}
+                    <span className="text-xs text-muted-foreground">
+                      {fmtSalary(app.expectedSalary)}
+                    </span>
+
+                    {/* Status */}
+                    <span className={cn(
+                      "w-fit rounded-full px-2 py-0.5 text-xs font-semibold",
+                      STATUS_STYLE[app.status] ?? "bg-muted text-muted-foreground",
+                    )}>
+                      {STATUS_LABEL[app.status] ?? app.status}
+                    </span>
+
+                    {/* Schedule interview */}
+                    <button
+                      title="Schedule Interview"
+                      onClick={() => {
+                        const params = new URLSearchParams({
+                          jobId:           app.jobId,
+                          jobTitle:        app.job.title,
+                          candidateId:     app.candidate.id,
+                          candidateName:   app.candidate.name,
+                          candidateEmail:  app.candidate.email,
+                          candidateAvatar: app.candidate.avatarUrl ?? "",
+                        })
+                        router.push(`/dashboard/hr/interviews?${params.toString()}`)
+                      }}
+                      className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                    >
+                      <CalendarPlus className="size-4" />
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
-        )}
+
+          {/* Pagination */}
+          {total > 0 && (
+            <div className="mt-3 flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                {total} applicant{total !== 1 ? "s" : ""}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handlePage(Math.max(1, page - 1))}
+                  disabled={page === 1}
+                  className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
+                >
+                  <ChevronLeft className="size-4" />
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => handlePage(p)}
+                    className={cn(
+                      "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
+                      p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
+                    )}
+                  >
+                    {p}
+                  </button>
+                ))}
+                <button
+                  onClick={() => handlePage(Math.min(totalPages, page + 1))}
+                  disabled={page === totalPages}
+                  className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
+                >
+                  <ChevronRight className="size-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
     </>
   )

@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
 import { ApiError } from "@/lib/api-client"
 import { leaveService, type ApiLeaveRequest, type ApiLeaveType, type ApiLeaveStatus } from "@/services/leave.service"
+import { Avatar } from "@/components/avatar"
 
 // ── Constants ─────────────────────────────────────────────────
-const DEFAULT_PHOTO = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
 const PER_PAGE = 5
 
 // ── Types ─────────────────────────────────────────────────────
@@ -125,24 +125,24 @@ function AddLeaveModal({
     }
   }
 
-  const fieldCls = "w-full rounded-lg border border-border bg-muted/40 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+  const fieldCls = "w-full rounded-lg border border-border bg-muted/40 px-2.5 py-2 text-xs text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-        <div className="mb-5 flex items-center justify-between">
+      <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-foreground">Request Leave</h2>
+            <h2 className="text-base font-semibold text-foreground">Request Leave</h2>
             <p className="mt-0.5 text-xs text-muted-foreground">Submit a new leave request for approval</p>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted">
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-foreground">Leave Type</label>
+            <label className="mb-1 block text-xs font-medium text-foreground">Leave Type</label>
             <select value={type} onChange={(e) => setType(e.target.value as ApiLeaveType)} className={fieldCls}>
               {LEAVE_TYPES.map((t) => (
                 <option key={t} value={t}>{TYPE_LABELS[t]}</option>
@@ -150,28 +150,28 @@ function AddLeaveModal({
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-foreground">Start Date</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">Start Date</label>
               <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={fieldCls} />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-foreground">End Date</label>
+              <label className="mb-1 block text-xs font-medium text-foreground">End Date</label>
               <input type="date" value={endDate} min={startDate} onChange={(e) => setEndDate(e.target.value)} className={fieldCls} />
             </div>
           </div>
 
           {startDate && endDate && endDate >= startDate && (
-            <div className="flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2">
+            <div className="flex items-center gap-1.5 rounded-lg bg-primary/5 px-2.5 py-1.5">
               <CalendarDays className="size-4 text-primary" />
-              <span className="text-sm font-medium text-primary">
+              <span className="text-xs font-medium text-primary">
                 {calcDays(startDate, endDate)} day{calcDays(startDate, endDate) !== 1 ? "s" : ""} requested
               </span>
             </div>
           )}
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-foreground">
+            <label className="mb-1 block text-xs font-medium text-foreground">
               Reason <span className="text-muted-foreground">(optional)</span>
             </label>
             <textarea
@@ -183,16 +183,16 @@ function AddLeaveModal({
             />
           </div>
 
-          {error && <p className="text-sm text-rose-500">{error}</p>}
+          {error && <p className="text-xs text-rose-500">{error}</p>}
 
-          <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} className="flex-1 rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted">
+          <div className="flex gap-2.5 pt-1">
+            <button type="button" onClick={onClose} className="flex-1 rounded-lg border border-border py-2 text-xs font-medium text-foreground hover:bg-muted">
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 rounded-lg bg-primary py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+              className="flex-1 rounded-lg bg-primary py-2 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
             >
               {saving ? "Submitting…" : "Submit Request"}
             </button>
@@ -267,57 +267,57 @@ export default function EssLeavePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-border bg-white px-4 py-3 lg:hidden">
-        <h1 className="text-base font-semibold text-foreground">My Leave</h1>
+      <div className="border-b border-border bg-white px-3 py-2.5 lg:hidden">
+        <h1 className="text-sm font-semibold text-foreground">My Leave</h1>
         <p className="mt-0.5 text-xs text-muted-foreground">Leave › Requests</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+      <div className="flex-1 overflow-y-auto p-3 md:p-5 lg:p-6">
 
         {/* Employee header */}
         <div
-          className="relative mb-6 overflow-hidden rounded-2xl p-5 text-white"
+          className="relative mb-5 overflow-hidden rounded-2xl p-4 text-white"
           style={{ background: "linear-gradient(135deg, #5A7CFF 0%, #3B5BDB 100%)" }}
         >
           <span className="absolute -right-6 -top-6 size-32 rounded-full bg-white/10" />
           <span className="absolute -bottom-8 right-16 size-24 rounded-full bg-white/10" />
 
-          <div className="relative flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <img
-                src={DEFAULT_PHOTO}
+          <div className="relative flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Avatar
+                src={null}
                 alt={user?.name ?? "Employee"}
-                className="size-14 shrink-0 rounded-full object-cover ring-2 ring-white/40"
+                className="size-14 shrink-0 ring-2 ring-white/40"
               />
               <div>
-                <p className="text-base font-semibold">{user?.name ?? "—"}</p>
-                <p className="text-sm text-white/70">{user?.role ?? ""}</p>
+                <p className="text-sm font-semibold">{user?.name ?? "—"}</p>
+                <p className="text-xs text-white/70">{user?.role ?? ""}</p>
               </div>
             </div>
             <div className="hidden text-right sm:block">
-              <p className="text-2xl font-bold">{totalUsed}</p>
+              <p className="text-xl font-bold">{totalUsed}</p>
               <p className="text-xs text-white/70">days used this year</p>
             </div>
           </div>
         </div>
 
         {/* Leave balance cards */}
-        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mb-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
           {leaveBalance.map((b) => {
             const remaining = b.total - b.used
             const pct = Math.min(100, Math.round((b.used / b.total) * 100))
             return (
-              <div key={b.type} className="rounded-2xl border border-border bg-white p-4 shadow-sm">
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-foreground">{TYPE_LABELS[b.type]}</span>
+              <div key={b.type} className="rounded-2xl border border-border bg-white p-3 shadow-sm">
+                <div className="mb-2.5 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-foreground">{TYPE_LABELS[b.type]}</span>
                   <span
-                    className="rounded-full px-2 py-0.5 text-xs font-semibold text-white"
+                    className="rounded-full px-1.5 py-0.5 text-xs font-semibold text-white"
                     style={{ backgroundColor: b.color }}
                   >
                     {remaining} left
                   </span>
                 </div>
-                <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-muted">
+                <div className="mb-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
                   <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: b.color }} />
                 </div>
                 <p className="text-xs text-muted-foreground">{b.used} of {b.total} days used</p>
@@ -328,25 +328,25 @@ export default function EssLeavePage() {
 
         {/* Leave requests table */}
         <div className="rounded-2xl border border-border bg-white shadow-sm">
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6">
+          <div className="flex flex-col gap-2.5 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:px-5">
             <div>
-              <h2 className="text-base font-semibold text-foreground">My Leave Requests</h2>
+              <h2 className="text-sm font-semibold text-foreground">My Leave Requests</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">{requests.length} total requests</p>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2">
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5">
                 <Search className="size-4 shrink-0 text-muted-foreground" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1) }}
                   placeholder="Search requests…"
-                  className="w-36 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground sm:w-44"
+                  className="w-36 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground sm:w-44"
                 />
               </div>
               <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+                className="flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
               >
                 <Plus className="size-4" />
                 <span className="hidden sm:inline">New Request</span>
@@ -358,47 +358,47 @@ export default function EssLeavePage() {
             <table className="w-full min-w-135">
               <thead>
                 <tr className="bg-muted/40">
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground md:px-6">Leave Type</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Start Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">End Date</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Days</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Reason</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground md:px-5">Leave Type</th>
+                  <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Start Date</th>
+                  <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">End Date</th>
+                  <th className="px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Days</th>
+                  <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Reason</th>
+                  <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-sm text-muted-foreground">Loading…</td>
+                    <td colSpan={6} className="px-5 py-12 text-center text-xs text-muted-foreground">Loading…</td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-sm text-rose-500">{error}</td>
+                    <td colSpan={6} className="px-5 py-12 text-center text-xs text-rose-500">{error}</td>
                   </tr>
                 ) : paginated.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-sm text-muted-foreground">No leave requests found.</td>
+                    <td colSpan={6} className="px-5 py-12 text-center text-xs text-muted-foreground">No leave requests found.</td>
                   </tr>
                 ) : (
                   paginated.map((r) => (
                     <tr key={r.id} className="transition-colors hover:bg-muted/20">
-                      <td className="px-5 py-4 md:px-6">
-                        <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", leaveTypeBadge[r.type])}>
+                      <td className="px-4 py-3 md:px-5">
+                        <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", leaveTypeBadge[r.type])}>
                           {TYPE_LABELS[r.type]}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-sm text-foreground">{formatDate(r.startDate)}</td>
-                      <td className="px-4 py-4 text-sm text-foreground">{formatDate(r.endDate)}</td>
-                      <td className="px-4 py-4 text-center">
-                        <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-foreground">
+                      <td className="px-3 py-3 text-xs text-foreground">{formatDate(r.startDate)}</td>
+                      <td className="px-3 py-3 text-xs text-foreground">{formatDate(r.endDate)}</td>
+                      <td className="px-3 py-3 text-center">
+                        <span className="rounded-full bg-muted px-2 py-1 text-xs font-semibold text-foreground">
                           {calcDays(r.startDate, r.endDate)}d
                         </span>
                       </td>
-                      <td className="max-w-45 truncate px-4 py-4 text-sm text-muted-foreground">
+                      <td className="max-w-45 truncate px-3 py-3 text-xs text-muted-foreground">
                         {r.reason || "—"}
                       </td>
-                      <td className="px-4 py-4">
-                        <span className={cn("flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold", statusBadge[r.status])}>
+                      <td className="px-3 py-3">
+                        <span className={cn("flex w-fit items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold", statusBadge[r.status])}>
                           {statusIcon[r.status]}
                           {r.status.charAt(0) + r.status.slice(1).toLowerCase()}
                         </span>
@@ -411,7 +411,7 @@ export default function EssLeavePage() {
           </div>
 
           {!loading && !error && totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-border px-5 py-3 md:px-6">
+            <div className="flex items-center justify-between border-t border-border px-4 py-2.5 md:px-5">
               <p className="text-xs text-muted-foreground">
                 Showing {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}
               </p>
@@ -421,7 +421,7 @@ export default function EssLeavePage() {
                     key={i}
                     onClick={() => setPage(i + 1)}
                     className={cn(
-                      "flex size-8 items-center justify-center rounded-lg text-sm font-medium",
+                      "flex size-8 items-center justify-center rounded-lg text-xs font-medium",
                       page === i + 1 ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted",
                     )}
                   >
