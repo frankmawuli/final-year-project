@@ -159,7 +159,7 @@ export default function JobDetailPage() {
 
               {/* Job header */}
               <div className="flex items-start gap-3">
-                <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-border bg-white shadow-sm">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-border bg-card shadow-sm">
                   {company.logo_url ? (
                     <img src={company.logo_url} alt={company.name} className="size-10 rounded-lg object-cover" />
                   ) : (
@@ -189,7 +189,7 @@ export default function JobDetailPage() {
               </div>
 
               {/* Description + Responsibilities */}
-              <div className="rounded-2xl border border-border bg-white p-3 sm:p-5 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-3 sm:p-5 shadow-sm">
                 <SectionTitle>Job Description</SectionTitle>
                 <p className="text-[14px] leading-relaxed text-muted-foreground">
                   {job.description || "No description provided."}
@@ -210,7 +210,7 @@ export default function JobDetailPage() {
               </div>
 
               {/* Requirements + Tags */}
-              <div className="rounded-2xl border border-border bg-white p-3 sm:p-5 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-3 sm:p-5 shadow-sm">
                 {job.requirements.length > 0 && (
                   <>
                     <SectionTitle>Requirements</SectionTitle>
@@ -239,7 +239,7 @@ export default function JobDetailPage() {
             <div className="flex flex-col gap-3">
 
               {/* Action buttons */}
-              <div className="flex flex-col gap-1.5 rounded-2xl border border-border bg-white p-3 shadow-sm">
+              <div className="flex flex-col gap-1.5 rounded-2xl border border-border bg-card p-3 shadow-sm">
                 <button
                   onClick={handleApply}
                   className="flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
@@ -264,7 +264,7 @@ export default function JobDetailPage() {
               </div>
 
               {/* Job overview */}
-              <div className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <p className="mb-3 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">
                   Job Overview
                 </p>
@@ -279,7 +279,7 @@ export default function JobDetailPage() {
               </div>
 
               {/* About company */}
-              <div className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <p className="mb-3 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">
                   About Company
                 </p>
