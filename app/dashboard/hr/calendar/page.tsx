@@ -14,8 +14,14 @@ import {
   Link2,
   AlignJustify,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { employeeService, type ApiEmployee } from "@/services/employee.service"
+import { interviewsService, type ApiInterview, type InterviewStatus } from "@/services/interviews.service"
+import { ApiError } from "@/lib/api-client"
 
 // ── Sidebar nav ───────────────────────────────────────────────
 const sidebarNav = [
@@ -26,15 +32,14 @@ const sidebarNav = [
 
 // ── Types ─────────────────────────────────────────────────────
 interface CandidateOption {
-  id:       number
+  id:       string
   name:     string
-  photo:    string
   email:    string
-  position: string
+  avatarUrl: string | null
 }
 
 interface Interview {
-  id:       number
+  id:       string
   title:    string
   date:     string   // "YYYY-MM-DD"
   startMin: number   // minutes from midnight
@@ -43,6 +48,7 @@ interface Interview {
   guests?:  string[]
   meetLink?: string
   desc?:    string
+  status:   InterviewStatus
 }
 
 // ── Color palette ─────────────────────────────────────────────
@@ -52,21 +58,6 @@ const COLORS = [
   { bg: "#dbeafe", text: "#1d4ed8", dot: "#60a5fa" },
   { bg: "#fef3c7", text: "#92400e", dot: "#fbbf24" },
   { bg: "#f3f4f6", text: "#374151", dot: "#9ca3af" },
-]
-
-// ── Candidate pool ────────────────────────────────────────────
-const CANDIDATES: CandidateOption[] = [
-  { id:1,  name:"Tiger Nixon",        photo:"/assets/2d1ac17bcf9792bb9bf0aa23b05c618ef381e258.png", email:"tiger.nixon@gmail.com",       position:"Web Developer"          },
-  { id:2,  name:"Garrett Winters",    photo:"/assets/2dba1db7966039308370470fce52b3b220f9a3fb.png", email:"garrett.winters@gmail.com",   position:"Accountant"             },
-  { id:3,  name:"Ashton Cox",         photo:"/assets/5f121b335ad17b18af3c3c797e7a5f1afc3ec39f.png", email:"ashton.cox@gmail.com",        position:"Technical Author"       },
-  { id:4,  name:"Cedric Kelly",       photo:"/assets/635a3bf857069957b4442100197a1e910ea3121d.png", email:"cedric.kelly@gmail.com",      position:"Integration Specialist"  },
-  { id:5,  name:"Airi Satou",         photo:"/assets/e4478e9b5a6f2c79870bedf6446dd7b9c9c09ee0.png", email:"airi.satou@gmail.com",        position:"Sales Assistant"        },
-  { id:6,  name:"Brielle Williamson", photo:"/assets/3b57a33d98b5a1b80a335988932aa248a0875725.png", email:"brielle.w@gmail.com",         position:"Integration Specialist"  },
-  { id:7,  name:"Herrod Chandler",    photo:"/assets/79f659fe748e86736e3698f50db3ab3a1e03bf36.png", email:"herrod.chandler@gmail.com",   position:"Javascript Developer"   },
-  { id:8,  name:"Rhona Davidson",     photo:"/assets/277048e308d3c618330fc9b64ac87f9bdc187ddd.png", email:"rhona.davidson@gmail.com",    position:"Software Engineer"      },
-  { id:9,  name:"Colleen Hurst",      photo:"/assets/e5675cc794aa5fab44f80689cbd19c4db987c3e7.png", email:"colleen.hurst@gmail.com",     position:"Javascript Developer"   },
-  { id:10, name:"Sonya Kim",          photo:"/assets/c8f5ae43e33ebde623eb7d3b22aeb6930878a4ce.png", email:"sonya.kim@gmail.com",         position:"Software Engineer"      },
-  { id:11, name:"Jenna Elliott",      photo:"/assets/ba50d841bff1eb820c0b59f56f778fbbf8b8a8c3.png", email:"jenna.elliott@gmail.com",     position:"Product Designer"       },
 ]
 
 // ── Grid constants ────────────────────────────────────────────
@@ -110,27 +101,31 @@ function parseTimeStr(s: string) {
   return h * 60 + m
 }
 
-// ── Seed interviews (relative to today's week) ────────────────
-let _nextId = 10
-
-function makeSeed(): Interview[] {
-  const ws = getWeekStart(new Date())
-  const d = (offset: number) => {
-    const dt = new Date(ws)
-    dt.setDate(dt.getDate() + offset)
-    return toIso(dt)
+function toGuestOption(employee: ApiEmployee): CandidateOption {
+  return {
+    id: String(employee.id),
+    name: employee.user?.name ?? employee.employeeId,
+    email: employee.user?.email ?? "",
+    avatarUrl: employee.user?.avatarUrl ?? null,
   }
-  return [
-    { id:1, title:"Sarah Adams – Frontend Dev",   date:d(1), startMin:9*60,     endMin:10*60,    colorIdx:2, guests:["sarah.adams@email.com"], meetLink:"https://meet.google.com/abc-defg" },
-    { id:2, title:"John Lee – Backend Engineer",  date:d(2), startMin:10*60,    endMin:11*60,    colorIdx:1 },
-    { id:3, title:"Maria Silva – UX Designer",    date:d(3), startMin:9*60,     endMin:9*60+30,  colorIdx:0 },
-    { id:4, title:"Team Sync",                    date:d(1), startMin:11*60,    endMin:11*60+30, colorIdx:3 },
-    { id:5, title:"David Chen – Product Mgr",     date:d(4), startMin:14*60,    endMin:15*60,    colorIdx:4 },
-    { id:6, title:"Amara Osei – Data Analyst",    date:d(0), startMin:9*60,     endMin:9*60+30,  colorIdx:2 },
-    { id:7, title:"Panel Review",                 date:d(3), startMin:13*60,    endMin:14*60,    colorIdx:1 },
-    { id:8, title:"Kevin Mensah – DevOps",        date:d(5), startMin:10*60,    endMin:11*60,    colorIdx:0 },
-    { id:9, title:"Offer Discussion",             date:d(2), startMin:14*60+30, endMin:15*60,    colorIdx:3 },
-  ]
+}
+
+function fromApi(iv: ApiInterview): Interview {
+  const start = new Date(iv.startTime)
+  const end = new Date(iv.endTime)
+  const pad = (value: number) => String(value).padStart(2, "0")
+  return {
+    id: iv.id,
+    title: iv.title,
+    date: `${start.getUTCFullYear()}-${pad(start.getUTCMonth() + 1)}-${pad(start.getUTCDate())}`,
+    startMin: start.getUTCHours() * 60 + start.getUTCMinutes(),
+    endMin: end.getUTCHours() * 60 + end.getUTCMinutes(),
+    colorIdx: iv.colorIdx,
+    guests: iv.guestEmails.length > 0 ? iv.guestEmails : undefined,
+    meetLink: iv.meetLink ?? undefined,
+    desc: iv.description ?? undefined,
+    status: iv.status,
+  }
 }
 
 // ── Add Schedule Modal ────────────────────────────────────────
@@ -143,6 +138,8 @@ interface ModalProps {
 }
 
 function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, defaultEnd = 10*60 ,}: ModalProps) {
+  const { accessToken } = useAuth()
+  const router = useRouter()
   const [title,       setTitle]       = useState("")
   const [date,        setDate]        = useState(defaultDate ?? toIso(new Date()))
   const [startMin,    setStartMin]    = useState(defaultStart)
@@ -154,7 +151,19 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
   const [desc,        setDesc]        = useState("")
   const [colorIdx,    setColorIdx]    = useState(2)
   const [error,       setError]       = useState("")
+  const [saving,       setSaving]       = useState(false)
+  const [employees,    setEmployees]    = useState<CandidateOption[]>([])
+  const [loadingEmployees, setLoadingEmployees] = useState(false)
   const guestRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!accessToken) return
+    setLoadingEmployees(true)
+    employeeService.list({ isActive: true, limit: 100 }, accessToken)
+      .then(res => setEmployees(res.data.filter((employee) => employee.user?.email).map(toGuestOption)))
+      .catch(() => toast.error("Could not load employees"))
+      .finally(() => setLoadingEmployees(false))
+  }, [accessToken])
 
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
@@ -166,29 +175,38 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
     return () => document.removeEventListener("mousedown", handleOutside)
   }, [])
 
-  const filteredCandidates = CANDIDATES.filter(
+  const filteredCandidates = employees.filter(
     c => !guests.some(g => g.id === c.id) &&
     (guestSearch === "" ||
       c.name.toLowerCase().includes(guestSearch.toLowerCase()) ||
-      c.position.toLowerCase().includes(guestSearch.toLowerCase()) ||
       c.email.toLowerCase().includes(guestSearch.toLowerCase()))
   )
 
-  function handleSave() {
+  async function handleSave() {
     if (!title.trim())    { setError("Please enter an event title."); return }
     if (endMin <= startMin) { setError("End time must be after start time."); return }
-    onSave({
-      id: _nextId++,
-      title: title.trim(),
-      date,
-      startMin,
-      endMin,
-      colorIdx,
-      guests:   guests.length > 0 ? guests.map(g => g.email) : undefined,
-      meetLink: meetLink || undefined,
-      desc:     desc     || undefined,
-    })
-    onClose()
+    if (!accessToken) { router.push("/auth/login"); return }
+    setSaving(true)
+    setError("")
+    try {
+      const res = await interviewsService.create({
+        title: title.trim(), date, startMin, endMin, colorIdx,
+        guests: guests.length > 0 ? guests.map(g => g.email) : undefined,
+        meetLink: meetLink || undefined,
+        desc: desc || undefined,
+      }, accessToken)
+      onSave(fromApi(res.data))
+      onClose()
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 401) { router.push("/auth/login"); return }
+        setError(err.message)
+      } else {
+        setError("Something went wrong. Please try again.")
+      }
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -262,7 +280,13 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
                   key={g.id}
                   className="flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary"
                 >
-                  <img src={g.photo} className="size-4 rounded-full object-cover" />
+                  {g.avatarUrl ? (
+                    <img src={g.avatarUrl} alt="" className="size-4 rounded-full object-cover" />
+                  ) : (
+                    <span className="flex size-4 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-primary">
+                      {g.name.slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
                   {g.name}
                   <button
                     type="button"
@@ -285,7 +309,9 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
 
             {showDrop && (
               <div className="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
-                {filteredCandidates.length > 0 ? filteredCandidates.map(c => (
+                {loadingEmployees ? (
+                  <p className="px-2.5 py-2.5 text-xs text-muted-foreground">Loading employees…</p>
+                ) : filteredCandidates.length > 0 ? filteredCandidates.map(c => (
                   <button
                     key={c.id}
                     type="button"
@@ -293,10 +319,16 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
                     onClick={() => { setGuests(prev => [...prev, c]); setGuestSearch(""); }}
                     className="flex w-full items-center gap-2.5 px-2.5 py-1.5 text-left hover:bg-muted"
                   >
-                    <img src={c.photo} className="size-8 shrink-0 rounded-full object-cover" />
+                    {c.avatarUrl ? (
+                      <img src={c.avatarUrl} alt={c.name} className="size-8 shrink-0 rounded-full object-cover" />
+                    ) : (
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                        {c.name.slice(0, 1).toUpperCase()}
+                      </span>
+                    )}
                     <div className="min-w-0">
                       <p className="truncate text-xs font-medium text-foreground">{c.name}</p>
-                      <p className="truncate text-xs text-muted-foreground">{c.position}</p>
+                      <p className="truncate text-xs text-muted-foreground">{c.email}</p>
                     </div>
                   </button>
                 )) : (
@@ -352,15 +384,17 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
         <div className="flex items-center justify-end gap-1.5 border-t border-border px-4 py-2.5">
           <button
             onClick={onClose}
-            className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
+            disabled={saving}
+            className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+            disabled={saving}
+            className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
-            Save
+            {saving ? "Saving…" : "Save"}
           </button>
         </div>
       </div>
@@ -370,15 +404,33 @@ function AddScheduleModal({ onClose, onSave, defaultDate, defaultStart = 9*60, d
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function InterviewsPage() {
+  const { accessToken, loading: authLoading } = useAuth()
+  const router = useRouter()
   const today = new Date()
 
   const [weekStart,   setWeekStart]   = useState(() => getWeekStart(today))
   const [view,        setView]        = useState<"Day"|"Week"|"Month">("Week")
-  const [interviews,  setInterviews]  = useState<Interview[]>(() => makeSeed())
+  const [interviews,  setInterviews]  = useState<Interview[]>([])
+  const [loadingData, setLoadingData] = useState(true)
   const [showModal,   setShowModal]   = useState(false)
   const [modalDate,   setModalDate]   = useState<string>()
   const [modalStart,  setModalStart]  = useState<number>()
   const [modalEnd,    setModalEnd]    = useState<number>()
+
+  useEffect(() => {
+    if (authLoading) return
+    if (!accessToken) { router.push("/auth/login"); return }
+    // The fetch overlay should appear immediately while the API request is pending.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoadingData(true)
+    interviewsService.list(accessToken)
+      .then(res => setInterviews(res.data.map(fromApi)))
+      .catch(err => {
+        if (err instanceof ApiError && err.status === 401) router.push("/auth/login")
+        else toast.error(err instanceof Error ? err.message : "Could not load schedules")
+      })
+      .finally(() => setLoadingData(false))
+  }, [accessToken, authLoading, router])
 
   // Build week days array
   const weekDays = Array.from({ length: 7 }, (_, i) => {
@@ -489,7 +541,12 @@ export default function InterviewsPage() {
         </div>
 
         {/* ── Calendar body ── */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="relative flex flex-1 overflow-hidden">
+          {loadingData && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-card/60 text-xs text-muted-foreground">
+              Loading schedules…
+            </div>
+          )}
           {/* Scrollable container */}
           <div className="flex flex-1 overflow-auto">
             {/* Inner width wrapper */}

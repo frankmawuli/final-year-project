@@ -1,7 +1,20 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { MapPin, Calendar, ChevronRight } from "lucide-react"
+import {
+  BadgeDollarSign,
+  Calendar,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Clock3,
+  FileText,
+  Gift,
+  MapPin,
+  Megaphone,
+  Play,
+  UserRound,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -14,11 +27,12 @@ const recentAttendance = [
   { date: "Tue, 07 March 2023", clockIn: "09:10", clockOut: "18:30" },
 ]
 
+
+
 function useLiveClock() {
   const [now, setNow] = useState<Date | null>(null)
 
   useEffect(() => {
-    setNow(new Date())
     const id = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(id)
   }, [])
@@ -44,7 +58,6 @@ export default function AttendancePage() {
   const { time, date } = useLiveClock()
   const [clockedIn, setClockedIn] = useState(false)
   const [startTime, setStartTime] = useState<string | null>(null)
-  const [endTime, setEndTime] = useState<string | null>(null)
   const [fromDate, setFromDate] = useState("")
   const [toDate, setToDate] = useState("")
 
@@ -57,193 +70,310 @@ export default function AttendancePage() {
       setStartTime(now)
       setClockedIn(true)
     } else {
-      setEndTime(now)
       setClockedIn(false)
     }
   }
 
   return (
-    <div className="flex h-full flex-col">
-     
+    <main className="min-h-full bg-background px-3 py-3 text-foreground sm:px-5 sm:py-5 lg:px-6">
+      <div className="mx-auto max-w-[1420px]">
+        <div className="mb-4 flex items-center justify-between lg:hidden">
+          <div>
+            <h1 className="text-base font-semibold">Clock In / Clock Out</h1>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Time / Attendance
+            </p>
+          </div>
+          <span className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Clock3 className="size-4" />
+          </span>
+        </div>
 
-      {/* ── Mobile page title ── */}
-      <div className="border-b border-border bg-card px-3 py-2.5 lg:hidden">
-        <h1 className="text-sm font-semibold text-foreground">Clock In / Clock Out</h1>
-        <p className="mt-0.5 text-xs text-muted-foreground">Time › Attendance</p>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-3 md:p-5 lg:p-6">
-        {/* ── Top content grid ─────────────────────────────── */}
-        <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-[380px_1fr] lg:gap-4">
-
-          {/* Left column */}
-          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-            {/* Greeting card */}
-            <div
-              className="gradient-primary relative overflow-hidden rounded-2xl p-4 text-white sm:flex-1 lg:flex-none"
-            >
-              <span className="absolute -right-6 -top-6 size-28 rounded-full bg-white/10" />
-              <span className="absolute -bottom-8 right-10 size-20 rounded-full bg-white/10" />
-
-              <p className="mb-0.5 text-sm font-semibold">Hi Muhammad !</p>
-              <p className="mb-3 text-xs text-white/70">Please check your attendance.</p>
-
-              <div className="flex items-center gap-2.5">
-                <img
-                  src={employeePhoto}
-                  alt="Muhammad Rifky Andrianto"
-                  className="size-12 shrink-0 rounded-full object-cover ring-2 ring-white/40"
-                />
-                <div>
-                  <p className="text-xs font-semibold">Muhammad Rifky Andrianto</p>
-                  <p className="text-xs text-white/70">UI/UX Designer</p>
-                </div>
+        <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1.05fr_1fr_1fr]">
+          <div className="flex flex-col gap-3">
+            <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-semibold">
+                  <Clock3 className="size-4 text-primary" />
+                  Time Entry
+                </h2>
+                <ChevronDown className="size-4 text-muted-foreground" />
               </div>
-
-              <button className="mt-3 w-full rounded-lg bg-white/20 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90">
-                View Profile
-              </button>
-            </div>
-
-            {/* Live clock card */}
-            <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:flex-1 lg:flex-none">
-              <p className="mb-1 text-xs font-medium text-muted-foreground">Time</p>
-              <p className="text-xl font-bold tracking-tight text-primary md:text-2xl">
-                {time}
-                <span className="ml-1.5 text-xs font-normal text-muted-foreground md:text-sm">
+              <p className="text-center text-xs text-muted-foreground">
+                {clockedIn
+                  ? `Clocked in since ${startTime}`
+                  : "Ready to start your workday"}
+              </p>
+              <div className="mx-auto my-4 flex size-40 flex-col items-center justify-center rounded-full border-[7px] border-primary/15 border-r-primary text-center">
+                <span className="text-[10px] font-semibold text-primary">
+                  {clockedIn ? "WORKING" : "TODAY"}
+                </span>
+                <span className="mt-1 text-3xl font-light tracking-tight">
+                  {time.slice(0, 5)}
+                </span>
+                <span className="mt-1 text-xs font-medium text-muted-foreground">
                   GMT+7
                 </span>
+              </div>
+              <p className="-mt-2 mb-3 text-center text-[10px] text-muted-foreground">
+                {date}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">{date}</p>
-            </div>
-          </div>
-
-          {/* Right column */}
-          <div className="flex flex-col gap-3">
-            {/* Select Project */}
-            <div className="rounded-2xl border border-border bg-card p-4 shadow-sm md:p-5">
-              <h2 className="mb-3 text-sm font-semibold text-foreground">Select Project</h2>
-              <div className="flex gap-2.5">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                  <MapPin className="size-4 text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-foreground">PT Linov Roket Prestasi</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Jl. Menteng Pulo, Menteng Dalam, Kec. Tebet, Kota Jakarta Selatan, Daerah
-                    Khusus Ibukota Jakarta 12870
-                  </p>
-                  <button className="mt-1 text-xs font-medium text-primary hover:underline">
-                    See Location
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Attendance clock in/out */}
-            <div className="rounded-2xl border border-border bg-card p-4 shadow-sm md:p-5">
-              <h2 className="mb-3 text-sm font-semibold text-foreground">Attendance</h2>
-              <div className="mb-4 grid grid-cols-2 gap-2.5 md:gap-3">
-                <div className="rounded-xl border border-border bg-background px-3 py-2.5 text-center">
-                  <p className="mb-1 text-xs text-muted-foreground">Start Time</p>
-                  <p
-                    className={cn(
-                      "text-base font-semibold",
-                      startTime ? "text-foreground" : "text-muted-foreground"
-                    )}
-                  >
-                    {startTime ?? "--,--"}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-border bg-background px-3 py-2.5 text-center">
-                  <p className="mb-1 text-xs text-muted-foreground">End Time</p>
-                  <p
-                    className={cn(
-                      "text-base font-semibold",
-                      endTime ? "text-foreground" : "text-muted-foreground"
-                    )}
-                  >
-                    {endTime ?? "--,--"}
-                  </p>
-                </div>
-              </div>
+              <label
+                className="mb-1.5 block text-xs font-medium text-muted-foreground"
+                htmlFor="attendance-notes"
+              >
+                Notes
+              </label>
+              <input
+                id="attendance-notes"
+                placeholder="Add a note for this entry"
+                className="mb-3 h-9 w-full rounded-lg border border-input bg-background px-3 text-xs outline-none focus:ring-2 focus:ring-ring/30"
+              />
               <Button
                 onClick={handleClock}
                 className={cn(
                   "w-full",
-                  clockedIn ? "bg-red-500 hover:bg-red-600" : "gradient-primary border-0 hover:opacity-90"
+                  clockedIn
+                    ? "bg-destructive hover:bg-destructive/90"
+                    : "gradient-primary border-0 hover:opacity-90"
                 )}
               >
                 {clockedIn ? "Clock Out" : "Clock In"}
               </Button>
-            </div>
-          </div>
-        </div>
+              <Button variant="outline" className="mt-2 w-full text-xs">
+                <MapPin className="size-3.5" />
+                Clock In + Transfer
+              </Button>
+              <Button variant="outline" className="mt-2 w-full text-xs">
+                Manual
+              </Button>
+            </section>
 
-        {/* ── Recent Attendance ─────────────────────────────── */}
-        <div className="rounded-2xl border border-border bg-card shadow-sm">
-          {/* Filters */}
-          <div className="flex flex-col gap-2.5 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:px-5">
-            <h2 className="text-sm font-semibold text-foreground">Recent Attendance</h2>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">From</span>
-              <div className="flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1">
-                <input
-                  type="date"
-                  value={fromDate}
-                  onChange={(e) => setFromDate(e.target.value)}
-                  className="w-[130px] bg-transparent text-xs text-foreground outline-none"
-                />
-                <Calendar className="size-4 shrink-0 text-muted-foreground" />
+            <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-semibold">
+                  <Gift className="size-4 text-primary" />
+                  Benefits
+                </h2>
+                <ChevronDown className="size-4 text-muted-foreground" />
               </div>
-              <span className="text-xs text-muted-foreground">To</span>
-              <div className="flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1">
-                <input
-                  type="date"
-                  value={toDate}
-                  onChange={(e) => setToDate(e.target.value)}
-                  className="w-[130px] bg-transparent text-xs text-foreground outline-none"
-                />
-                <Calendar className="size-4 shrink-0 text-muted-foreground" />
+              <div className="rounded-xl border border-border bg-background p-3">
+                <p className="text-sm font-bold text-primary">
+                  BlueCross BlueShield
+                </p>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-[10px] text-muted-foreground">
+                  <span>
+                    Member Name
+                    <br />
+                    <b className="text-foreground">Muhammad Rifky</b>
+                  </span>
+                  <span>
+                    Network Name
+                    <br />
+                    <b className="text-foreground">Standard</b>
+                  </span>
+                  <span>
+                    ID
+                    <br />
+                    <b className="text-foreground">XX123456789</b>
+                  </span>
+                  <span>
+                    Coverage
+                    <br />
+                    <b className="text-foreground">Medical & Rx</b>
+                  </span>
+                </div>
               </div>
-            </div>
+              <Button className="gradient-primary mt-3 w-full border-0 text-xs">
+                View Compensation
+              </Button>
+            </section>
           </div>
 
-          {/* Scrollable table on small screens */}
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[420px]">
-              <thead>
-                <tr className="bg-muted/40">
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-foreground md:px-5">
-                    Date
-                  </th>
-                  <th className="px-4 py-2.5 text-center text-xs font-semibold text-foreground md:px-5">
-                    Clock In
-                  </th>
-                  <th className="px-4 py-2.5 text-center text-xs font-semibold text-foreground md:px-5">
-                    Clock Out
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentAttendance.map((row, i) => (
-                  <tr
-                    key={i}
-                    className={cn(
-                      "border-t border-border transition-colors hover:bg-muted/30",
-                      i === 0 && "text-muted-foreground"
-                    )}
+          <div className="flex flex-col gap-3">
+            <section className="gradient-primary relative overflow-hidden rounded-2xl p-5 text-white shadow-sm">
+              <div className="absolute -top-8 -right-8 size-32 rounded-full bg-white/10" />
+              <div className="relative">
+                <div className="mb-3 flex items-start justify-between">
+                  <div>
+                    <p className="text-lg font-semibold">Hi, Muhammad!</p>
+                    <p className="mt-1 text-xs text-white/75">
+                      Here is your workday at a glance.
+                    </p>
+                  </div>
+                  <UserRound className="size-5 text-white/75" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={employeePhoto}
+                    alt="Muhammad Rifky Andrianto"
+                    className="size-12 rounded-full object-cover ring-2 ring-white/40"
+                  />
+                  <div>
+                    <p className="text-xs font-semibold">
+                      Muhammad Rifky Andrianto
+                    </p>
+                    <p className="text-xs text-white/75">UI/UX Designer</p>
+                  </div>
+                </div>
+                <button className="mt-4 rounded-lg bg-white/20 px-3 py-1.5 text-xs font-semibold hover:bg-white/30">
+                  View Employee Record
+                </button>
+              </div>
+            </section>
+            <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-semibold">
+                  <Clock3 className="size-4 text-primary" />
+                  Time Off
+                </h2>
+                <ChevronDown className="size-4 text-muted-foreground" />
+              </div>
+              <Button className="gradient-primary border-0 text-xs">
+                Request Time Off
+              </Button>
+              <div className="mt-4 grid grid-cols-3 gap-2 border-b border-border pb-2 text-[10px] font-semibold text-muted-foreground">
+                <span>Type</span>
+                <span>Available</span>
+                <span>Future Approved</span>
+              </div>
+              {[
+                ["Sick", "40.00 hours", "8.00 hours"],
+                ["Vacation", "80.00 hours", "16.00 hours"],
+                ["Volunteer", "16.00 hours", "0.00 hours"],
+              ].map(([type, available, future]) => (
+                <div
+                  key={type}
+                  className="grid grid-cols-3 gap-2 border-b border-border py-2 text-xs"
+                >
+                  <span className="font-medium text-primary">{type}</span>
+                  <span>{available}</span>
+                  <span>{future}</span>
+                </div>
+              ))}
+              <div className="mt-3 flex gap-2">
+                <Button variant="outline" size="sm">
+                  Time Off History
+                </Button>
+                <Button variant="outline" size="sm">
+                  More <ChevronDown className="size-3" />
+                </Button>
+              </div>
+            </section>
+                       <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-semibold">
+                  <UserRound className="size-4 text-primary" />
+                  Employment
+                </h2>
+                <ChevronDown className="size-4 text-muted-foreground" />
+              </div>
+              <div className="mb-3 flex items-center justify-between rounded-xl bg-primary/10 px-3 py-2.5">
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Employment status</p>
+                  <p className="mt-0.5 text-xs font-semibold text-foreground">Active · Full-time</p>
+                </div>
+                <span className="flex size-7 items-center justify-center rounded-full bg-card text-emerald-600">
+                  <Check className="size-4" />
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-[10px]">
+                <div>
+                  <p className="text-muted-foreground">Job title</p>
+                  <p className="mt-0.5 font-semibold text-foreground">UI/UX Designer</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Department</p>
+                  <p className="mt-0.5 font-semibold text-foreground">Design</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Company</p>
+                  <p className="mt-0.5 font-semibold text-foreground">Acme Corp</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Start date</p>
+                  <p className="mt-0.5 font-semibold text-foreground">12 Jan 2023</p>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                <span className="text-[10px] text-muted-foreground">Jakarta office · GMT+7</span>
+                <button className="text-xs font-medium text-primary hover:underline">View record</button>
+              </div>
+            </section>
+ 
+    
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-semibold">
+                  <Megaphone className="size-4 text-primary" />
+                  Announcements
+                </h2>
+                <ChevronDown className="size-4 text-muted-foreground" />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                You&apos;re all caught up!
+              </p>
+              <div className="mt-3 flex h-28 items-center justify-center overflow-hidden rounded-xl bg-primary/10">
+                <Play className="size-10 rounded-full bg-card p-3 text-primary shadow-sm" />
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-xs font-semibold">Visit Community</span>
+                <ChevronRight className="size-5 rounded-full border border-border p-1 text-muted-foreground" />
+              </div>
+            </section>
+            <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-semibold">
+                  <BadgeDollarSign className="size-4 text-primary" />
+                  Pay
+                </h2>
+                <ChevronDown className="size-4 text-muted-foreground" />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Your next check is Friday, July 29 for pay period dates 11 - Jul
+                24.
+              </p>
+              <div className="mt-3 flex gap-2">
+                <Button className="gradient-primary border-0 text-xs">
+                  On Demand Pay
+                </Button>
+                <Button variant="outline" className="text-xs">
+                  Upcoming Check
+                </Button>
+              </div>
+              {["07/15/2022", "07/08/2022", "07/01/2022", "06/15/2022"].map(
+                (payDate) => (
+                  <div
+                    key={payDate}
+                    className="flex items-center justify-between border-b border-border py-2 text-[10px]"
                   >
-                    <td className="px-4 py-3 text-xs md:px-5">{row.date}</td>
-                    <td className="px-4 py-3 text-center text-xs md:px-5">{row.clockIn}</td>
-                    <td className="px-4 py-3 text-center text-xs md:px-5">{row.clockOut}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    <span className="font-semibold text-primary">
+                      {payDate}
+                    </span>
+                    <span>102034</span>
+                    <span className="text-muted-foreground">hidden</span>
+                    <span className="flex size-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                      <Check className="size-3" />
+                    </span>
+                  </div>
+                )
+              )}
+              <div className="mt-3 flex gap-2">
+                <Button variant="outline" size="sm">
+                  View Expenses
+                </Button>
+                <Button variant="outline" size="sm">
+                  Go Paperless
+                </Button>
+              </div>
+            </section>
+         
           </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

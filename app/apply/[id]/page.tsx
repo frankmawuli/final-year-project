@@ -11,6 +11,15 @@ import { cn } from "@/lib/utils"
 import { jobsService, type PublicJobDetail } from "@/services/jobs.service"
 import { ApplyModal } from "@/components/jobs/apply-modal"
 import { useApplicantAuth } from "@/context/applicant-auth-context"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import {
   PUBLIC_TYPE_LABEL,
   PUBLIC_LEVEL_LABEL,
@@ -72,18 +81,19 @@ export default function JobDetailPage() {
   const id = String(params.id ?? "")
   const { isAuthenticated } = useApplicantAuth()
 
-  const [job,       setJob]       = useState<PublicJobDetail | null>(null)
-  const [loading,   setLoading]   = useState(true)
-  const [error,     setError]     = useState<string | null>(null)
-  const [applyOpen, setApplyOpen] = useState(false)
+  const [job,         setJob]         = useState<PublicJobDetail | null>(null)
+  const [loading,     setLoading]     = useState(true)
+  const [error,       setError]       = useState<string | null>(null)
+  const [applyOpen,   setApplyOpen]   = useState(false)
+  const [guestPromptOpen, setGuestPromptOpen] = useState(false)
 
-  // Logged-in applicants pick between quick apply and the form; everyone else
-  // goes straight to the form as before.
+  // Logged-in applicants pick between quick apply and the form; guests are
+  // offered the choice to continue without an account or to log in first.
   function handleApply() {
     if (isAuthenticated) {
       setApplyOpen(true)
     } else {
-      router.push(`/apply/apply?jobId=${id}`)
+      setGuestPromptOpen(true)
     }
   }
 
@@ -128,6 +138,26 @@ export default function JobDetailPage() {
       </div>
 
       <ApplyModal jobId={id} jobTitle={job.title} open={applyOpen} onOpenChange={setApplyOpen} />
+
+      <Dialog open={guestPromptOpen} onOpenChange={setGuestPromptOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Apply without an account?</DialogTitle>
+            <DialogDescription>
+              You can continue as a guest and fill out the application form, or log in to reuse a
+              saved profile and track your applications afterwards.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-between">
+            <Button variant="outline" onClick={() => router.push("/jobs/login")}>
+              Login
+            </Button>
+            <Button onClick={() => router.push(`/apply/apply?jobId=${id}`)}>
+              Continue as guest
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <main className="flex-1 overflow-y-auto pb-16 lg:pb-0">
         <div className="mx-auto max-w-7xl p-3 sm:p-5">
