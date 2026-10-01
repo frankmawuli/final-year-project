@@ -23,6 +23,17 @@ export interface HrOverviewData {
   employeesByRole:       HrOverviewRoleCount[]
 }
 
+export interface HrAttendanceSummary {
+  year: number
+  months: Array<{ month: string; attendance: number | null }>
+}
+
+export interface HrTodayAttendance {
+  date: string
+  attendance: number | null
+  change: number | null
+}
+
 export type ActivityCategory = "HR" | "RECRUITMENT"
 
 export interface ActivityItem {
@@ -35,6 +46,16 @@ export interface ActivityItem {
 }
 
 export const hrService = {
+  todayAttendance: (token: string) =>
+    api.get<{ success: boolean; data: HrTodayAttendance }>("/hr/attendance/today", {
+      Authorization: `Bearer ${token}`,
+    }),
+
+  attendanceSummary: (token: string, year = new Date().getFullYear()) =>
+    api.get<{ success: boolean; data: HrAttendanceSummary }>(`/hr/attendance/summary?year=${year}`, {
+      Authorization: `Bearer ${token}`,
+    }),
+
   overview: (token: string) =>
     api.get<{ success: boolean; data: HrOverviewData }>("/hr/overview", {
       Authorization: `Bearer ${token}`,

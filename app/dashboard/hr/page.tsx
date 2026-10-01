@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { startTransition, useEffect, useState } from "react"
 import {
   Users,
   Briefcase,
@@ -13,7 +13,6 @@ import {
   FileText,
   FileCheck,
 } from "lucide-react"
-import Link from "next/link"
 import {
   BarChart,
   Bar,
@@ -30,7 +29,7 @@ import {
 } from "recharts"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { useAuth } from "@/context/auth-context"
-import { hrService, type HrOverviewData, type ActivityItem } from "@/services/hr.service"
+import { hrService, type HrOverviewData, type HrAttendanceSummary, type HrTodayAttendance, type ActivityItem } from "@/services/hr.service"
 import { employeeService, type ApiEmployee } from "@/services/employee.service"
 
 const ACTIVITY_ICONS: Record<string, React.ElementType> = {
@@ -53,22 +52,6 @@ function timeAgo(iso: string): string {
   if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }
-
-// ── Chart Data ───────────────────────────────────────────────
-const attendanceData = [
-  { month: "Jan", attendance: 91 },
-  { month: "Feb", attendance: 88 },
-  { month: "Mar", attendance: 94 },
-  { month: "Apr", attendance: 90 },
-  { month: "May", attendance: 96 },
-  { month: "Jun", attendance: 93 },
-  { month: "Jul", attendance: 87 },
-  { month: "Aug", attendance: 95 },
-  { month: "Sep", attendance: 92 },
-  { month: "Oct", attendance: 97 },
-  { month: "Nov", attendance: 94 },
-  { month: "Dec", attendance: 96 },
-]
 
 const ROLE_COLORS = ["#3d70fa", "#f59e0b", "#10b981", "#f472b6", "#a78bfa", "#22d3ee", "#fb923c"]
 
@@ -120,16 +103,34 @@ export default function HRDashboard() {
   const [overview, setOverview] = useState<HrOverviewData | null>(null)
   const [loading, setLoading]   = useState(true)
   const [error, setError]       = useState<string | null>(null)
+  const [attendanceSummary, setAttendanceSummary] = useState<HrAttendanceSummary | null>(null)
+  const [todayAttendance, setTodayAttendance] = useState<HrTodayAttendance | null>(null)
 
   useEffect(() => {
     if (!accessToken) return
-    setLoading(true)
-    setError(null)
+    startTransition(() => {
+      setLoading(true)
+      setError(null)
+    })
     hrService
       .overview(accessToken)
       .then((res) => setOverview(res.data))
       .catch((e: unknown) => setError(e instanceof Error ? e.message : "Failed to load overview"))
       .finally(() => setLoading(false))
+  }, [accessToken])
+
+  useEffect(() => {
+    if (!accessToken) return
+    hrService.todayAttendance(accessToken)
+      .then((res) => setTodayAttendance(res.data))
+      .catch(() => setTodayAttendance(null))
+  }, [accessToken])
+
+  useEffect(() => {
+    if (!accessToken) return
+    hrService.attendanceSummary(accessToken)
+      .then((res) => setAttendanceSummary(res.data))
+      .catch(() => setAttendanceSummary(null))
   }, [accessToken])
 
   const departmentData = (overview?.employeesByDepartment ?? []).map((d) => ({
@@ -152,6 +153,8 @@ export default function HRDashboard() {
   const openJobsChange = loading
     ? ""
     : `+${overview?.stats.newJobsThisWeek ?? 0} this week`
+
+  const attendanceData = attendanceSummary?.months ?? []
 
   const [activity, setActivity] = useState<ActivityItem[]>([])
 
@@ -220,9 +223,9 @@ export default function HRDashboard() {
           />
           <StatCard
             label="Attendance Today"
-            value="96%"
-            change="+1.2% vs yesterday"
-            positive
+            value={todayAttendance?.attendance == null ? "—" : `${todayAttendance.attendance}%`}
+            change={todayAttendance?.change == null ? "No comparison" : `${todayAttendance.change >= 0 ? "+" : ""}${todayAttendance.change}% vs yesterday`}
+            positive={todayAttendance?.change == null || todayAttendance.change >= 0}
             icon={CalendarCheck}
           />
         </div>
@@ -254,7 +257,7 @@ export default function HRDashboard() {
               <Tooltip
                 cursor={{ stroke: "var(--color-border)" }}
                 contentStyle={{ borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 12, background: "var(--color-card)", color: "var(--color-foreground)" }}
-                formatter={(v) => [`${v}%`, "Attendance"]}
+                formatter={(v) => [v == null ? "No data" : `${v}%`, "Attendance"]}
               />
               <Line
                 type="monotone"

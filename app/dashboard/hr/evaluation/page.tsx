@@ -189,13 +189,13 @@ function StatusDropdown({
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex h-[28px] min-w-[130px] items-center justify-between gap-1 rounded border border-border bg-white px-2 text-xs font-medium text-[#374151] hover:bg-muted"
+        className="flex h-[28px] min-w-[130px] items-center justify-between gap-1 rounded border border-border bg-card px-2 text-xs font-medium text-foreground hover:bg-muted"
       >
         <span>{value}</span>
-        <ChevronDown className="size-3 shrink-0 text-[#8181a5]" />
+        <ChevronDown className="size-3 shrink-0 text-muted-foreground" />
       </button>
       {open && (
-        <div className="absolute left-0 top-full z-20 mt-1 w-40 overflow-hidden rounded-lg border border-border bg-white shadow-lg">
+        <div className="absolute left-0 top-full z-20 mt-1 w-40 overflow-hidden rounded-lg border border-border bg-card shadow-lg">
           {STATUS_OPTIONS.map((opt) => {
             const { text } = statusConfig[opt]
             return (
@@ -232,10 +232,10 @@ function ProfilePanel({
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
 
-      <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-white shadow-2xl">
+      <aside className="fixed right-0 top-0 z-40 flex h-full w-[420px] flex-col bg-card shadow-2xl">
         <div className="flex items-center justify-between border-b border-border px-5 py-3">
-          <h2 className="text-sm font-semibold text-[#1f2937]">Applicant Profile</h2>
-          <button onClick={onClose} className="rounded-lg p-1 text-[#8181a5] hover:bg-muted">
+          <h2 className="text-sm font-semibold text-foreground">Applicant Profile</h2>
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground hover:bg-muted">
             <X className="size-5" />
           </button>
         </div>
@@ -250,19 +250,19 @@ function ProfilePanel({
                 className="size-16 shrink-0 rounded-full object-cover ring-2 ring-border"
               />
             ) : (
-              <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] ring-2 ring-border text-base font-bold text-[#8a8cd9]">
+              <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary/10 ring-2 ring-border text-base font-bold text-primary">
                 {candidate.name.charAt(0)}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-base font-bold text-[#1f2937]">{candidate.name}</p>
-              <p className="text-xs font-medium text-[#3d70fa]">{candidate.position}</p>
-              <div className="mt-1 flex flex-wrap gap-1.5 text-xs text-[#667388]">
+              <p className="text-base font-bold text-foreground">{candidate.name}</p>
+              <p className="text-xs font-medium text-primary">{candidate.position}</p>
+              <div className="mt-1 flex flex-wrap gap-1.5 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Mail className="size-3" />{candidate.email}
                 </span>
               </div>
-              <div className="mt-1 flex flex-wrap gap-2.5 text-xs text-[#667388]">
+              <div className="mt-1 flex flex-wrap gap-2.5 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Phone className="size-3" />{candidate.phone}
                 </span>
@@ -274,62 +274,62 @@ function ProfilePanel({
           </div>
 
           {/* AI Score + Status */}
-          <div className="flex items-center gap-2.5 rounded-xl border border-border bg-[#f8fafc] px-3 py-2.5">
+          <div className="flex items-center gap-2.5 rounded-xl border border-border bg-muted/30 px-3 py-2.5">
             <div className="flex flex-col items-center gap-1">
-              <p className="text-[10px] uppercase tracking-wide text-[#8181a5]">AI Score</p>
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">AI Score</p>
               <AiScoreBadge score={candidate.aiScore} />
             </div>
             <div className="h-8 w-px bg-border" />
             <div className="flex flex-col items-center gap-1">
-              <p className="text-[10px] uppercase tracking-wide text-[#8181a5]">Status</p>
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Status</p>
               <StatusBadge status={candidate.status} />
             </div>
             <div className="h-8 w-px bg-border" />
             <div className="flex flex-col items-center gap-1">
-              <p className="text-[10px] uppercase tracking-wide text-[#8181a5]">Applied</p>
-              <p className="text-xs font-medium text-[#374151]">{candidate.appliedAt}</p>
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Applied</p>
+              <p className="text-xs font-medium text-foreground">{candidate.appliedAt}</p>
             </div>
           </div>
 
           {/* About */}
           {candidate.about && (
             <div>
-              <p className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
+              <p className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-foreground">
                 <Star className="size-3.5 text-[#ffc555]" />About
               </p>
-              <p className="text-xs leading-relaxed text-[#667388]">{candidate.about}</p>
+              <p className="text-xs leading-relaxed text-muted-foreground">{candidate.about}</p>
             </div>
           )}
 
           {/* Skills */}
           <div>
-            <p className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
+            <p className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-foreground">
               <Briefcase className="size-3.5 text-[#5e81f4]" />Skills
             </p>
             {loading ? (
-              <div className="flex items-center gap-1.5 text-xs text-[#8181a5]">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Loader2 className="size-3.5 animate-spin" />Loading…
               </div>
             ) : candidate.skills.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
                 {candidate.skills.map((s) => (
-                  <span key={s} className="rounded-full bg-[#f0f0ff] px-2 py-0.5 text-xs font-medium text-[#8a8cd9]">
+                  <span key={s} className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                     {s}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-[#8181a5]">No skills listed.</p>
+              <p className="text-xs text-muted-foreground">No skills listed.</p>
             )}
           </div>
 
           {/* Experience */}
           <div>
-            <p className="mb-2.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
+            <p className="mb-2.5 flex items-center gap-1 text-xs font-semibold text-foreground">
               <Briefcase className="size-3.5 text-[#3b82f6]" />Experience
             </p>
             {loading ? (
-              <div className="flex items-center gap-1.5 text-xs text-[#8181a5]">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Loader2 className="size-3.5 animate-spin" />Loading…
               </div>
             ) : candidate.experience.length > 0 ? (
@@ -338,24 +338,24 @@ function ProfilePanel({
                   <div key={i} className="flex items-start gap-2.5">
                     <div className="mt-1 size-2 shrink-0 rounded-full bg-[#5e81f4]" />
                     <div>
-                      <p className="text-xs font-semibold text-[#1f2937]">{exp.role}</p>
-                      <p className="text-xs text-[#667388]">{exp.company} · {exp.duration}</p>
+                      <p className="text-xs font-semibold text-foreground">{exp.role}</p>
+                      <p className="text-xs text-muted-foreground">{exp.company} · {exp.duration}</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-[#8181a5]">No experience listed.</p>
+              <p className="text-xs text-muted-foreground">No experience listed.</p>
             )}
           </div>
 
           {/* Education */}
           <div>
-            <p className="mb-2.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
+            <p className="mb-2.5 flex items-center gap-1 text-xs font-semibold text-foreground">
               <GraduationCap className="size-3.5 text-[#4aa785]" />Education
             </p>
             {loading ? (
-              <div className="flex items-center gap-1.5 text-xs text-[#8181a5]">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Loader2 className="size-3.5 animate-spin" />Loading…
               </div>
             ) : candidate.education.length > 0 ? (
@@ -364,43 +364,43 @@ function ProfilePanel({
                   <div key={i} className="flex items-start gap-2.5">
                     <div className="mt-1 size-2 shrink-0 rounded-full bg-[#4aa785]" />
                     <div>
-                      <p className="text-xs font-semibold text-[#1f2937]">{edu.degree}</p>
-                      <p className="text-xs text-[#667388]">{edu.school} · {edu.year}</p>
+                      <p className="text-xs font-semibold text-foreground">{edu.degree}</p>
+                      <p className="text-xs text-muted-foreground">{edu.school} · {edu.year}</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-[#8181a5]">No education listed.</p>
+              <p className="text-xs text-muted-foreground">No education listed.</p>
             )}
           </div>
 
           {/* Documents */}
           {candidate.documents.length > 0 && (
             <div>
-              <p className="mb-2.5 flex items-center gap-1 text-xs font-semibold text-[#1f2937]">
+              <p className="mb-2.5 flex items-center gap-1 text-xs font-semibold text-foreground">
                 <FileText className="size-3.5 text-[#ffc555]" />Submitted Documents
               </p>
               <div className="space-y-1.5">
                 {candidate.documents.map((doc, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between rounded-lg border border-border bg-[#f8fafc] px-2.5 py-2"
+                    className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-2.5 py-2"
                   >
                     <div className="flex items-center gap-2">
                       <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#eff6ff]">
                         <FileText className="size-4 text-[#3b82f6]" />
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-[#1f2937]">{doc.name}</p>
-                        <p className="text-[10px] text-[#8181a5]">{doc.type}</p>
+                        <p className="text-xs font-medium text-foreground">{doc.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{doc.type}</p>
                       </div>
                     </div>
                     <a
                       href={doc.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-lg p-1 text-[#5e81f4] hover:bg-[#f0f0ff]"
+                      className="rounded-lg p-1 text-primary hover:bg-primary/10"
                       title="Download"
                     >
                       <Download className="size-4" />
@@ -421,8 +421,8 @@ const sidebarNav = [
   { label: "Job Listings",         href: "/dashboard/hr/jobs",       active: false },
   { label: "Applicants",           href: "/dashboard/hr/applicants", active: false },
   { label: "Candidate Evaluation", href: "/dashboard/hr/evaluation", active: true  },
-  { label: "Interview Scheduling", href: "#",                         active: false },
-  { label: "History",              href: "#",                         active: false },
+  { label: "Interview Scheduling", href: "/dashboard/hr/interviews", active: false },
+  { label: "History",              href: "/dashboard/hr/history", active: false },
 ]
 
 // ── Main Page ─────────────────────────────────────────────────
@@ -505,15 +505,15 @@ export default function EvaluationPage() {
 
       <main className="flex flex-1 flex-col overflow-hidden">
         {/* Search */}
-        <div className="flex shrink-0 items-center gap-2.5 border-b border-border bg-white px-5 py-2.5">
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-border bg-background px-5 py-2.5">
           <div className="flex flex-1 items-center gap-1.5">
-            <Search className="size-5 shrink-0 text-[#8181a5]" />
+            <Search className="size-5 shrink-0 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search ⌘K"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 bg-transparent text-xs text-[#1f2937] outline-none placeholder:text-[rgba(34,48,62,0.4)]"
+              className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
           <FilterDropdown
@@ -540,12 +540,12 @@ export default function EvaluationPage() {
           )}
 
           {/* Table card */}
-          <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+          <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             <div className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center border-b border-border px-5 py-3">
               {["Candidate Name", "Job Position", "Applied", "AI Score", "Status", "Actions"].map((h, i) => (
                 <span
                   key={h}
-                  className={cn("text-xs font-medium text-[#1f2937]", i === 5 && "text-right")}
+                  className={cn("text-xs font-medium text-foreground", i === 5 && "text-right")}
                 >
                   {h}
                 </span>
@@ -555,36 +555,36 @@ export default function EvaluationPage() {
             <div className="flex-1 overflow-y-auto divide-y divide-border">
               {listLoading ? (
                 <div className="flex h-32 items-center justify-center">
-                  <Loader2 className="size-5 animate-spin text-[#8181a5]" />
+                  <Loader2 className="size-5 animate-spin text-muted-foreground" />
                 </div>
               ) : rows.length > 0 ? rows.map((c) => (
                 <div
                   key={c.id}
-                  className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center gap-x-2.5 px-5 py-2.5 transition-colors hover:bg-[#f8fafc]"
+                  className="grid grid-cols-[2fr_2fr_1.2fr_0.8fr_1.2fr_1.8fr] items-center gap-x-2.5 px-5 py-2.5 transition-colors hover:bg-muted/50"
                 >
                   {/* Name */}
                   <div className="flex min-w-0 items-center gap-2.5">
                     {c.photo ? (
                       <img src={c.photo} alt={c.name} className="size-9 shrink-0 rounded-full object-cover" />
                     ) : (
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f0f0ff] text-xs font-bold text-[#8a8cd9]">
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                         {c.name.charAt(0)}
                       </div>
                     )}
                     <div className="min-w-0">
-                      <p className="truncate text-xs font-medium text-[#1f2937]">{c.name}</p>
-                      <p className="truncate text-xs text-[#667388]">{c.email}</p>
+                      <p className="truncate text-xs font-medium text-foreground">{c.name}</p>
+                      <p className="truncate text-xs text-muted-foreground">{c.email}</p>
                     </div>
                   </div>
 
                   {/* Position */}
                   <div className="min-w-0">
-                    <p className="truncate text-xs text-[#1f2937]">{c.position}</p>
-                    <p className="truncate text-xs text-[#8181a5]">{c.department}</p>
+                    <p className="truncate text-xs text-foreground">{c.position}</p>
+                    <p className="truncate text-xs text-muted-foreground">{c.department}</p>
                   </div>
 
                   {/* Applied */}
-                  <span className="text-xs text-[#667388]">{c.appliedAt}</span>
+                  <span className="text-xs text-muted-foreground">{c.appliedAt}</span>
 
                   {/* AI Score */}
                   <div>
@@ -611,7 +611,7 @@ export default function EvaluationPage() {
                   </div>
                 </div>
               )) : (
-                <div className="flex h-32 items-center justify-center text-xs text-[#8181a5]">
+                <div className="flex h-32 items-center justify-center text-xs text-muted-foreground">
                   No candidates match your search.
                 </div>
               )}
@@ -623,7 +623,7 @@ export default function EvaluationPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="flex size-8 items-center justify-center rounded-full text-[#4b5563] transition-colors hover:bg-muted disabled:opacity-40"
+              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
             >
               <ChevronLeft className="size-4" />
             </button>
@@ -633,7 +633,7 @@ export default function EvaluationPage() {
                 onClick={() => setPage(p)}
                 className={cn(
                   "flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
-                  p === page ? "bg-[#3b6feb] text-white" : "text-[#4b5563] hover:bg-muted"
+                  p === page ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
                 )}
               >
                 {p}
@@ -642,7 +642,7 @@ export default function EvaluationPage() {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="flex size-8 items-center justify-center rounded-full text-[#4b5563] transition-colors hover:bg-muted disabled:opacity-40"
+              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
             >
               <ChevronRight className="size-4" />
             </button>

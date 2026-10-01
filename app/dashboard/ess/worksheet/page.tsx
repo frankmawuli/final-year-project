@@ -1,17 +1,16 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { startTransition, useEffect, useMemo, useState } from "react"
 import {
-  CalendarDays,
   ChevronLeft,
   ChevronRight,
-  CircleHelp,
   Clock3,
-  Download,
   LogIn,
   LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { attendanceService, type ApiAttendanceRecord } from "@/services/attendance.service"
 
 type AttendanceStatus = "present" | "absent" | "leave" | "holiday" | "weekend"
 
@@ -34,32 +33,13 @@ const STATUS_STYLES: Record<AttendanceStatus, { label: string; band: string; tex
   weekend: { label: "Weekend", band: "bg-slate-100", text: "text-slate-500" },
 }
 
-const MOCK_ATTENDANCE: Record<number, AttendanceDay> = {
-  1: { date: 1, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  2: { date: 2, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  3: { date: 3, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  4: { date: 4, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  5: { date: 5, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  8: { date: 8, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  9: { date: 9, status: "absent", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "0.00 Hrs" },
-  10: { date: 10, status: "present", checkIn: "09:30 AM", checkOut: "07:30 PM", hours: "9.25 Hrs" },
-  11: { date: 11, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  12: { date: 12, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  15: { date: 15, status: "present", checkIn: "09:00 AM", checkOut: "07:30 PM", hours: "9.25 Hrs" },
-  16: { date: 16, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  17: { date: 17, status: "holiday", note: "National Holiday" },
-  18: { date: 18, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  19: { date: 19, status: "leave", note: "Leave (SL)" },
-  22: { date: 22, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  23: { date: 23, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  24: { date: 24, status: "absent", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "0.00 Hrs" },
-  25: { date: 25, status: "leave", note: "Leave (SL)" },
-  26: { date: 26, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
-  29: { date: 29, status: "leave", note: "Leave (SL)" },
-  30: { date: 30, status: "present", checkIn: "09:00 AM", checkOut: "06:00 PM", hours: "8.00 Hrs" },
+function formatTime(value: string | null) {
+  return value
+    ? new Date(value).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+    : undefined
 }
 
-function getMonthDays(month: Date) {
+function getMonthDays(month: Date, records: ApiAttendanceRecord[]) {
   const firstDay = new Date(month.getFullYear(), month.getMonth(), 1).getDay()
   const dayCount = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate()
   const previousMonthDays = new Date(month.getFullYear(), month.getMonth(), 0).getDate()
@@ -68,13 +48,25 @@ function getMonthDays(month: Date) {
   for (let index = firstDay - 1; index >= 0; index -= 1) {
     cells.push({ date: previousMonthDays - index, currentMonth: false })
   }
+  const recordByDate = new Map(records.map((record) => [record.date.slice(0, 10), record]))
   for (let date = 1; date <= dayCount; date += 1) {
-    const weekday = new Date(month.getFullYear(), month.getMonth(), date).getDay()
-    const day = MOCK_ATTENDANCE[date] ?? {
-      date,
-      status: weekday === 0 || weekday === 6 ? "weekend" : "absent",
-      hours: "0.00 Hrs",
-    }
+    const calendarDate = new Date(month.getFullYear(), month.getMonth(), date)
+    const weekday = calendarDate.getDay()
+    const isoDate = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-${String(date).padStart(2, "0")}`
+    const record = recordByDate.get(isoDate)
+    const day: AttendanceDay = record
+      ? {
+          date,
+          status: "present" as const,
+          checkIn: formatTime(record.clockIn),
+          checkOut: formatTime(record.clockOut),
+          hours: record.hoursWorked === null ? undefined : `${record.hoursWorked.toFixed(2)} Hrs`,
+        }
+      : {
+          date,
+          status: weekday === 0 || weekday === 6 ? "weekend" : "absent",
+          hours: "0.00 Hrs",
+        }
     cells.push({ date, currentMonth: true, day })
   }
   const trailingDays = (7 - (cells.length % 7)) % 7
@@ -85,12 +77,39 @@ function getMonthDays(month: Date) {
 }
 
 export default function WorksheetPage() {
-  const [month, setMonth] = useState(() => new Date(2026, 8, 1))
+  const { accessToken } = useAuth()
+  const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1))
+  const [records, setRecords] = useState<ApiAttendanceRecord[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const today = new Date()
-  const cells = useMemo(() => getMonthDays(month), [month])
+  const fromDate = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-01`
+  const toDate = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-${String(new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate()).padStart(2, "0")}`
+  const cells = useMemo(() => getMonthDays(month, records), [month, records])
   const monthLabel = month.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-  const presentDays = cells.filter((cell) => cell.day?.status === "present").length
-  const totalHours = cells.reduce((sum, cell) => sum + (cell.day?.hours ? Number.parseFloat(cell.day.hours) : 0), 0)
+
+  useEffect(() => {
+    if (!accessToken) return
+    let cancelled = false
+    startTransition(() => {
+      setLoading(true)
+      setError(null)
+    })
+    attendanceService.list(accessToken, { from: fromDate, to: toDate })
+      .then((response) => {
+        if (!cancelled) setRecords(response.data)
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setRecords([])
+          setError("Unable to load attendance for this month.")
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [accessToken, fromDate, toDate])
 
   function shiftMonth(amount: number) {
     setMonth((current) => new Date(current.getFullYear(), current.getMonth() + amount, 1))
@@ -108,6 +127,8 @@ export default function WorksheetPage() {
     
 
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          {error && <p className="border-b border-rose-200 bg-rose-50 px-4 py-2 text-xs text-rose-700">{error}</p>}
+          {loading && <p className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-500">Loading attendance...</p>}
           <div className="flex flex-col gap-3 border-b border-slate-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
               <button onClick={goToCurrentMonth} className="rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Today</button>
