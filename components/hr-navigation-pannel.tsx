@@ -8,6 +8,7 @@ import { Avatar } from "@/components/avatar"
 import type { Role } from "@/services/auth.service"
 
 const ROLE_LABELS: Record<Role, string> = {
+  SUPER_ADMIN: "Super Admin",
   HR_ADMIN:   "HR Administrator",
   HR_MANAGER: "HR Manager",
   EMPLOYEE:   "Employee",

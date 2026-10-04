@@ -1,6 +1,6 @@
 import { api } from "@/lib/api-client"
 
-export type Role = "HR_ADMIN" | "EMPLOYEE" |"HR_MANAGER"
+export type Role = "SUPER_ADMIN" | "HR_ADMIN" | "EMPLOYEE" | "HR_MANAGER"
 
 export interface User {
   id: string

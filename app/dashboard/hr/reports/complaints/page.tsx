@@ -5,10 +5,12 @@ import {
   Search, ChevronDown, ChevronLeft, ChevronRight, X,
   ShieldAlert, AlertCircle, CheckCircle2, Clock, XCircle,
   EyeOff, Eye, MessageSquare, CalendarDays, Building2,
-  SlidersHorizontal,
+  SlidersHorizontal, Loader2,
 } from "lucide-react"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
+import { complaintService, type ApiComplaint } from "@/services/complaint.service"
 
 // ── Sidebar nav ───────────────────────────────────────────────
 const sidebarNav = [
@@ -38,6 +40,28 @@ interface Complaint {
   status:      ComplaintStatus
   description: string
   updates:     { date: string; text: string }[]
+}
+
+function toViewComplaint(complaint: ApiComplaint): Complaint {
+  return {
+    id: complaint.id,
+    ref: complaint.ref,
+    name: complaint.employee?.name ?? "Anonymous",
+    photo: complaint.employee?.avatarUrl ?? ANON_AVATAR,
+    email: complaint.employee?.email ?? "",
+    department: complaint.employee?.department ?? "",
+    anonymous: complaint.anonymous,
+    title: complaint.title,
+    category: complaint.category,
+    priority: complaint.priority,
+    submittedOn: new Date(complaint.submittedOn).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
+    status: complaint.status,
+    description: complaint.description,
+    updates: complaint.updates.map((update) => ({
+      date: new Date(update.date).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
+      text: update.text,
+    })),
+  }
 }
 
 // ── Style maps ────────────────────────────────────────────────
@@ -487,13 +511,29 @@ function DetailPanel({ c, onClose, onStatusChange }: {
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function HRComplaintsPage() {
-  const [complaints,   setComplaints]   = useState<Complaint[]>(seed)
+  const { accessToken } = useAuth()
+  const [complaints,   setComplaints]   = useState<Complaint[]>([])
+  const [hasLoaded,    setHasLoaded]    = useState(false)
+  const [loadError,    setLoadError]    = useState<string | null>(null)
+  const isLoading = Boolean(accessToken) && !hasLoaded
   const [search,       setSearch]       = useState("")
   const [catFilter,    setCatFilter]    = useState<ComplaintCategory | "All">("All")
   const [prioFilter,   setPrioFilter]   = useState<ComplaintPriority | "All">("All")
   const [statFilter,   setStatFilter]   = useState<ComplaintStatus   | "All">("All")
   const [page,         setPage]         = useState(1)
   const [detail,       setDetail]       = useState<Complaint | null>(null)
+
+  useEffect(() => {
+    if (!accessToken) return
+    setLoadError(null)
+    complaintService.list(accessToken).then((result) => {
+      setComplaints(result.data.map(toViewComplaint))
+      setHasLoaded(true)
+    }).catch(() => {
+      setLoadError("Unable to load complaints. Please try again.")
+      setHasLoaded(true)
+    })
+  }, [accessToken])
 
   // Filtering
   const filtered = complaints.filter(c => {
@@ -514,9 +554,12 @@ export default function HRComplaintsPage() {
   const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
   const hasFilters = search !== "" || catFilter !== "All" || prioFilter !== "All" || statFilter !== "All"
 
-  function updateStatus(id: number, status: ComplaintStatus) {
-    setComplaints(prev => prev.map(c => c.id === id ? { ...c, status } : c))
-    if (detail?.id === id) setDetail(prev => prev ? { ...prev, status } : prev)
+  async function updateStatus(id: number, status: ComplaintStatus) {
+    if (!accessToken) return
+    const result = await complaintService.updateStatus(id, status, accessToken)
+    const updated = toViewComplaint(result.data)
+    setComplaints(prev => prev.map(c => c.id === id ? updated : c))
+    if (detail?.id === id) setDetail(updated)
   }
 
   function clearFilters() {
@@ -564,6 +607,18 @@ export default function HRComplaintsPage() {
         {/* ── Table ── */}
         <div className="flex-1 overflow-auto p-5">
           <div className="rounded-xl border border-border bg-card shadow-sm">
+            {isLoading && (
+              <div className="flex items-center justify-center gap-2 px-5 py-16 text-xs text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" /> Loading complaints...
+              </div>
+            )}
+            {!isLoading && loadError && (
+              <div className="flex flex-col items-center justify-center gap-2 px-5 py-16 text-center">
+                <AlertCircle className="size-8 text-destructive" />
+                <p className="text-xs text-muted-foreground">{loadError}</p>
+              </div>
+            )}
+            {!isLoading && !loadError && (
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border">
@@ -678,9 +733,10 @@ export default function HRComplaintsPage() {
                 )}
               </tbody>
             </table>
+            )}
 
             {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
+            {!isLoading && !loadError && <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
               <p className="text-xs text-muted-foreground">
                 {filtered.length === 0
                   ? "No results"
@@ -714,7 +770,7 @@ export default function HRComplaintsPage() {
                   <ChevronRight className="size-4" />
                 </button>
               </div>
-            </div>
+            </div>}
           </div>
         </div>
       </main>

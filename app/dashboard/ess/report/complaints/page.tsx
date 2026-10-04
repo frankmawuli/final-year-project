@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import {
   AlertCircle, CheckCircle2, Clock, ShieldAlert, Eye, EyeOff,
   MessageSquare, ChevronRight, Plus, X, Paperclip, Send, Loader2,
@@ -8,24 +8,14 @@ import {
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
 import { uploadService } from "@/services/upload.service"
+import { complaintService, type ComplaintCategory, type ComplaintPriority, type ApiComplaint } from "@/services/complaint.service"
 
 // ── Types ────────────────────────────────────────────────────────
-type ComplaintCategory = "Workplace Harassment" | "Discrimination" | "Safety Concern" | "Manager Conduct" | "Policy Violation" | "Other"
 type ComplaintStatus   = "Submitted" | "Under Investigation" | "Resolved" | "Closed"
-type ComplaintPriority = "Low" | "Medium" | "High" | "Critical"
+type Complaint = ApiComplaint
 
-interface Complaint {
-  id:             number
-  ref:            string
-  title:          string
-  category:       ComplaintCategory
-  priority:       ComplaintPriority
-  submittedOn:    string
-  status:         ComplaintStatus
-  anonymous:      boolean
-  description:    string
-  attachmentUrl?: string
-  updates:        { date: string; text: string }[]
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
 }
 
 // ── Style maps ───────────────────────────────────────────────────
@@ -75,9 +65,6 @@ const CATEGORIES: ComplaintCategory[] = [
 const PRIORITIES: ComplaintPriority[] = ["Low", "Medium", "High", "Critical"]
 
 // ── Seed data ─────────────────────────────────────────────────────
-let _nextId  = 3
-let _nextRef = 1003
-
 const seed: Complaint[] = [
   {
     id:          1,
@@ -195,7 +182,7 @@ function ComplaintDetail({ c, onClose }: { c: Complaint; onClose: () => void }) 
 
 // ── New complaint form ────────────────────────────────────────────
 function NewComplaintForm({ onSubmit, onCancel }: {
-  onSubmit: (c: Complaint) => void
+  onSubmit: (body: { title: string; category: ComplaintCategory; priority: ComplaintPriority; description: string; anonymous: boolean; attachmentUrl?: string }) => Promise<void>
   onCancel: () => void
 }) {
   const { accessToken } = useAuth()
@@ -209,6 +196,7 @@ function NewComplaintForm({ onSubmit, onCancel }: {
   const [attachmentUrl,     setAttachmentUrl]     = useState<string | null>(null)
   const [attachmentLoading, setAttachmentLoading] = useState(false)
   const [attachmentError,   setAttachmentError]   = useState<string | null>(null)
+  const [isSubmitting,      setIsSubmitting]      = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const fieldCls = "w-full rounded-lg border border-border bg-muted/40 px-2.5 py-2 text-xs text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -237,26 +225,38 @@ function NewComplaintForm({ onSubmit, onCancel }: {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (isSubmitting) return
     if (!title.trim())       { setError("Please provide a complaint title."); return }
     if (!description.trim()) { setError("Please describe the issue."); return }
     if (attachmentLoading)   { setError("Please wait for the attachment to finish uploading."); return }
 
-    const now = new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
-    onSubmit({
-      id:             _nextId++,
-      ref:            `CMP-${_nextRef++}`,
-      title:          title.trim(),
-      category,
-      priority,
-      submittedOn:    now,
-      status:         "Submitted",
-      anonymous,
-      description:    description.trim(),
-      ...(attachmentUrl ? { attachmentUrl } : {}),
-      updates:        [{ date: now, text: "Complaint received and queued for review by HR." }],
-    })
+    setError("")
+    setIsSubmitting(true)
+    try {
+      await onSubmit({
+        title: title.trim(),
+        category,
+        priority,
+        description: description.trim(),
+        anonymous,
+        ...(attachmentUrl ? { attachmentUrl } : {}),
+      })
+      setTitle("")
+      setCategory("Other")
+      setPriority("Medium")
+      setDescription("")
+      setAnonymous(false)
+      setFileName("")
+      setAttachmentUrl(null)
+      setAttachmentError(null)
+      if (fileRef.current) fileRef.current.value = ""
+    } catch {
+      setError("Unable to submit your complaint. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -382,16 +382,21 @@ function NewComplaintForm({ onSubmit, onCancel }: {
             <button
               type="button"
               onClick={onCancel}
+              disabled={isSubmitting}
               className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-foreground hover:bg-muted"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-semibold text-white hover:opacity-90"
+              disabled={isSubmitting}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <Send className="size-4" />
-              Submit Complaint
+              {isSubmitting
+                ? <Loader2 className="size-4 animate-spin" />
+                : <Send className="size-4" />
+              }
+              {isSubmitting ? "Submitting…" : "Submit Complaint"}
             </button>
           </div>
         </div>
@@ -470,15 +475,38 @@ function ComplaintCard({ c, onView }: { c: Complaint; onView: () => void }) {
 
 // ── Main page ─────────────────────────────────────────────────────
 export default function ComplaintsPage() {
-  const [complaints, setComplaints] = useState<Complaint[]>(seed)
+  const { accessToken } = useAuth()
+  const [complaints, setComplaints] = useState<Complaint[]>([])
+  const [hasLoaded, setHasLoaded] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const isLoading = Boolean(accessToken) && !hasLoaded
   const [showForm,   setShowForm]   = useState(false)
   const [viewing,    setViewing]    = useState<Complaint | null>(null)
   const [submitted,  setSubmitted]  = useState<Complaint | null>(null)
 
-  function handleSubmit(c: Complaint) {
-    setComplaints((prev) => [c, ...prev])
+  useEffect(() => {
+    if (!accessToken) return
+    setLoadError(null)
+    complaintService.list(accessToken).then((result) => {
+      setComplaints(result.data.map((complaint) => ({
+        ...complaint,
+        submittedOn: formatDate(complaint.submittedOn),
+        updates: complaint.updates.map((update) => ({ ...update, date: formatDate(update.date) })),
+      })))
+      setHasLoaded(true)
+    }).catch(() => {
+      setLoadError("Unable to load your complaints. Please try again.")
+      setHasLoaded(true)
+    })
+  }, [accessToken])
+
+  async function handleSubmit(body: { title: string; category: ComplaintCategory; priority: ComplaintPriority; description: string; anonymous: boolean; attachmentUrl?: string }) {
+    if (!accessToken) throw new Error("Not authenticated")
+    const result = await complaintService.create(body, accessToken)
+    const complaint = result.data
+    setComplaints((prev) => [complaint, ...prev])
     setShowForm(false)
-    setSubmitted(c)
+    setSubmitted(complaint)
   }
 
   return (
@@ -542,7 +570,16 @@ export default function ComplaintsPage() {
         </div>
 
         {/* ── List ── */}
-        {complaints.length > 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-white py-16 text-xs text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" /> Loading complaints...
+          </div>
+        ) : loadError ? (
+          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-white py-16 text-center">
+            <AlertCircle className="size-8 text-destructive" />
+            <p className="text-xs text-muted-foreground">{loadError}</p>
+          </div>
+        ) : complaints.length > 0 ? (
           <div className="flex flex-col gap-2.5">
             {complaints.map((c) => (
               <ComplaintCard key={c.id} c={c} onView={() => setViewing(c)} />

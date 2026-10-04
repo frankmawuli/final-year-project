@@ -45,7 +45,6 @@ const sections: Section[] = [
     icon: Clock,
     children: [
       { label: "Clock In / Clock Out", href: "/dashboard/ess/attendance" },
-      { label: "Overtime", href: "/dashboard/ess/overtime",  },
       { label: "Worksheet", href: "/dashboard/ess/worksheet" },
     ],
   },
@@ -54,7 +53,6 @@ const sections: Section[] = [
     icon: CreditCard,
     children: [
       { label: "My Requests", href: "/dashboard/ess/leave" },
-      { label: "History", href: "/dashboard/ess/leave/history" },
     ],
   },
   {
@@ -78,7 +76,6 @@ const sections: Section[] = [
     label: "Report",
     icon: FileBarChart2,
     children: [
-      { label: "My Reports",   href: "/dashboard/ess/report"      },
       { label: "Complaints",   href: "/dashboard/ess/report/complaints" },
     ],
   },

@@ -34,6 +34,13 @@ interface PaginationMeta {
 }
 
 export const employeeService = {
+  getMe: (token: string) =>
+    api.get<{ success: boolean; data: ApiEmployee & {
+      company: { id: string; name: string; timezone: string | null }
+    } }>("/employees/me", {
+      Authorization: `Bearer ${token}`,
+    }),
+
   list: (
     params: {
       search?: string

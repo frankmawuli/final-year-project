@@ -16,8 +16,8 @@ const sidebarNav = [
   { label: "Job Listings",         active: true,  href: "/dashboard/hr/jobs"       },
   { label: "Applicants",           active: false, href: "/dashboard/hr/applicants" },
   { label: "Candidate Evaluation", active: false, href: "/dashboard/hr/evaluation" },
-  { label: "Interview Scheduling", active: false, href: "#"                        },
-  { label: "History",              active: false, href: "#"                        },
+  { label: "Interview Scheduling", active: false, href: "/dashboard/hr/interviews" },
+  { label: "History",              active: false, href: "/dashboard/hr/history" },
 ]
 
 const JOB_STATUS_LABELS: Record<ApiJobStatus, string> = {

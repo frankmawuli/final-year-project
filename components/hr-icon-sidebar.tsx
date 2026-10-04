@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTheme } from "next-themes"
 import {
   LayoutDashboard,
   Briefcase,
@@ -22,12 +23,17 @@ const navItems = [
   { icon: Users,           href: "/dashboard/hr/employees",  label: "Employees",
     matchGroup: ["/dashboard/hr/employees", "/dashboard/hr/departments", "/dashboard/hr/payroll", "/dashboard/hr/leave", "/dashboard/hr/history"] },
   { icon: Monitor,         href: "/dashboard/hr/reports",    label: "Reports"   },
-  { icon: ClipboardList,   href: "/dashboard/hr/tasks",      label: "Tasks"     },
+  // { icon: ClipboardList,   href: "/dashboard/hr/tasks",      label: "Tasks"     },
   { imgSrc: chatbotSvg,    href: "/dashboard/hr/assistant",  label: "Assistant" },
 ]
 
 export function HRIconSidebar() {
   const pathname = usePathname()
+  const { resolvedTheme, setTheme } = useTheme()
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+  }
 
   return (
     <aside className="flex w-[84px] shrink-0 flex-col items-center border-r border-border bg-sidebar py-5">
@@ -73,7 +79,13 @@ export function HRIconSidebar() {
 
       {/* Bottom */}
       <div className="flex flex-col items-center gap-1">
-        <button className="flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground" title="Toggle theme">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="flex size-12 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+          title="Toggle theme"
+          aria-label="Toggle theme"
+        >
           <Moon className="size-5.5" />
         </button>
         <Link

@@ -873,16 +873,16 @@ export default function CompanyOnboardingPage() {
         open={!!inviteLink}
         onOpenChange={(open) => { if (!open) router.push("/dashboard/hr") }}
       >
-        <DialogContent showCloseButton={false}>
+        <DialogContent showCloseButton={false} className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Your workspace is ready 🎉</DialogTitle>
             <DialogDescription>
               Share this link with your team. Anyone with the link can create their account and join your workspace.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted px-2.5 py-2">
+          <div className="flex w-full min-w-0 items-center gap-1.5 rounded-lg border border-border bg-muted px-2.5 py-2">
             <LinkIcon className="size-4 shrink-0 text-muted-foreground" />
-            <span className="flex-1 truncate text-[12px] text-foreground">{inviteLink}</span>
+            <span className="min-w-0 flex-1 truncate text-[12px] text-foreground">{inviteLink}</span>
             <button
               type="button"
               onClick={() => {
