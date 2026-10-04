@@ -313,7 +313,7 @@ export default function Payroll() {
         <div className="flex flex-col gap-2">
           <div className="grid grid-cols-[1fr_120px_40px] gap-1.5 px-1">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Allowance</span>
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Amount ($)</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Amount (₵)</span>
             <span />
           </div>
           {allowances.map((a, i) => (

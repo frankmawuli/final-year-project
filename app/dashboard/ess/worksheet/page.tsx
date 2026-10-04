@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
 import { attendanceService, type ApiAttendanceRecord } from "@/services/attendance.service"
 
-type AttendanceStatus = "present" | "absent" | "leave" | "holiday" | "weekend"
+type AttendanceStatus = "present" | "absent" | "pending" | "upcoming" | "leave" | "holiday" | "weekend"
 
 interface AttendanceDay {
   date: number
@@ -28,6 +28,8 @@ const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const STATUS_STYLES: Record<AttendanceStatus, { label: string; band: string; text: string }> = {
   present: { label: "Present", band: "bg-emerald-100", text: "text-emerald-700" },
   absent: { label: "Absent", band: "bg-rose-100", text: "text-rose-700" },
+  pending: { label: "Pending", band: "bg-blue-100", text: "text-blue-700" },
+  upcoming: { label: "Upcoming", band: "bg-slate-100", text: "text-slate-500" },
   leave: { label: "Leave", band: "bg-amber-100", text: "text-amber-700" },
   holiday: { label: "Holiday", band: "bg-sky-100", text: "text-sky-700" },
   weekend: { label: "Weekend", band: "bg-slate-100", text: "text-slate-500" },
@@ -39,7 +41,7 @@ function formatTime(value: string | null) {
     : undefined
 }
 
-function getMonthDays(month: Date, records: ApiAttendanceRecord[]) {
+function getMonthDays(month: Date, records: ApiAttendanceRecord[], today: Date) {
   const firstDay = new Date(month.getFullYear(), month.getMonth(), 1).getDay()
   const dayCount = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate()
   const previousMonthDays = new Date(month.getFullYear(), month.getMonth(), 0).getDate()
@@ -52,6 +54,8 @@ function getMonthDays(month: Date, records: ApiAttendanceRecord[]) {
   for (let date = 1; date <= dayCount; date += 1) {
     const calendarDate = new Date(month.getFullYear(), month.getMonth(), date)
     const weekday = calendarDate.getDay()
+    const isToday = calendarDate.toDateString() === today.toDateString()
+    const isFuture = calendarDate > today && !isToday
     const isoDate = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-${String(date).padStart(2, "0")}`
     const record = recordByDate.get(isoDate)
     const day: AttendanceDay = record
@@ -64,7 +68,13 @@ function getMonthDays(month: Date, records: ApiAttendanceRecord[]) {
         }
       : {
           date,
-          status: weekday === 0 || weekday === 6 ? "weekend" : "absent",
+          status: weekday === 0 || weekday === 6
+            ? "weekend"
+            : isFuture
+              ? "upcoming"
+              : isToday
+                ? "pending"
+                : "absent",
           hours: "0.00 Hrs",
         }
     cells.push({ date, currentMonth: true, day })
@@ -85,7 +95,7 @@ export default function WorksheetPage() {
   const today = new Date()
   const fromDate = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-01`
   const toDate = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-${String(new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate()).padStart(2, "0")}`
-  const cells = useMemo(() => getMonthDays(month, records), [month, records])
+  const cells = useMemo(() => getMonthDays(month, records, today), [month, records, today])
   const monthLabel = month.toLocaleDateString("en-US", { month: "long", year: "numeric" })
 
   useEffect(() => {
