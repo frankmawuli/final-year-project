@@ -22,6 +22,7 @@ interface AuthContextValue {
   loading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
+  loginAsSuperAdmin: (email: string, password: string) => Promise<void>
   loginWithGoogle: (idToken: string) => Promise<void>
   register: (fullName: string, email: string, password: string) => Promise<void>
   logout: () => void
@@ -74,6 +75,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(u)
       if (mustChangePassword) {
         router.push("/auth/change-password")
+      } else if (role === "SUPER_ADMIN") {
+        router.push("/dashboard/admin")
       } else if (role === "HR_ADMIN" && numberOfLogins === 0) {
         router.push("/onboarding")
       } else if (role === "HR_ADMIN") {
@@ -88,6 +91,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(
     async (email: string, password: string) => {
       const res = await authService.login(email, password)
+      applySession(res.data)
+    },
+    [applySession],
+  )
+
+  const loginAsSuperAdmin = useCallback(
+    async (email: string, password: string) => {
+      const res = await authService.login(email, password)
+      if (res.data.role !== "SUPER_ADMIN") {
+        throw new Error("This account does not have Super Admin access")
+      }
       applySession(res.data)
     },
     [applySession],
@@ -154,6 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         isAuthenticated: !!user,
         login,
+        loginAsSuperAdmin,
         loginWithGoogle,
         register,
         logout,

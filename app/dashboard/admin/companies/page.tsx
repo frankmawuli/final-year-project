@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   Archive,
   ArrowDownUp,
@@ -24,6 +24,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/context/auth-context"
+import { adminService } from "@/services/admin.service"
 
  type CompanyStatus = "Active" | "Suspended" | "Archived"
 type Plan = "Enterprise" | "Professional" | "Starter"
@@ -71,7 +73,12 @@ function planClass(plan: Plan) {
 }
 
 export default function AdminCompaniesPage() {
-  const [companies, setCompanies] = useState(initialCompanies)
+  const { accessToken } = useAuth()
+  const [companies, setCompanies] = useState<Company[]>([])
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
   const [query, setQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<CompanyStatus | "All">("All")
   const [planFilter, setPlanFilter] = useState<Plan | "All">("All")
@@ -81,6 +88,33 @@ export default function AdminCompaniesPage() {
   const [draft, setDraft] = useState(emptyDraft)
   const [menuId, setMenuId] = useState<number | null>(null)
   const [notice, setNotice] = useState("")
+
+  useEffect(() => {
+    if (!accessToken) return
+    adminService.companies(accessToken, page, 25, query)
+      .then((response) => {
+        setTotal(response.pagination.total)
+        setCompanies(response.data.map((company) => ({
+          id: Array.from(company.id).reduce((hash, character) => (hash * 31 + character.charCodeAt(0)) >>> 0, 0),
+          name: company.name,
+          industry: company.industry ?? "Not specified",
+          location: [company.city, company.country].filter(Boolean).join(", ") || "Not specified",
+          status: "Active",
+          plan: "Professional",
+          employees: company._count.employees,
+          users: company._count.users,
+          jobs: company._count.Jobs,
+          applications: 0,
+          usage: 0,
+          admin: "Not available",
+          adminEmail: "",
+          created: new Date(company.createdAt).toLocaleDateString(),
+          lastActive: "Not available",
+        })))
+      })
+      .catch((reason: Error) => setError(reason.message))
+      .finally(() => setLoading(false))
+  }, [accessToken, page, query])
 
   const filteredCompanies = useMemo(() => {
     return companies
@@ -175,6 +209,8 @@ export default function AdminCompaniesPage() {
               </div>
 
               <div className="overflow-x-auto">
+                {error && <p className="p-4 text-xs text-destructive">{error}</p>}
+                {loading && <p className="p-4 text-xs text-muted-foreground">Loading companies...</p>}
                 <table className="w-full min-w-230 text-left">
                   <thead className="bg-muted/40 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"><tr><th className="px-4 py-3">Company</th><th className="px-4 py-3">Plan</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Employees</th><th className="px-4 py-3">Usage</th><th className="px-4 py-3">Last active</th><th className="px-4 py-3 text-right">Actions</th></tr></thead>
                   <tbody className="divide-y divide-border/70">
@@ -193,7 +229,7 @@ export default function AdminCompaniesPage() {
                 </table>
                 {filteredCompanies.length === 0 && <div className="flex flex-col items-center gap-2 px-6 py-16 text-center"><Building2 className="size-8 text-muted-foreground/50" /><p className="text-sm font-semibold">No companies found</p><p className="text-xs text-muted-foreground">Try changing your search or filters.</p></div>}
               </div>
-              <div className="flex items-center justify-between border-t border-border/70 px-4 py-3 text-[11px] text-muted-foreground"><span>Showing {filteredCompanies.length} of {companies.length} companies</span><span>Mock data · ready for API integration</span></div>
+              <div className="flex items-center justify-between border-t border-border/70 px-4 py-3 text-[11px] text-muted-foreground"><span>Showing {filteredCompanies.length} of {total} companies</span><div className="flex items-center gap-2"><Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((value) => value - 1)}>Previous</Button><span>Page {page}</span><Button variant="outline" size="sm" disabled={filteredCompanies.length < 25} onClick={() => setPage((value) => value + 1)}>Next</Button></div></div>
             </CardContent>
           </Card>
         </div>

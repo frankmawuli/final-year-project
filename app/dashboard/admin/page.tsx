@@ -1,11 +1,10 @@
 
 "use client"
 
-import type { ElementType } from "react"
+import { useEffect, useState, type ElementType } from "react"
 import {
   Activity,
   AlertTriangle,
-  ArrowUpRight,
   BriefcaseBusiness,
   Building2,
   CheckCircle2,
@@ -13,7 +12,6 @@ import {
   FileText,
   HeartPulse,
   MessageSquareText,
-  MoreHorizontal,
   Server,
   ShieldCheck,
   Users,
@@ -22,6 +20,8 @@ import {
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import AdminSidebar from "@/components/admin-sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/context/auth-context"
+import { adminService, type AdminOverviewData } from "@/services/admin.service"
 
 type Stat = {
   label: string
@@ -32,63 +32,58 @@ type Stat = {
   tone: string
 }
 
-const stats: Stat[] = [
+function buildStats(data: AdminOverviewData): Stat[] {
+  return [
   {
     label: "Total companies",
-    value: "248",
-    detail: "214 active accounts",
-    trend: "+12.4%",
+    value: data.companies.total.toLocaleString(),
+    detail: "Platform company accounts",
+    trend: "",
     icon: Building2,
     tone: "bg-blue-500/10 text-blue-600",
   },
   {
     label: "Total users",
-    value: "18,642",
-    detail: "16,908 active this month",
-    trend: "+8.7%",
+    value: data.users.total.toLocaleString(),
+    detail: `${data.users.active.toLocaleString()} active accounts`,
+    trend: "",
     icon: Users,
     tone: "bg-emerald-500/10 text-emerald-600",
   },
   {
     label: "Employees",
-    value: "15,284",
-    detail: "1,126 added this quarter",
-    trend: "+6.2%",
+    value: data.employees.total.toLocaleString(),
+    detail: `${data.employees.active.toLocaleString()} active employees`,
+    trend: "",
     icon: ShieldCheck,
     tone: "bg-violet-500/10 text-violet-600",
   },
   {
     label: "Active job listings",
-    value: "1,426",
-    detail: "382 posted this month",
-    trend: "+14.1%",
+    value: data.jobs.active.toLocaleString(),
+    detail: "Currently open listings",
+    trend: "",
     icon: BriefcaseBusiness,
     tone: "bg-amber-500/10 text-amber-600",
   },
   {
     label: "Applications",
-    value: "32,891",
-    detail: "4,208 received this month",
-    trend: "+18.6%",
+    value: data.applications.total.toLocaleString(),
+    detail: "Applications across the platform",
+    trend: "",
     icon: FileText,
     tone: "bg-rose-500/10 text-rose-600",
   },
   {
     label: "Interviews",
-    value: "5,814",
-    detail: "1,032 scheduled this month",
-    trend: "+9.3%",
+    value: data.interviews.total.toLocaleString(),
+    detail: "Interviews across the platform",
+    trend: "",
     icon: MessageSquareText,
     tone: "bg-cyan-500/10 text-cyan-600",
   },
-]
-
-const activity = [
-  { title: "Northstar Labs upgraded to Enterprise", detail: "Subscription change", time: "12 min ago", icon: ArrowUpRight, tone: "text-emerald-600 bg-emerald-500/10" },
-  { title: "New company account created", detail: "Brightpath Technologies", time: "38 min ago", icon: Building2, tone: "text-blue-600 bg-blue-500/10" },
-  { title: "Bulk user import completed", detail: "Acme Corporation · 184 users", time: "1 hr ago", icon: Users, tone: "text-violet-600 bg-violet-500/10" },
-  { title: "System settings updated", detail: "Password policy", time: "2 hrs ago", icon: ShieldCheck, tone: "text-amber-600 bg-amber-500/10" },
-]
+  ]
+}
 
 const subscriptionPlans = [
   { name: "Enterprise", companies: 42, percentage: 17, color: "bg-primary", chartColor: "#4f6ef7" },
@@ -127,14 +122,34 @@ function StatCard({ stat }: { stat: Stat }) {
 }
 
 export default function AdminDashboardPage() {
+  const { accessToken } = useAuth()
+  const [overview, setOverview] = useState<AdminOverviewData | null>(null)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (!accessToken) return
+    adminService.overview(accessToken)
+      .then((response) => setOverview(response.data))
+      .catch((reason: Error) => setError(reason.message))
+  }, [accessToken])
+
+  const stats = overview ? buildStats(overview) : []
+  const activity = overview?.recentActivity.map((item) => ({
+    title: item.action,
+    detail: [item.company?.name, item.actor?.name, typeof item.details === "string" ? item.details : ""].filter(Boolean).join(" · "),
+    time: new Date(item.timestamp).toLocaleString(),
+    icon: item.company ? Building2 : Users,
+    tone: item.company ? "text-blue-600 bg-blue-500/10" : "text-violet-600 bg-violet-500/10",
+  })) ?? []
+
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <AdminSidebar />
       <main className="min-w-0 flex-1 overflow-y-auto p-5 sm:p-7">
         <div className="mx-auto max-w-350 space-y-6">
-        
+          {error && <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-xs text-destructive">{error}</div>}
           <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" aria-label="Platform metrics">
-            {stats.map((stat) => <StatCard key={stat.label} stat={stat} />)}
+            {stats.length > 0 ? stats.map((stat) => <StatCard key={stat.label} stat={stat} />) : <p className="text-sm text-muted-foreground">Loading platform statistics...</p>}
           </section>
 
           <section className="grid gap-5 xl:grid-cols-[1.35fr_0.65fr]">
@@ -150,8 +165,8 @@ export default function AdminDashboardPage() {
               <CardContent className="pt-1">
                 <div className="flex items-end justify-between gap-3">
                   <div>
-                    <p className="text-3xl font-bold tracking-tight">32,891</p>
-                    <p className="mt-1 text-xs text-muted-foreground"><span className="font-semibold text-emerald-600">+18.6%</span> compared with last month</p>
+                    <p className="text-3xl font-bold tracking-tight">{overview?.applications.total.toLocaleString() ?? "-"}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">All applications across the platform</p>
                   </div>
                   <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                     <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-primary" />Applications</span>
@@ -238,6 +253,7 @@ export default function AdminDashboardPage() {
                     </div>
                   )
                 })}
+                {activity.length === 0 && <p className="py-4 text-xs text-muted-foreground">Loading recent activity...</p>}
               </CardContent>
             </Card>
 

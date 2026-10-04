@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
+import { useState, type FormEvent } from "react"
 import {
   BarChart3,
   Bell,
@@ -19,6 +20,9 @@ import { Avatar } from "@/components/avatar"
 import { Logo } from "@/components/logo"
 import { useAuth } from "@/context/auth-context"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 
 const navItems = [
   { label: "Overview", href: "/dashboard/admin", icon: LayoutDashboard },
@@ -38,10 +42,30 @@ function isItemActive(pathname: string, href: string) {
 export default function AdminSidebar() {
   const pathname = usePathname()
   const { resolvedTheme, setTheme } = useTheme()
-  const { user } = useAuth()
+  const { user, loading, loginAsSuperAdmin, logout } = useAuth()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+  const needsLogin = !loading && !user
+  const needsAccess = !loading && !!user && user.role !== "SUPER_ADMIN"
+
+  async function submitSuperAdminLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError("")
+    setSubmitting(true)
+    try {
+      await loginAsSuperAdmin(email, password)
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Unable to sign in as Super Admin")
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
-    <aside className="flex min-h-screen w-62 shrink-0 flex-col border-r border-border bg-sidebar px-3 py-5">
+    <>
+      <aside className="flex min-h-screen w-62 shrink-0 flex-col border-r border-border bg-sidebar px-3 py-5">
       <Link href="/dashboard/admin" className="mb-8 flex items-center gap-2 px-2">
         <Logo width={34} height={34} />
         <div className="min-w-0">
@@ -104,6 +128,28 @@ export default function AdminSidebar() {
         </button>
 
       </div>
-    </aside>
+      </aside>
+
+      <Dialog open={needsLogin || needsAccess}>
+        <DialogContent onPointerDownOutside={(event) => event.preventDefault()} onEscapeKeyDown={(event) => event.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle>{needsAccess ? "Super Admin access required" : "Sign in to Platform Admin"}</DialogTitle>
+            <DialogDescription>
+              {needsAccess ? "This area is restricted to Super Admin accounts. Sign out of the current account to continue." : "Use a Super Admin account to access platform statistics, companies, users, and audit logs."}
+            </DialogDescription>
+          </DialogHeader>
+          {needsAccess ? (
+            <Button type="button" variant="outline" onClick={logout}>Use another account</Button>
+          ) : (
+            <form className="space-y-4" onSubmit={submitSuperAdminLogin}>
+              <label className="block space-y-1.5 text-xs font-medium">Email<Input value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="username" required /></label>
+              <label className="block space-y-1.5 text-xs font-medium">Password<Input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete="current-password" required /></label>
+              {error && <p className="text-xs text-destructive">{error}</p>}
+              <Button className="w-full" type="submit" disabled={submitting}>{submitting ? "Signing in..." : "Sign in as Super Admin"}</Button>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
