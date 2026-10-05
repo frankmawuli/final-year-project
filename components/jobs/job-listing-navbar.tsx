@@ -47,7 +47,7 @@ export function JobListingNavbar() {
                 href={href}
                 className={cn(
                   "text-[13.5px] font-medium transition-colors",
-                  active ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"
+                  active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {label}

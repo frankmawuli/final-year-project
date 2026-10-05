@@ -1,47 +1,39 @@
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export function CtaSection() {
   return (
-    <section className="bg-white py-16">
+    <section className="bg-white py-14 sm:py-16">
       <div className="mx-auto max-w-7xl px-5">
-        <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 px-8 py-11">
-          {/* Decorative dot grid — left */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-44 opacity-[0.07]">
-            <div className="grid h-full grid-cols-5 gap-2.5 p-6">
-              {Array.from({ length: 60 }).map((_, i) => (
-                <div key={i} className="h-1.5 w-1.5 rounded-full bg-primary" />
-              ))}
-            </div>
-          </div>
-          {/* Decorative dot grid — right */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-44 opacity-[0.07]">
-            <div className="grid h-full grid-cols-5 gap-2.5 p-6">
-              {Array.from({ length: 60 }).map((_, i) => (
-                <div key={i} className="h-1.5 w-1.5 rounded-full bg-primary" />
-              ))}
-            </div>
-          </div>
-
-          <div className="relative flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="text-center md:text-left">
-              <h2 className="mb-1.5 text-2xl font-bold text-gray-900">
-                Ready to transform your HR operations?
-              </h2>
-              <p className="text-sm text-gray-500">
-                Join thousands of HR teams already using CoreRecruiter.
-              </p>
-            </div>
-            <div className="flex flex-shrink-0 flex-wrap gap-2.5">
-              <Button className="h-11 bg-primary px-5 text-white hover:bg-primary/90">
+        <div className="grid overflow-hidden rounded-[1.4rem] border-2 border-primary/80 bg-white md:grid-cols-[1.06fr_0.94fr]">
+          <div className="flex flex-col justify-center px-7 py-12 sm:px-10 sm:py-14 lg:px-14">
+            <h2 className="max-w-xl text-4xl font-semibold leading-[1.1] tracking-tight text-gray-900 sm:text-5xl">
+              Let&apos;s upgrade your
+              <br />
+              HR experience
+              <br />
+              with CoreRecruiter
+            </h2>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button className="h-11 rounded-full bg-primary px-7 text-xs font-semibold text-white hover:bg-primary/90">
                 Request Demo
               </Button>
               <Button
                 variant="outline"
-                className="h-11 border-gray-200 px-5 text-gray-700 hover:bg-gray-50"
+                className="h-11 rounded-full border-gray-900 bg-gray-900 px-7 text-xs font-semibold text-white hover:bg-gray-800 hover:text-white"
               >
-                Talk to Sales
+                Watch Video
               </Button>
             </div>
+          </div>
+          <div className="relative min-h-[260px] overflow-hidden bg-[#eaf3f8] md:min-h-[340px]">
+            <Image
+              src="/assets/core-recruiter.png"
+              alt="CoreRecruiter workforce dashboard"
+              fill
+              className="object-contain object-center p-5 sm:p-8"
+              sizes="(max-width: 768px) 100vw, 45vw"
+            />
           </div>
         </div>
       </div>

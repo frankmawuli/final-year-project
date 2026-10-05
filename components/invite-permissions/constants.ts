@@ -1,6 +1,6 @@
 import type { InviteLinkRole } from "@/services/onboarding.service"
 
-export const ROLE_OPTIONS: InviteLinkRole[] = ["HR_ADMIN", "HR_MANAGER", "SUPER_ADMIN", "EMPLOYEE"]
+export const ROLE_OPTIONS: InviteLinkRole[] = ["HR_ADMIN", "EMPLOYEE"]
 
 export const ROLE_LABELS: Record<InviteLinkRole, string> = {
   HR_ADMIN:    "HR Admin",

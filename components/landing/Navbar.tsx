@@ -22,13 +22,23 @@ export function Navbar() {
 
         <nav className="hidden items-center md:flex">
           {navLinks.map((link) => (
-            <button
-              key={link.label}
-              className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
-            >
-              {link.label}
-              {link.hasDropdown && <ChevronDown className="h-3.5 w-3.5 text-gray-400" />}
-            </button>
+            link.label === "Pricing" ? (
+              <Link
+                key={link.label}
+                href="/pricing"
+                className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <button
+                key={link.label}
+                className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
+              >
+                {link.label}
+                {link.hasDropdown && <ChevronDown className="h-3.5 w-3.5 text-gray-400" />}
+              </button>
+            )
           ))}
         </nav>
 

@@ -12,11 +12,13 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white text-gray-900">
       <Navbar />
       <HeroSection />
-      <TrustedBySection />
-      <FeaturesSection />
-      <WhyChooseSection />
-      <StatsBanner />
-      <CtaSection />
+      {/* <TrustedBySection /> */}
+      <div className="flex flex-col gap-19 pb-10">
+        <FeaturesSection />
+        <WhyChooseSection />
+        {/* <StatsBanner /> */}
+        <CtaSection />
+      </div>
       <Footer />
     </div>
   );
