@@ -1,4 +1,4 @@
-import { BarChart3, Check, Clock3, Search, Users } from "lucide-react";
+import { Bot, CheckCircle2, Clock3, Search, Users } from "lucide-react";
 
 const teamMembers = ["Jems R", "Jedan D", "Emily J", "Jordan M"];
 
@@ -63,19 +63,29 @@ function TeamPreview() {
 function PerformancePreview() {
   return (
     <div className="flex h-40 items-center justify-between rounded-xl bg-[#f5f7fa] px-4 sm:h-48 sm:px-7">
-      <div className="w-[42%]">
-        <div className="mb-3 flex -space-x-2">
-          {teamMembers.slice(0, 4).map((member) => <span key={member} className="h-7 w-7 rounded-full border-2 border-white bg-[#d9b596]" />)}
-          <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-gray-900 text-sm text-white">+</span>
+      <div className="w-[48%]">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#4384f5] text-white">
+            <Bot className="h-4 w-4" />
+          </span>
+          <span className="text-[9px] font-semibold text-gray-700">Recruiting Agent</span>
         </div>
-        <p className="text-[8px] leading-relaxed text-gray-500">Monitor employee development, goal completion, and team performance in one view.</p>
-        <p className="mt-3 text-[9px] font-semibold text-gray-700">Today</p>
-        <p className="text-[8px] text-gray-400">20% uncompleted</p>
+        <div className="space-y-1.5 text-[8px] text-gray-500">
+          <div className="flex items-center gap-1.5 rounded bg-white px-2 py-1.5 shadow-sm">
+            <CheckCircle2 className="h-3 w-3 text-green-500" /> Screen candidates
+          </div>
+          <div className="flex items-center gap-1.5 rounded bg-white px-2 py-1.5 shadow-sm">
+            <CheckCircle2 className="h-3 w-3 text-green-500" /> Rank top matches
+          </div>
+          <div className="flex items-center gap-1.5 rounded bg-white px-2 py-1.5 shadow-sm">
+            <Clock3 className="h-3 w-3 text-[#4384f5]" /> Awaiting approval
+          </div>
+        </div>
       </div>
       <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-[conic-gradient(#4384f5_0deg_288deg,#dfe4e9_288deg_360deg)] sm:h-32 sm:w-32">
         <div className="flex h-[84%] w-[84%] flex-col items-center justify-center rounded-full bg-[#f5f7fa]">
           <span className="text-2xl font-medium text-gray-800">80%</span>
-          <span className="text-[9px] text-gray-400">Work Complete</span>
+          <span className="text-[9px] text-gray-400">Workflow Ready</span>
         </div>
       </div>
     </div>
@@ -98,14 +108,13 @@ function AttendancePreview() {
 
 export function FeaturesSection() {
   return (
-    <section className="bg-[#f8f8f8] py-16 sm:py-20">
+    <section className="bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-5">
         <div className="mb-10 grid gap-5 md:grid-cols-[1.2fr_0.8fr] md:items-end lg:mb-12">
           <h2 className="max-w-xl text-3xl font-semibold leading-[1.12] tracking-tight text-gray-900 sm:text-4xl">
             Powerful Features to <span className="text-gray-500">Simplify</span><br className="hidden sm:block" /> HR Management
           </h2>
           <p className="max-w-sm text-sm leading-relaxed text-gray-500">
-            Manage onboarding, attendance, performance, and more from one smart dashboard. Treandex helps your HR team work faster, smarter, and with total clarity.
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
@@ -119,7 +128,7 @@ export function FeaturesSection() {
           </article>
           <article className="rounded-xl bg-white p-3 shadow-sm sm:p-4">
             <PerformancePreview />
-            <div className="px-1 pb-1 pt-4"><h3 className="text-xl font-semibold text-gray-900">Performance Management</h3><p className="mt-1 text-xs leading-relaxed text-gray-500">Set goals, track progress, and build high-performing teams with transparent feedback and clear growth paths.</p></div>
+            <div className="px-1 pb-1 pt-4"><h3 className="text-xl font-semibold text-gray-900">Agentic AI Workflows</h3><p className="mt-1 text-xs leading-relaxed text-gray-500">Let intelligent agents screen candidates, coordinate tasks, and move hiring workflows forward with human approval at every step.</p></div>
           </article>
           <article className="rounded-xl bg-white p-3 shadow-sm sm:p-4">
             <AttendancePreview />

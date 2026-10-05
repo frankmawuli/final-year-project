@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
 import { DashboardMockup } from "./DashboardMockup";
 
 export function HeroSection() {
@@ -22,18 +23,27 @@ export function HeroSection() {
               and manage your entire workforce in one intelligent platform
             </p>
             <div className="mb-6 flex flex-wrap items-center gap-2.5">
-              <Button className="h-11 gap-1.5 bg-primary px-5 text-white hover:bg-primary/90">
-                Request Demo
-                <ArrowRight className="h-4 w-4" />
+              <Button asChild className="h-11 gap-1.5 bg-primary px-5 text-white hover:bg-primary/90">
+                <Link href="/auth/signup">
+                  Request Demo
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </Button>
               <Button
+                asChild
                 variant="outline"
                 className="h-11 gap-2 border-gray-200 px-4 text-gray-700 hover:bg-gray-50"
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
-                  <Play className="h-3 w-3 fill-primary text-primary" />
-                </span>
-                Explore Features
+                <a
+                  href="https://www.youtube.com/channel/UCarbnbLtSEjzPMFaQF3hpkQ"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
+                    <Play className="h-3 w-3 fill-primary text-primary" />
+                  </span>
+                  Explore Features
+                </a>
               </Button>
             </div>
             <div className="flex flex-wrap gap-4 text-xs text-gray-500">
@@ -48,7 +58,6 @@ export function HeroSection() {
 
           {/* Right — dashboard preview */}
           <div className="relative">
-            <div className="absolute -inset-8 rounded-3xl bg-gradient-to-br from-primary/5 via-blue-50/40 to-indigo-50/60" />
             <div className="relative">
               <DashboardMockup />
             </div>

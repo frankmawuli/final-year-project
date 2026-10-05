@@ -13,10 +13,12 @@ export default function LandingPage() {
       <Navbar />
       <HeroSection />
       {/* <TrustedBySection /> */}
-      <FeaturesSection />
-      <WhyChooseSection />
-      {/* <StatsBanner /> */}
-      <CtaSection />
+      <div className="flex flex-col gap-19 pb-10">
+        <FeaturesSection />
+        <WhyChooseSection />
+        {/* <StatsBanner /> */}
+        <CtaSection />
+      </div>
       <Footer />
     </div>
   );

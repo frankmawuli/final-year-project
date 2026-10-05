@@ -68,18 +68,18 @@ function TeamPanel() {
 
 export function WhyChooseSection() {
   return (
-    <section className="bg-gray-50 py-16 sm:py-20">
+    <section data-gsap="scroll-section" className="bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-5">
-        <div className="mb-10 flex items-end justify-between gap-5 sm:mb-12">
+        <div data-gsap="scroll-item" className="mb-10 flex items-end justify-between gap-5 sm:mb-12">
           <div><div className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Why choose CoreRecruiter</div><h2 className="max-w-xl text-3xl font-semibold leading-tight text-gray-900 sm:text-4xl">A clearer way to run your HR team.</h2></div>
-          <p className="hidden max-w-xs text-right text-xs leading-relaxed text-gray-500 md:block">Connected tools, useful insights, and less busywork for every stage of the employee journey.</p>
+          <p className="hidden max-w-xs text-right text-xs leading-relaxed text-gray-500 md:block"></p>
         </div>
-        <div className="grid gap-3 md:grid-cols-[0.9fr_1.9fr_0.9fr]">
+        <div data-gsap="scroll-item" className="grid gap-3 md:grid-cols-[0.9fr_1.9fr_0.9fr]">
           <AnalyticsPanel />
           <GrowthPanel />
           <CollaborationPanel />
         </div>
-        <div className="mt-3 grid gap-3 md:grid-cols-[1.05fr_1fr]">
+        <div data-gsap="scroll-item" className="mt-3 grid gap-3 md:grid-cols-[1.05fr_1fr]">
           <AccountingPanel />
           <TeamPanel />
         </div>
