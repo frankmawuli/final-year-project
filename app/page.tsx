@@ -12,10 +12,10 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white text-gray-900">
       <Navbar />
       <HeroSection />
-      <TrustedBySection />
+      {/* <TrustedBySection /> */}
       <FeaturesSection />
       <WhyChooseSection />
-      <StatsBanner />
+      {/* <StatsBanner /> */}
       <CtaSection />
       <Footer />
     </div>

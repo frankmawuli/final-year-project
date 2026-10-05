@@ -18,6 +18,14 @@ function formatDate(value: string) {
   return new Date(value).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
 }
 
+function normalizeComplaint(complaint: ApiComplaint): Complaint {
+  return {
+    ...complaint,
+    submittedOn: formatDate(complaint.submittedOn),
+    updates: complaint.updates.map((update) => ({ ...update, date: formatDate(update.date) })),
+  }
+}
+
 // ── Style maps ───────────────────────────────────────────────────
 const categoryColor: Record<ComplaintCategory, string> = {
   "Workplace Harassment": "#dc2626",
@@ -488,11 +496,7 @@ export default function ComplaintsPage() {
     if (!accessToken) return
     setLoadError(null)
     complaintService.list(accessToken).then((result) => {
-      setComplaints(result.data.map((complaint) => ({
-        ...complaint,
-        submittedOn: formatDate(complaint.submittedOn),
-        updates: complaint.updates.map((update) => ({ ...update, date: formatDate(update.date) })),
-      })))
+      setComplaints(result.data.map(normalizeComplaint))
       setHasLoaded(true)
     }).catch(() => {
       setLoadError("Unable to load your complaints. Please try again.")
@@ -503,7 +507,7 @@ export default function ComplaintsPage() {
   async function handleSubmit(body: { title: string; category: ComplaintCategory; priority: ComplaintPriority; description: string; anonymous: boolean; attachmentUrl?: string }) {
     if (!accessToken) throw new Error("Not authenticated")
     const result = await complaintService.create(body, accessToken)
-    const complaint = result.data
+    const complaint = normalizeComplaint(result.data)
     setComplaints((prev) => [complaint, ...prev])
     setShowForm(false)
     setSubmitted(complaint)
