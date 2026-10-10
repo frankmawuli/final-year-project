@@ -15,8 +15,6 @@ import { complaintService, type ApiComplaint } from "@/services/complaint.servic
 // ── Sidebar nav ───────────────────────────────────────────────
 const sidebarNav = [
   { label: "All Reports",  href: "/dashboard/hr/reports"              },
-  { label: "Performance",  href: "#"                                   },
-  { label: "Incidents",    href: "#"                                   },
   { label: "Complaints",   href: "/dashboard/hr/reports/complaints"   },
 ]
 

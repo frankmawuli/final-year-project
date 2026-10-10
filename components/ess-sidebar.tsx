@@ -4,16 +4,20 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import {
+  CalendarDays,
   Clock,
   ChevronDown,
   ChevronUp,
-  CreditCard,
-  Banknote,
-  MessageSquare,
-  FileBarChart2,
+  Files,
+  WalletCards,
+  ClipboardList,
   LogOut,
+  UserRound,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Avatar } from "@/components/avatar"
+import { useAuth } from "@/context/auth-context"
+import { employeeService } from "@/services/employee.service"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,14 +54,14 @@ const sections: Section[] = [
   },
   {
     label: "Leave & Time Off",
-    icon: CreditCard,
+    icon: CalendarDays,
     children: [
       { label: "My Requests", href: "/dashboard/ess/leave" },
     ],
   },
   {
     label: "Compensation",
-    icon: Banknote,
+    icon: WalletCards,
     children: [
       { label: "Allowance", href: "/dashboard/ess/payroll" },
       { label: "Payslips", href: "/dashboard/ess/payroll/tax" },
@@ -66,7 +70,7 @@ const sections: Section[] = [
   
   {
     label: "Documents",
-    icon: MessageSquare,
+    icon: Files,
     children: [
       { label: "My Documents",  href: "/dashboard/ess/documents" },
       { label: "Upload Files",  href: "/dashboard/ess/documents/upload" },
@@ -74,7 +78,7 @@ const sections: Section[] = [
   },
   {
     label: "Report",
-    icon: FileBarChart2,
+    icon: ClipboardList,
     children: [
       { label: "Complaints",   href: "/dashboard/ess/report/complaints" },
     ],
@@ -83,6 +87,25 @@ const sections: Section[] = [
 
 export default function EssSidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname()
+  const { accessToken, user, logout } = useAuth()
+  const [employee, setEmployee] = useState<Awaited<ReturnType<typeof employeeService.getMe>>["data"] | null>(null)
+
+  useEffect(() => {
+    if (!accessToken) return
+    let cancelled = false
+
+    employeeService.getMe(accessToken)
+      .then(({ data }) => {
+        if (!cancelled) setEmployee(data)
+      })
+      .catch(() => {
+        if (!cancelled) setEmployee(null)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [accessToken])
 
   // Close mobile drawer whenever the route changes
   useEffect(() => {
@@ -109,6 +132,10 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
       return next
     })
   }
+
+  const profileName = employee?.user?.name ?? user?.name ?? "Employee"
+  const profileRole = employee?.jobTitle ?? employee?.user?.role ?? "Employee"
+  const profileAvatar = employee?.user?.avatarUrl
 
   return (
     <aside className="flex h-full w-[220px] shrink-0 flex-col bg-sidebar py-4 pl-3 pr-2.5 shadow-sm">
@@ -141,17 +168,9 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
                 )}
               >
                 <span
-                  className={cn(
-                    "flex size-7 shrink-0 items-center justify-center rounded-md",
-                    sectionActive ? "bg-primary/10" : "bg-muted"
-                  )}
+                  className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary"
                 >
-                  <Icon
-                    className={cn(
-                      "size-4",
-                      sectionActive ? "text-primary" : "text-muted-foreground"
-                    )}
-                  />
+                  <Icon className="size-4 text-primary-foreground" />
                 </span>
                 <span className="flex-1">{section.label}</span>
                 {isOpen ? (
@@ -240,26 +259,43 @@ export default function EssSidebar({ onClose }: { onClose?: () => void }) {
         })}
       </nav>
 
-      {/* User profile at bottom */}
-      <div className="mt-auto pt-3">
+      {/* Profile and user menu at bottom */}
+      <div className="mt-auto border-t border-border pt-3">
+        <Link
+          href="/dashboard/ess/profile"
+          className={cn(
+            "mb-2 flex w-full items-center gap-2 rounded-lg px-1.5 py-2 text-xs font-medium transition-colors",
+            pathname === "/dashboard/ess/profile"
+              ? "text-primary"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          )}
+        >
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary">
+            <UserRound className="size-4 text-primary-foreground" />
+          </span>
+          <span>My Profile</span>
+        </Link>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex w-full items-center gap-2.5 rounded-lg px-1.5 py-2 text-left transition-colors hover:bg-muted">
+            <Link
+              href="/dashboard/ess/profile"
+              className="flex w-full items-center gap-2.5 rounded-lg px-1.5 py-2 text-left transition-colors hover:bg-muted"
+            >
               <div className="size-8 shrink-0 overflow-hidden rounded-full bg-muted">
-                <img
-                  src="https://i.pravatar.cc/32?img=11"
-                  alt="Michael Smith"
-                  className="size-full object-cover"
-                />
+                <Avatar src={profileAvatar} alt={profileName} className="size-full" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-medium text-foreground">Michael Smith</p>
-                <p className="truncate text-[11px] text-muted-foreground">HR Administrator</p>
+                <p className="truncate text-xs font-medium text-foreground">{profileName}</p>
+                <p className="truncate text-[11px] text-muted-foreground">{profileRole}</p>
               </div>
-            </button>
+            </Link>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" align="start" className="w-48">
-            <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+            <DropdownMenuItem
+              onClick={logout}
+              className="cursor-pointer text-destructive focus:text-destructive"
+            >
               <LogOut className="mr-1.5 size-4" />
               Log out
             </DropdownMenuItem>

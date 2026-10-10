@@ -86,9 +86,7 @@ function buildStats(data: AdminOverviewData): Stat[] {
 }
 
 const subscriptionPlans = [
-  { name: "Enterprise", companies: 42, percentage: 17, color: "bg-primary", chartColor: "#4f6ef7" },
-  { name: "Professional", companies: 96, percentage: 39, color: "bg-cyan-500", chartColor: "#22d3ee" },
-  { name: "Starter", companies: 110, percentage: 44, color: "bg-amber-400", chartColor: "#fbbf24" },
+  { name: "Standard", companies: 7, percentage: 100, color: "bg-primary", chartColor: "#4f6ef7" },
 ]
 
 const healthChecks = [
@@ -190,7 +188,7 @@ export default function AdminDashboardPage() {
             <Card className="shadow-sm">
               <CardHeader className=" pb-4">
                 <CardTitle>Subscription mix</CardTitle>
-                <p className="mt-1 text-xs text-muted-foreground">248 total company accounts</p>
+                <p className="mt-1 text-xs text-muted-foreground">7 total company accounts</p>
               </CardHeader>
               <CardContent className="pt-5">
                 <div className="h-44 w-full">

@@ -32,6 +32,7 @@ import { useAuth } from "@/context/auth-context"
 import { onboardingService } from "@/services/onboarding.service"
 import { uploadService } from "@/services/upload.service"
 import { ApiError } from "@/lib/api-client"
+import { z } from "zod"
 
 // ── Step definitions ───────────────────────────────────────────
 const STEPS = [
@@ -359,7 +360,7 @@ function Step1({
         <div>
           <FieldLabel>Registration Number</FieldLabel>
           <TextInput value={data.registrationNumber} onChange={(v) => onChange("registrationNumber", v)}
-            placeholder="e.g. RC-123456" />
+            placeholder="e.g. BN335953367" error={errors.registrationNumber} />
         </div>
       </div>
 
@@ -380,7 +381,7 @@ function Step1({
         <div>
           <FieldLabel>Year Founded</FieldLabel>
           <TextInput value={data.yearFounded} onChange={(v) => onChange("yearFounded", v)}
-            placeholder="e.g. 2015" type="number" />
+            placeholder="e.g. 2015" type="number" error={errors.yearFounded} />
         </div>
         <div>
           <FieldLabel>Company Website</FieldLabel>
@@ -413,7 +414,7 @@ function Step2({ data, errors, onChange }: {
         <div>
           <FieldLabel>State / Region</FieldLabel>
           <TextInput value={data.state} onChange={(v) => onChange("state", v)}
-            placeholder="e.g. California" />
+            placeholder="Greater Accra" />
         </div>
       </div>
 
@@ -421,12 +422,12 @@ function Step2({ data, errors, onChange }: {
         <div>
           <FieldLabel required>City</FieldLabel>
           <TextInput value={data.city} onChange={(v) => onChange("city", v)}
-            placeholder="e.g. San Francisco" error={errors.city} />
+            placeholder="e.g. Accra" error={errors.city} />
         </div>
         <div>
           <FieldLabel>Postal Code</FieldLabel>
           <TextInput value={data.postalCode} onChange={(v) => onChange("postalCode", v)}
-            placeholder="e.g. 94105" />
+            placeholder="e.g. GH-123-7893" error={errors.postalCode} />
         </div>
       </div>
 
@@ -601,6 +602,55 @@ interface Step4Data {
   inviteRows: InviteRow[]
 }
 
+const currentYear = new Date().getFullYear()
+
+const step1Schema = z.object({
+  companyName: z.string().trim().min(1, "Company name is required."),
+  registrationNumber: z.string().refine(
+    (value) => !value || /^[A-Z]{2}\d{9}$/i.test(value),
+    "Use the format BN335953367 (2 letters followed by 9 digits)."
+  ),
+  industry: z.string().min(1, "Please select an industry."),
+  companySize: z.string().min(1, "Please select a company size."),
+  yearFounded: z.string().refine(
+    (value) => !value || (/^\d{4}$/.test(value) && Number(value) >= 1800 && Number(value) <= currentYear),
+    `Enter a year between 1800 and ${currentYear}.`
+  ),
+  website: z.string().refine(
+    (value) => !value || z.url().safeParse(value).success,
+    "Enter a valid URL starting with https://"
+  ),
+})
+
+function isValidPostalCode(country: string, postalCode: string) {
+  const patterns: Record<string, RegExp> = {
+    "United States": /^\d{5}(-\d{4})?$/,
+    "United Kingdom": /^[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}$/i,
+    Canada: /^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i,
+    Australia: /^\d{4}$/,
+    Ghana: /^[A-Z]{2}-\d{3}-\d{4}$/i,
+    Nigeria: /^\d{6}$/,
+  }
+  return (patterns[country] ?? /^[A-Za-z0-9][A-Za-z0-9 -]{2,9}$/).test(postalCode)
+}
+
+const step2Schema = z.object({
+  country: z.string().min(1, "Please select a country."),
+  state: z.string(),
+  city: z.string().trim().min(1, "City is required."),
+  address: z.string(),
+  postalCode: z.string(),
+  timezone: z.string().min(1, "Please select a timezone."),
+}).superRefine((data, ctx) => {
+  if (data.postalCode && !isValidPostalCode(data.country, data.postalCode)) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["postalCode"],
+      message: "Enter a valid postal code for the selected country.",
+    })
+  }
+})
+
 // ── Left sidebar step list ─────────────────────────────────────
 function SidebarStepList({ current }: { current: number }) {
   return (
@@ -688,31 +738,49 @@ export default function CompanyOnboardingPage() {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
+  function updateFieldError(schema: z.ZodType, data: unknown, field: string) {
+    const result = schema.safeParse(data)
+    const issue = result.success
+      ? undefined
+      : result.error.issues.find((item) => item.path[0] === field)
+    setErrors((current) => {
+      const next = { ...current }
+      if (issue) next[field] = issue.message
+      else delete next[field]
+      return next
+    })
+  }
+
   function setS1(field: keyof Step1Data, val: string) {
-    setStep1((f) => ({ ...f, [field]: val }))
-    setErrors((e) => { const n = { ...e }; delete n[field]; return n })
+    const next = { ...step1, [field]: val }
+    setStep1(next)
+    updateFieldError(step1Schema, next, field)
   }
   function setS2(field: keyof Step2Data, val: string) {
-    setStep2((f) => ({ ...f, [field]: val }))
-    setErrors((e) => { const n = { ...e }; delete n[field]; return n })
+    const next = { ...step2, [field]: val }
+    setStep2(next)
+    updateFieldError(step2Schema, next, field)
   }
 
   function validate(): boolean {
-    const errs: Record<string, string> = {}
-    if (step === 1) {
-      if (!step1.companyName.trim())  errs.companyName  = "Company name is required."
-      if (!step1.industry)            errs.industry     = "Please select an industry."
-      if (!step1.companySize)         errs.companySize  = "Please select a company size."
-      if (step1.website && !/^https?:\/\/.+/.test(step1.website))
-        errs.website = "Enter a valid URL starting with https://"
+    const result = step === 1
+      ? step1Schema.safeParse(step1)
+      : step === 2
+        ? step2Schema.safeParse(step2)
+        : { success: true as const, data: undefined }
+
+    if (result.success) {
+      setErrors({})
+      return true
     }
-    if (step === 2) {
-      if (!step2.country) errs.country  = "Please select a country."
-      if (!step2.city.trim()) errs.city = "City is required."
-      if (!step2.timezone) errs.timezone = "Please select a timezone."
+
+    const nextErrors: Record<string, string> = {}
+    for (const issue of result.error.issues) {
+      const field = issue.path[0]
+      if (typeof field === "string" && !nextErrors[field]) nextErrors[field] = issue.message
     }
-    setErrors(errs)
-    return Object.keys(errs).length === 0
+    setErrors(nextErrors)
+    return false
   }
 
   async function handleNext() {
