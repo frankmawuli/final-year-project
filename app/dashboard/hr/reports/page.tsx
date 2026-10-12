@@ -10,7 +10,7 @@ import {
 import {
   TrendingUp, FileBarChart2, AlertCircle, Target, MessageSquare,
   CheckCircle2, Clock, XCircle, FileText, CalendarDays, Building2,
-  X, ChevronRight,
+  X, ChevronRight, HardHat,
 } from "lucide-react"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { cn } from "@/lib/utils"
@@ -441,18 +441,21 @@ export default function HRReportsPage() {
     <>
       <HrNavigationPannel navItems={sidebarNav} />
 
-      <main className="flex-1 overflow-auto p-5">
-        <div className="space-y-5">
+      <main className="flex min-h-0 flex-1 flex-col overflow-auto p-5">
+        <div className="flex min-h-0 flex-1 flex-col gap-5">
 
           {/* ── KPI cards ── */}
+          {false && (
           <div className="grid grid-cols-4 gap-3">
             <KpiCard label="Total Reports"      value={kpi.total}    sub="All submissions"         color="#3b6feb"  />
             <KpiCard label="Active"             value={kpi.active}   sub="Submitted or in review"  color="#f59e0b"  />
             <KpiCard label="Resolved"           value={kpi.resolved} sub="Resolved and closed"     color="#10b981"  />
             <KpiCard label="Avg Perf Score"     value={kpi.avgScore} sub="Across scored reports"   color="#9333ea" suffix="/100" />
           </div>
+          )}
 
           {/* ── Charts grid ── */}
+          {false && (
           <div className="grid grid-cols-[3fr_2fr] gap-5">
 
             {/* Left column */}
@@ -575,6 +578,17 @@ export default function HRReportsPage() {
               </div>
             </div>
           </div>
+          )}
+
+          <section className="flex min-h-0 flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-primary/30 bg-card p-8 text-center shadow-sm">
+            <div className="mb-5 flex size-20 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <HardHat className="size-10" aria-hidden="true" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Under Construction</h2>
+            <p className="mt-2 max-w-md text-sm text-muted-foreground">
+              The reports dashboard is being improved. Charts and deeper report insights will be available here soon.
+            </p>
+          </section>
         </div>
       </main>
 

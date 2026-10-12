@@ -20,9 +20,6 @@ import { employeeService } from "@/services/employee.service"
 import { leaveService, type ApiLeaveRequest } from "@/services/leave.service"
 import { payrollService, type ApiMyPayslip } from "@/services/payroll.service"
 
-const employeePhoto = "/assets/b24745fcb2f3b6fd6f823ae99430dfe5ab8cd460.png"
-
-
 function useLiveClock() {
   const [now, setNow] = useState<Date | null>(null)
 
@@ -122,6 +119,13 @@ export default function AttendancePage() {
   const formatMoney = (amount: number, currency: string) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount)
   const employeeName = employee?.user?.name ?? "there"
+  const employeeInitials = employeeName
+    .split(" ")
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase()
   const employmentType = employee?.employmentType?.replace("_", "-").toLowerCase() ?? "—"
   const joinDate = employee?.joinDate
     ? new Date(employee.joinDate).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
@@ -206,36 +210,11 @@ export default function AttendancePage() {
                 </h2>
                 <ChevronDown className="size-4 text-muted-foreground" />
               </div>
-              <div className="rounded-xl border border-border bg-background p-3">
-                <p className="text-sm font-bold text-primary">
-                  BlueCross BlueShield
+              <div className="rounded-xl border border-dashed border-border bg-background p-4 text-center">
+                <p className="text-xs text-muted-foreground">
+                  No benefits information is available yet.
                 </p>
-                <div className="mt-3 grid grid-cols-2 gap-3 text-[10px] text-muted-foreground">
-                  <span>
-                    Member Name
-                    <br />
-                    <b className="text-foreground">Muhammad Rifky</b>
-                  </span>
-                  <span>
-                    Network Name
-                    <br />
-                    <b className="text-foreground">Standard</b>
-                  </span>
-                  <span>
-                    ID
-                    <br />
-                    <b className="text-foreground">XX123456789</b>
-                  </span>
-                  <span>
-                    Coverage
-                    <br />
-                    <b className="text-foreground">Medical & Rx</b>
-                  </span>
-                </div>
               </div>
-              <Button className="gradient-primary mt-3 w-full border-0 text-xs">
-                View Compensation
-              </Button>
             </section>
           </div>
 
@@ -253,11 +232,17 @@ export default function AttendancePage() {
                   <UserRound className="size-5 text-white/75" />
                 </div>
                 <div className="flex items-center gap-3">
-                  <img
-                    src={employee?.user?.avatarUrl ?? employeePhoto}
-                    alt={employeeName}
-                    className="size-12 rounded-full object-cover ring-2 ring-white/40"
-                  />
+                  {employee?.user?.avatarUrl ? (
+                    <img
+                      src={employee.user.avatarUrl}
+                      alt={employeeName}
+                      className="size-12 rounded-full object-cover ring-2 ring-white/40"
+                    />
+                  ) : (
+                    <span className="flex size-12 items-center justify-center rounded-full bg-white/20 text-sm font-semibold ring-2 ring-white/40">
+                      {employeeInitials}
+                    </span>
+                  )}
                   <div>
                     <p className="text-xs font-semibold">
                       {employeeName}

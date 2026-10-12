@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { useAuth } from "@/context/auth-context"
+import { resolveAssetUrl } from "@/lib/asset-url"
 import { jobsService, type ApiApplicant, type ApiApplicantStatus } from "@/services/jobs.service"
 import { FilterDropdown } from "@/components/filter-dropdown"
 
@@ -65,8 +66,17 @@ function XIcon() {
 
 // ── Sub-components ────────────────────────────────────────────
 function CandidateAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | null }) {
-  if (avatarUrl) {
-    return <img src={avatarUrl} alt={name} className="size-9 shrink-0 rounded-full object-cover" />
+  const [imageFailed, setImageFailed] = useState(false)
+  const resolvedAvatarUrl = resolveAssetUrl(avatarUrl)
+  if (resolvedAvatarUrl && !imageFailed) {
+    return (
+      <img
+        src={resolvedAvatarUrl}
+        alt={name}
+        className="size-9 shrink-0 rounded-full object-cover"
+        onError={() => setImageFailed(true)}
+      />
+    )
   }
   const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
   return (

@@ -89,6 +89,19 @@
     --gradient-end: #3B5BDB;
 }
 
+  select {
+    color-scheme: light;
+  }
+
+  .dark select {
+    color-scheme: dark;
+  }
+
+  select option {
+    background-color: var(--card);
+    color: var(--foreground);
+  }
+
 @theme inline {
     --font-sans: var(--font-sans);
     --color-sidebar-ring: var(--sidebar-ring);

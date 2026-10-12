@@ -5,8 +5,10 @@ import {
   Search, ChevronLeft, ChevronRight,
   ChevronDown, X, Download, MapPin, Mail, Phone,
   Briefcase, GraduationCap, FileText, Star, Loader2,
+  Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { resolveAssetUrl } from "@/lib/asset-url"
 import HrNavigationPannel from "@/components/hr-navigation-pannel"
 import { useAuth } from "@/context/auth-context"
 import { FilterDropdown } from "@/components/filter-dropdown"
@@ -30,6 +32,7 @@ interface Candidate {
   appliedAt:  string
   location:   string
   aiScore:    number
+  screeningSummary: string | null
   status:     EvalStatus
   about:      string
   skills:     string[]
@@ -82,6 +85,24 @@ function formatDuration(start?: string, end?: string | null): string {
   return `${s} – ${e}`
 }
 
+function screeningPoints(summary: string): { label: string; value: string }[] {
+  return summary
+    .split(/\s+\|\s+/)
+    .flatMap((section) => section.split(/\s+·\s+/))
+    .flatMap((point) => {
+      const separator = point.indexOf(":")
+      const scoreMatch = point.trim().match(/^(Skills|Experience|Education|Nice-to-have)\s+(.+)$/)
+      const label = scoreMatch ? scoreMatch[1] : separator === -1 ? "Reason" : point.slice(0, separator).trim()
+      const value = scoreMatch ? scoreMatch[2] : separator === -1 ? point.trim() : point.slice(separator + 1).trim()
+
+      if (!value) return []
+      if (label === "Strengths" || label === "Gaps") {
+        return value.split(/;\s*/).filter(Boolean).map((item) => ({ label, value: item }))
+      }
+      return [{ label, value }]
+    })
+}
+
 // MISMATCH: ApiApplicant.job has no department name — job.type used as fallback.
 // Ask the backend to include department.name in the applicant job payload.
 const JOB_TYPE_LABEL: Record<string, string> = {
@@ -98,12 +119,13 @@ function fromApplicant(a: ApiApplicant): Candidate {
     name:       a.candidate.name,
     email:      a.candidate.email,
     phone:      a.candidate.phone    ?? "",
-    photo:      a.candidate.avatarUrl ?? "",
+    photo:      resolveAssetUrl(a.candidate.avatarUrl) ?? "",
     position:   a.job.title,
     department: JOB_TYPE_LABEL[a.job.type] ?? a.job.type,
     appliedAt:  formatDate(a.appliedAt),
     location:   a.candidate.location ?? "",
     aiScore:    a.aiScore             ?? 0,
+    screeningSummary: a.screeningSummary,
     status:     STATUS_TO_EVAL[a.status],
     about:      a.candidate.about    ?? "",
     skills:     [],
@@ -228,6 +250,8 @@ function ProfilePanel({
   loading:   boolean
   onClose:   () => void
 }) {
+  const [photoFailed, setPhotoFailed] = useState(false)
+
   return (
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
@@ -243,11 +267,12 @@ function ProfilePanel({
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Identity */}
           <div className="flex items-start gap-3">
-            {candidate.photo ? (
+            {candidate.photo && !photoFailed ? (
               <img
                 src={candidate.photo}
                 alt={candidate.name}
                 className="size-16 shrink-0 rounded-full object-cover ring-2 ring-border"
+                onError={() => setPhotoFailed(true)}
               />
             ) : (
               <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary/10 ring-2 ring-border text-base font-bold text-primary">
@@ -290,6 +315,26 @@ function ProfilePanel({
               <p className="text-xs font-medium text-foreground">{candidate.appliedAt}</p>
             </div>
           </div>
+
+          {/* AI reasoning */}
+          {candidate.screeningSummary && (
+            <div className="rounded-xl border border-primary/20 bg-primary/5 px-3.5 py-3">
+              <p className="mb-2.5 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                <Sparkles className="size-3.5 text-primary" />AI Screening Reason
+              </p>
+              <ul className="space-y-2">
+                {screeningPoints(candidate.screeningSummary).map((point, index) => (
+                  <li key={`${point.label}-${index}`} className="flex items-start gap-2 text-xs leading-relaxed">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span className="min-w-0 text-muted-foreground">
+                      <span className="font-semibold text-foreground">{point.label}:</span>{" "}
+                      {point.value}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* About */}
           {candidate.about && (

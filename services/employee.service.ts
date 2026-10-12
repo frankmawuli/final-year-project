@@ -23,6 +23,14 @@ export interface ApiEmployee {
   department: { id: number; name: string } | null
   officeLocation: { id: number; name: string; city: string } | null
   skills: Array<string | { id?: number; name: string }>
+  experiences: Array<{
+    id?: number
+    title: string
+    company: string
+    duration: string | null
+    responsibilities: string | null
+    position?: number
+  }>
   leaveRequests?: unknown[]
 }
 
@@ -34,6 +42,19 @@ interface PaginationMeta {
 }
 
 export const employeeService = {
+  autofillFromCv: async (file: File, token: string) => {
+    const formData = new FormData()
+    formData.append("file", file)
+    return api.upload<{
+      success: boolean
+      data: {
+        about: string | null
+        skills: string[]
+        experience: Array<{ role: string; company: string; duration: string; responsibilities: string | null }>
+      }
+    }>("/employees/me/cv-autofill", formData, { Authorization: `Bearer ${token}` })
+  },
+
   getMe: (token: string) =>
     api.get<{ success: boolean; data: ApiEmployee & {
       company: { id: string; name: string; timezone: string | null }
@@ -102,6 +123,12 @@ export const employeeService = {
       bio?: string
       joinDate?: string
       endDate?: string
+      experience?: Array<{
+        title: string
+        company: string
+        duration?: string
+        responsibilities?: string
+      }>
       isActive?: boolean
     },
     token: string,

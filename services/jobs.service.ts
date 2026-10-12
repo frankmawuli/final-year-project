@@ -131,6 +131,7 @@ export interface ApiApplicant {
   id:             string
   status:         ApiApplicantStatus
   aiScore:        number | null
+  screeningSummary: string | null
   expectedSalary: number | null
   appliedAt:      string
   updatedAt:      string
